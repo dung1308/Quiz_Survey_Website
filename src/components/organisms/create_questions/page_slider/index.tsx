@@ -55,7 +55,6 @@ const SliderComponent: React.FC<SliderProps> = ({ slides, setSlideIndex, addData
                             onClick={() => handleCardClick(index)}
                             >
                               <h2>{slide.no}</h2>
-                              <p>{slide.type}</p>
                             </Card>
           ))}
           </Box>

@@ -1,5 +1,5 @@
 import React, {} from 'react';
-import {Box, Button, Grid, TextField} from '@mui/material';
+import {Card, CardContent, Box, Button, Grid, TextField, List, ListItem} from '@mui/material';
 import FillAnswer from '../../../molecules/fillAnswer';
 
 
@@ -15,13 +15,26 @@ const Quiz_Template: React.FC<any> = (
     
     return (
         <Box sx = {{display: 'flex', justifyContent: 'center', textAlign: '-webkit-center' }}>
-            <TextField id="filled-basic" label="Question" variant="filled" />
-            <Box>
-                <FillAnswer answerLabel = {'Answer 1'} value={1}/>
-                <FillAnswer answerLabel = {'Answer 2'} value={2}/>
-                <FillAnswer answerLabel = {'Answer 3'} value={3}/>
-                <FillAnswer answerLabel = {'Answer 4'} value={4}/>
-            </Box>
+            
+            <Card>
+                <CardContent>
+                    <TextField id="filled-basic" label="Question" variant="filled" />
+                    <List>
+                    <ListItem>
+                        <FillAnswer answerLabel = {'Answer 1'} value={1} />
+                    </ListItem>
+                    <ListItem>
+                        <FillAnswer answerLabel = {'Answer 2'} value={2} />
+                    </ListItem>
+                    <ListItem>
+                        <FillAnswer answerLabel = {'Answer 3'} value={3} />
+                    </ListItem>
+                    <ListItem>
+                        <FillAnswer answerLabel = {'Answer 4'} value={4} />
+                    </ListItem>
+                    </List>
+                </CardContent>
+            </Card>
         </Box>
     );
 };

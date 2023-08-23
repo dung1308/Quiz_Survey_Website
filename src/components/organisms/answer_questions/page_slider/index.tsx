@@ -9,25 +9,16 @@ interface Slide {
 interface SliderProps {
   slides: Slide[];
   setSlideIndex:any,
-  addData:any,
+  scrollRefs:any,
 }
 
-const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, addData}) => {
+const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, scrollRefs}) => {
   const [slideData, setSlideData] = useState(slides);
   
 
   const handleCardClick = (no: number) => {
     setSlideIndex(no);
-  };
-  
-  const addSlide = () => {
-    const newSlide: Slide = {
-      no: slideData.length+1,
-      type: '',
-    };
-    
-    setSlideData([...slideData, newSlide])
-    addData(newSlide);
+    scrollRefs.current[no]?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -41,7 +32,7 @@ const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, 
           <Tooltip title={slideData.map((slide, index) => `${index + 1}. ${slide.no}`).join('\n')}>
           <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center', height: '100vh' }}>
           {slideData.map((slide, index) => (
-                            <Card  sx={{ p: 2, m:2, width:3/4, textAlign:'center', ':hover': {
+                            <Card sx={{ p: 2, m:2, width:3/4, textAlign:'center', ':hover': {
                               boxShadow: 20}}} key={index} 
                             onClick={() => handleCardClick(index)}
                             >

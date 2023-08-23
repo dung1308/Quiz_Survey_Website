@@ -21,7 +21,7 @@ const RowComponent:React.FC<any> = ({row, status}) => {
       <StyledTableCell align="right">{row.category}</StyledTableCell>
       <StyledTableCell align="center">
           <Box sx={{justifyContent: 'space-between'}}>
-          <Button variant="contained" color="secondary" href='/answer_page' size="small">
+          <Button variant="contained" color="secondary" href='/edit' size="small">
               edit
           </Button>
           

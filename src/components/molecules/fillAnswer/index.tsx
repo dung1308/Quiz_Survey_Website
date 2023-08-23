@@ -17,7 +17,7 @@ const FillAnswer: React.FC<any> = (
           {answerLabel}
         </InputLabel>
         <Input
-          id="input-with-icon-adornment" placeholder="Fill in your answer"
+          id="input-with-icon-adornment" placeholder="Fill in your answer" 
           startAdornment={
             <InputAdornment position="start">
               <Checkbox

@@ -1,48 +1,11 @@
 import React, {} from 'react';
-import Layout from '../../components/templates/layout';import {Box, Container, CssBaseline, Grid, Typography, TextField, FormControl, InputLabel, MenuItem,SelectChangeEvent, Select } from '@mui/material';
+import Layout from '../../components/templates/layout';import {Box, Container, CssBaseline, Grid, Typography, TextField, FormControl, InputLabel, MenuItem,SelectChangeEvent, Select, Button } from '@mui/material';
 
 import SliderComponent from '../../components/organisms/create_questions/page_slider';
 import Quiz_Template from '../../components/organisms/create_questions/quiz';
 import Type_Question from '../../components/organisms/create_questions/type_question';
 
-const questions = [
-    {
-        no:1,
-        question: 'What is the capital of France?',
-        choices: ['Paris', 'London', 'New York'],
-        type: 'Quiz',
-        answer: 'Paris',
-        select: false,
-    },
-    {
-        no:2,
-        question: 'What is the largest planet in our solar system?',
-        choices: ['Mars', 'Jupiter', 'Venus'],
-        type: 'Quiz',
-        answer: 'Jupiter',
-    },
-    {
-        no:3,
-        question: 'What is the boiling point of water?',
-        choices: ['100°C', '0°C', '50°C'],
-        type: 'Quiz',
-        answer: '100°C',
-    },
-    {
-        no:4,
-        question: 'What is the largest planet in our solar system?',
-        choices: ['Mars', 'Jupiter', 'Venus'],
-        type: 'Quiz',
-        answer: 'Jupiter',
-    },
-    {
-        no:6,
-        question: 'What is the boiling point of water?',
-        choices: ['100°C', '0°C', '50°C'],
-        type: 'Type Answer',
-        answer: '100°C',
-    },
-];
+
 export const questions_test = [
     {
         no:1,
@@ -71,6 +34,7 @@ const CreateSurvey: React.FC<any>  = () =>  {
     const [slideIndex, setSlideIndex] = React.useState(0);
     const handleCardClick = (no: number) => {
         setSlideIndex(no);
+        setSeed(Math.random());
       };
     const [type, setType] = React.useState('');
     const handleChange = (index: number,event: SelectChangeEvent) => {
@@ -101,7 +65,7 @@ const CreateSurvey: React.FC<any>  = () =>  {
                 </Box>
 
                 {/*Making Quiz*/}
-                {questions.map((question, index) => (
+                {data.map((question, index) => (
                     (slideIndex === index  && 
                     <Box key = {seed}
                             sx={{
@@ -184,7 +148,9 @@ const CreateSurvey: React.FC<any>  = () =>  {
                         <TextField inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} sx= {{width: 3/4}}/>
                         </Box>
                     </Grid>
-
+                    <Box sx={{m:2}} >
+                        <Button color='warning' variant="contained" sx = {{color:'#52DB4B', backgroundColor:'#DB7A35'}}>Save</Button>
+                    </Box>
                 </Box>
 
             </Container>

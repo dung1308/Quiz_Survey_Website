@@ -1,10 +1,10 @@
 import React from 'react';
-import {Box, Input, InputLabel, InputAdornment, FormControl, Checkbox} from '@mui/material';
+import {Box, Input, InputLabel, InputAdornment, FormControl, Checkbox, Typography, FormControlLabel} from '@mui/material';
 
 const AnswerChoice: React.FC<any> = (
     {answerLabel, answer, value}) => {
 
-  const [checked, setChecked] = React.useState(true);
+  const [checked, setChecked] = React.useState(false);
 
   const handleChange = () => {
     setChecked(checked => !checked);
@@ -16,7 +16,7 @@ const AnswerChoice: React.FC<any> = (
         <InputLabel htmlFor="input-with-icon-adornment">
           {answerLabel}
         </InputLabel>
-        <Input disabled
+        <Input
           id="input-with-icon-adornment" value = {answer}
           startAdornment={
             <InputAdornment position="start">
@@ -29,6 +29,13 @@ const AnswerChoice: React.FC<any> = (
             </InputAdornment>
           }
         />
+        {/* <FormControlLabel
+            control={<Checkbox value={value}
+            checked={checked}
+            onChange={handleChange}
+            inputProps={{ 'aria-label': 'controlled' }} />}
+            label={<Typography variant="body1">{answer}</Typography>}
+    /> */}
       </FormControl>
     </Box>
   );

@@ -1,10 +1,11 @@
 import React, {} from 'react';
-import Layout from '../../components/templates/layout';
-import {Box, Container, CssBaseline, Grid, Typography, SelectChangeEvent} from '@mui/material';
-import Timer_Answer from '../../components/atoms/timer';
-import Quiz_Answer from '../../components/organisms/answer_questions/quiz';
-import SliderComponent_Answer from '../../components/organisms/answer_questions/page_slider';
-import Type_Answer from '../../components/organisms/answer_questions/type_question';
+import Layout from '../../components/templates/layout';import {Box, Container, CssBaseline, Grid, Typography, TextField, FormControl, InputLabel, MenuItem,SelectChangeEvent, Select, Button } from '@mui/material';
+
+import SliderComponent from '../../components/organisms/create_questions/page_slider';
+import Quiz_Template from '../../components/organisms/create_questions/quiz';
+import Type_Question from '../../components/organisms/create_questions/type_question';
+
+// Similar to the Create Quiz Page
 
 const questions = [
     {
@@ -51,14 +52,14 @@ const questions = [
 ];
 
 
-const slides = questions.map(x=>({no: x.no, type: x.type}))
+
+const slides = questions.map(x=>({no: x.no, type: ''}))
 
 
-const AnswerPage: React.FC<any>  = (time) =>  {
-    time = 1000
+const Edit: React.FC<any>  = () =>  {
     const [data, setData] = React.useState(questions); // Temporary Database
     const [seed, setSeed] = React.useState(1); // Reload State
-    const scrollRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+
 
     const addData = (data_new:any) => {
         setData([...data,data_new])
@@ -97,20 +98,13 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                 }}
                 >
        
-                    <SliderComponent_Answer slides={slides} setSlideIndex = {setSlideIndex} scrollRefs = {scrollRefs}/>
+                    <SliderComponent slides={slides} setSlideIndex = {setSlideIndex} addData = {addData}/>
                     
                 </Box>
-                <Box key = {seed}
-                            sx={{
-                                width: 2/4,
-                                height: '100vh',
-                                textAlign: '-webkit-center',
-                                overflow: 'auto'
-                            }}
-                    >
+
                 {/*Making Quiz*/}
-                {questions.map((question, index) => (
-                    (
+                {data.map((question, index) => (
+                    (slideIndex === index  && 
                     <Box key = {seed}
                             sx={{
                                 width: 2/4,
@@ -118,14 +112,13 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                                 textAlign: '-webkit-center',
                             }}
                     >
-                        <div ref={(el) => (scrollRefs.current[index] = el)}>
-                            <h1 className="text-center">Question {index + 1}</h1>
-                            {getDataType(index) === "Quiz" && <Quiz_Answer index={index + 1} question={question.question} answers = {question.choices}/>}
-                            {getDataType(index) === "Type Answer" && <Type_Answer index={index + 1} question={question.question} />}
+                        <div>
+                            <h1 className="text-center">Quiz App</h1>
+                            {getDataType(index) === "Quiz" && <Quiz_Template/>}
+                            {getDataType(index) === "Type Answer" && <Type_Question/>}
                         </div>
 
                     </Box>)))}
-                    </Box>
                 
 
                 {/*Setup Type, Timer*/}
@@ -142,15 +135,46 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                 }}
                 >
 
+                    {/*Question Type*/}
+
+                    <Box sx={{m:2}} >
+                        <Grid sx={{
+                        backgroundColor: '#C4C4C4',
+                        width: 1/2,
+                        textAlign: 'center'}}
+                        >
+                            <Typography variant="h5" sx={{color:'#2AA789'}}>Question Type</Typography>
+                        </Grid>
+                    </Box>
+
+                    <Box sx={{m:2}} >
+                        <FormControl fullWidth sx={{
+                        backgroundColor: '#C4C4C4',
+                        width: 1/2,
+                        textAlign: 'center'}}>
+                        <InputLabel id="demo-simple-select-label" color='primary' sx={{fontWeight: 'bold', color:'#000000'}}>Quiz Type</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={type}
+                            label="question type"
+                            onChange={event => handleChange(slideIndex, event)}
+                        >
+                            <MenuItem value={'Quiz'}>Quiz</MenuItem>
+                            <MenuItem value={'Type Answer'}>Type Answer</MenuItem>
+                        </Select>
+                        </FormControl>
+                    </Box>
+
 
                     {/*Timer*/}
 
                     <Grid sx={{
                     backgroundColor: '#C4C4C4',
                     width: 1/2,
-                    textAlign: 'center', m:2}}
+                    textAlign: 'center'}}
                     >
-                    <Typography variant="h5" sx={{color:'#2AA789'}}>Timer</Typography>
+                    <Typography variant="h5" sx={{color:'#2AA789'}}>Set Timer</Typography>
                     </Grid>
 
                     <Grid sx={{
@@ -158,9 +182,13 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                     width: 1/2,
                     textAlign: 'center'
                     }}>
-                        <Timer_Answer time={time}/>
+                        <Box>
+                        <TextField inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} sx= {{width: 3/4}}/>
+                        </Box>
                     </Grid>
-
+                    <Box sx={{m:2}} >
+                        <Button color='warning' variant="contained" sx = {{color:'#52DB4B', backgroundColor:'#DB7A35'}}>Save</Button>
+                    </Box>
                 </Box>
 
             </Container>
@@ -168,4 +196,4 @@ const AnswerPage: React.FC<any>  = (time) =>  {
     );
 }
 
-export default AnswerPage;
+export default Edit;
