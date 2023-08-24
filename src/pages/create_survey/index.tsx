@@ -1,5 +1,6 @@
 import React, {} from 'react';
-import Layout from '../../components/templates/layout';import {Box, Container, CssBaseline, Grid, Typography, TextField, FormControl, InputLabel, MenuItem,SelectChangeEvent, Select, Button } from '@mui/material';
+import Layout from '../../components/templates/layout';
+import {Box, Container, CssBaseline, Grid, Typography, TextField, FormControl, InputLabel, MenuItem,SelectChangeEvent, Select, Button } from '@mui/material';
 
 import SliderComponent from '../../components/organisms/create_questions/page_slider';
 import Quiz_Template from '../../components/organisms/create_questions/quiz';
@@ -95,12 +96,12 @@ const questions = [
         no:6,
         question: 'What is the largest planet in our solar system?',
         choices: ['Mars', 'Jupiter', 'Venus', 'Earth'],
-        type: 'Quiz',
+        type: 'Multi Answer Question',
         answer: 'Jupiter',
     },
 ];
 //const slides = questions_test.map(x=>({no: x.no, type: ''}))
-    const slides = questions.map(x=>({no: x.no, type: ''})) 
+    const slides = questions.map(x=>({no: x.no, type: x.question})) 
 
 const CreateSurvey: React.FC<any>  = () =>  {
     //const [data, setData] = React.useState(questions_test); // Temporary Database
@@ -130,17 +131,16 @@ const CreateSurvey: React.FC<any>  = () =>  {
     
 
     return(
-        <>
-            <CssBaseline />
+        <Box sx={{ width: '100%',}}>
+            <CssBaseline/>
             <Layout/>
-            <Container maxWidth={false} disableGutters sx={{ display: 'inline-flex' }}>
+            <Container maxWidth={false} disableGutters sx={{ display: 'inline-flex'}}>
 
                 {/*Page Slider*/}
 
                 <Box
                 sx={{
                     width: 1/4,
-                    height: '100vh',
                     backgroundColor: '#A0B3A0',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'auto'
                 }}
@@ -153,18 +153,20 @@ const CreateSurvey: React.FC<any>  = () =>  {
                 {/*Making Quiz*/}
                 {data.map((question, index) => (
                     (slideIndex === index  && 
-                    <Box key = {seed}
+                    <Box
                             sx={{
                                 width: 2/4,
-                                height: '100vh',
                                 textAlign: '-webkit-center',
                             }}
+                            key = {index}
                     >
+                        <h1 className="text-center">Create Questions</h1>
+                        <h2 className="text-center">Question {index + 1}</h2>
                         <div>
-                            <h1 className="text-center">Quiz App</h1>
-                            {getDataType(index) === "Quiz" && <Quiz_Template/>}
+                            
+                            {getDataType(index) === "Quiz" && <Quiz_Template index={index + 1} question = {question.question} answers = {question.choices}/>}
                             {getDataType(index) === "Type Answer" && <Type_Question/>}
-                            {getDataType(index) === "Multi Answer Question" && <Multi_Ans_Quiz_Template/>}
+                            {getDataType(index) === "Multi Answer Question" && <Multi_Ans_Quiz_Template answer index={index + 1} question = {question.question} answers = {question.choices}/>}
                         </div>
 
                     </Box>)))}
@@ -177,7 +179,6 @@ const CreateSurvey: React.FC<any>  = () =>  {
 
                 sx={{
                     width: 1/4,
-                    height: '100vh',
                     backgroundColor: '#5770B2', flexDirection: 'column', justifyContent: 'end',
                     textAlign: '-webkit-center',
                     overflow: 'auto',
@@ -242,7 +243,7 @@ const CreateSurvey: React.FC<any>  = () =>  {
                 </Box>
 
             </Container>
-        </>
+        </Box>
     );
 }
 

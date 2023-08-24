@@ -39,12 +39,13 @@ const SliderComponent: React.FC<SliderProps> = ({ slides, setSlideIndex, addData
             {slideData.map((slide, index) => (
               <Card
                 sx={{ p: 2, m: 2, marginBottom:'2', width: '75%', textAlign: 'center', ':hover': { boxShadow: 20 } }}
-                key={index}
                 onClick={() => handleCardClick(index)}
               >
                 <h2>{slide.no}</h2>
+                <p>{slide.type}</p>
               </Card>
             ))}
+
           </Box>
         </Tooltip>
         <Box sx={{ position: 'fixed', bottom: '20px', left:'1px', display: 'flex', justifyContent: 'center' }}>

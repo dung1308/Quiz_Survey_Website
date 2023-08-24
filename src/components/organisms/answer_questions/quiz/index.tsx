@@ -34,18 +34,6 @@ const Quiz_Answer: React.FC<any> = (
     
     return (
         <Box sx = {{display: 'flex', justifyContent: 'center', textAlign: '-webkit-center' }}>
-            {/*<Card>
-                <CardContent>
-                    <Typography>{index}. {question}</Typography>
-                    <List>
-                        {answers.map((answer:string, index:number) => (
-                            <ListItem>
-                            <AnswerChoice answerLabel = {`Answer ${index}`} answer = {answer} value={index}/>
-                            </ListItem>
-                        ))}
-                    </List>
-                </CardContent>
-                </Card>*/}
             
             <Card className="custom-card" sx = {{
                 backgroundImage: `url('https://www.transparenttextures.com/patterns/leather.png')`,

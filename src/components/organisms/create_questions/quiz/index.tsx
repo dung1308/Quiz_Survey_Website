@@ -11,13 +11,16 @@ interface Props {
 }
   
 const Quiz_Template: React.FC<any> = (
-    {}) => {
+    {index, question, answers = []}) => {
         const theme = createTheme();
         const [inputs, setInputs] = useState<{ label: string; value: number; placeholder: string; checked: boolean }[]>([{ label: '', value: 1, placeholder: '', checked: false }]);
+        const [answers_Quiz, setAnswers_Quiz] = useState(answers);
 
         const handleAddInput = () => {
             const newInput = { label: '', value: inputs.length + 1, placeholder: '', checked: false };
             setInputs([...inputs, newInput]);
+            answers_Quiz.push('')
+           
         };
 
         const handleInputChange = (index: number) => {
@@ -56,23 +59,24 @@ const Quiz_Template: React.FC<any> = (
                     borderRadius: '5px',
                     padding: '10px',
                     marginBottom: '20px',}}
+                defaultValue={question}
                 />                
                 <FormControl component="fieldset">
                 <FormLabel component="legend">Radio Button Group</FormLabel>
                 <RadioGroup>
-                    {inputs.map((input, index) => (
+                    {answers_Quiz.map((answer:string, index:number) => (
                     <FormControl key={index}>
                         <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                         <FormControlLabel
                             control={<Radio />}
                             label=""
-                            value={input.value}
-                            checked={input.checked}
+                            value={index}
                             onChange={() => handleInputChange(index)}
                             sx = {{ fontSize: '18px', fontWeight: 'bold', color: '#8d6e63', textShadow: '1px 1px #ffffff', marginRight: '10px', paddingTop: '5px' }}
                         />
                         <Input
-                            placeholder={`Input ${input.value}`}
+                            defaultValue={`${answer}`}
+                            placeholder={`Input ${index+1}`}
                             onChange={(event) => handleInputChange(index)}
                         />
                         </Box>

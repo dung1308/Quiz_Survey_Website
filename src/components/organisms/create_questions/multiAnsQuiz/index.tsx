@@ -11,13 +11,14 @@ interface Props {
 }
   
 const Multi_Ans_Quiz_Template: React.FC<any> = (
-    {}) => {
+    {index, question, answers = []}) => {
         const theme = createTheme();
         const [inputs, setInputs] = useState<{ label: string; value: number; placeholder: string; checked: boolean }[]>([{ label: '', value: 1, placeholder: '', checked: false }]);
-
+        const [answers_Quiz, setAnswers_Quiz] = useState(answers);
         const handleAddInput = () => {
             const newInput = { label: '', value: inputs.length + 1, placeholder: '', checked: false };
             setInputs([...inputs, newInput]);
+            answers_Quiz.push('');
         };
 
         const handleInputChange = (index: number) => {
@@ -50,12 +51,13 @@ const Multi_Ans_Quiz_Template: React.FC<any> = (
                     border: '2px solid #8d6e63',
                     borderRadius: '5px',
                     padding: '10px',
-                    marginBottom: '20px',}} />
+                    marginBottom: '20px',}} 
+                    defaultValue={question} />
                     <List>
 
-                    {inputs.map((input, index) => (
+                    {answers_Quiz.map((answer:string, index:number) => (
                     <ListItem key={index}>
-                        <FillAnswer answerLabel = {''} value={input.value} />
+                        <FillAnswer answerLabel = {''} value={index} defaultValue = {answer} />
                     </ListItem>
                     ))}
 

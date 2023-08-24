@@ -5,6 +5,7 @@ import Timer_Answer from '../../components/atoms/timer';
 import Quiz_Answer from '../../components/organisms/answer_questions/quiz';
 import SliderComponent_Answer from '../../components/organisms/answer_questions/page_slider';
 import Type_Answer from '../../components/organisms/answer_questions/type_question';
+import Multi_Ans_Quiz_Answer from '../../components/organisms/answer_questions/multiAnsQuiz';
 
 const questions = [
     {
@@ -45,7 +46,7 @@ const questions = [
         no:6,
         question: 'What is the largest planet in our solar system?',
         choices: ['Mars', 'Jupiter', 'Venus', 'Earth'],
-        type: 'Quiz',
+        type: 'Multi Answer Question',
         answer: 'Jupiter',
     },
 ];
@@ -122,16 +123,10 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                             <h1 className="text-center">Question {index + 1}</h1>
                             {getDataType(index) === "Quiz" && <Quiz_Answer index={index + 1} question={question.question} answers = {question.choices}/>}
                             {getDataType(index) === "Type Answer" && <Type_Answer index={index + 1} question={question.question} />}
+                            {getDataType(index) === "Multi Answer Question" && <Multi_Ans_Quiz_Answer index={index + 1} question={question.question} answers = {question.choices}/>}
                         </div>
 
                     </Box>)))}
-                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                        <Button className="submit-button" sx={{ backgroundColor: '#8d6e63', color: '#ffffff', 
-                        border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer' }} 
-                        onClick={() => console.log('Submit button clicked!')
-                        }
-                        href='/'>Submit</Button>
-                    </Box>
                 </Box>
                 
 
@@ -166,6 +161,14 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                     textAlign: 'center'
                     }}>
                         <Timer_Answer time={time}/>
+                    </Grid>
+
+                    <Grid sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                        <Button className="submit-button" sx={{ backgroundColor: '#8d6e63', color: '#ffffff', 
+                        border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer' }} 
+                        onClick={() => console.log('Submit button clicked!')
+                        }
+                        href='/'>Submit</Button>
                     </Grid>
 
                 </Box>
