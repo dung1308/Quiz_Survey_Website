@@ -4,6 +4,7 @@ import Layout from '../../components/templates/layout';import {Box, Container, C
 import SliderComponent from '../../components/organisms/create_questions/page_slider';
 import Quiz_Template from '../../components/organisms/create_questions/quiz';
 import Type_Question from '../../components/organisms/create_questions/type_question';
+import Multi_Ans_Quiz_Template from '../../components/organisms/create_questions/multiAnsQuiz';
 
 
 export const questions_test = [
@@ -12,13 +13,98 @@ export const questions_test = [
         type: '',
     }
 ]
-
-
-const slides = questions_test.map(x=>({no: x.no, type: ''}))
-
+// const questions = [
+//     {
+//         no:1,
+//         question: 'What is the capital of France?',
+//         choices: ['Paris', 'London', 'New York'],
+//         type: 'Quiz',
+//         answer: 'Paris',
+//         select: false,
+//     },
+//     {
+//         no:2,
+//         question: 'What is the largest planet in our solar system?',
+//         choices: ['Mars', 'Jupiter', 'Venus'],
+//         type: 'Quiz',
+//         answer: 'Jupiter',
+//     },
+//     {
+//         no:3,
+//         question: 'What is the boiling point of water?',
+//         choices: ['100°C', '0°C', '50°C'],
+//         type: 'Quiz',
+//         answer: '100°C',
+//     },
+//     {
+//         no:4,
+//         question: 'What is the largest planet in our solar system?',
+//         choices: ['Mars', 'Jupiter', 'Venus'],
+//         type: 'Quiz',
+//         answer: 'Jupiter',
+//     },
+//     {
+//         no:5,
+//         question: 'What is the boiling point of water?',
+//         type: 'Type Answer',
+//     },
+//     {
+//         no:6,
+//         question: 'What is the largest planet in our solar system?',
+//         choices: ['Mars', 'Jupiter', 'Venus', 'Earth'],
+//         type: 'Quiz',
+//         answer: 'Jupiter',
+//     },
+// ];
+const questions = [
+    {
+        no:1,
+        question: 'What is the capital of France?',
+        choices: ['Paris', 'London', 'New York'],
+        type: 'Quiz',
+        answer: 'Paris',
+        select: false,
+    },
+    {
+        no:2,
+        question: 'What is the largest planet in our solar system?',
+        choices: ['Mars', 'Jupiter', 'Venus'],
+        type: 'Quiz',
+        answer: 'Jupiter',
+    },
+    {
+        no:3,
+        question: 'What is the boiling point of water?',
+        choices: ['100°C', '0°C', '50°C'],
+        type: 'Quiz',
+        answer: '100°C',
+    },
+    {
+        no:4,
+        question: 'What is the largest planet in our solar system?',
+        choices: ['Mars', 'Jupiter', 'Venus'],
+        type: 'Quiz',
+        answer: 'Jupiter',
+    },
+    {
+        no:5,
+        question: 'What is the boiling point of water?',
+        type: 'Type Answer',
+    },
+    {
+        no:6,
+        question: 'What is the largest planet in our solar system?',
+        choices: ['Mars', 'Jupiter', 'Venus', 'Earth'],
+        type: 'Quiz',
+        answer: 'Jupiter',
+    },
+];
+//const slides = questions_test.map(x=>({no: x.no, type: ''}))
+    const slides = questions.map(x=>({no: x.no, type: ''})) 
 
 const CreateSurvey: React.FC<any>  = () =>  {
-    const [data, setData] = React.useState(questions_test); // Temporary Database
+    //const [data, setData] = React.useState(questions_test); // Temporary Database
+    const [data, setData] = React.useState(questions); // Use for edit page
     const [seed, setSeed] = React.useState(1); // Reload State
 
 
@@ -78,6 +164,7 @@ const CreateSurvey: React.FC<any>  = () =>  {
                             <h1 className="text-center">Quiz App</h1>
                             {getDataType(index) === "Quiz" && <Quiz_Template/>}
                             {getDataType(index) === "Type Answer" && <Type_Question/>}
+                            {getDataType(index) === "Multi Answer Question" && <Multi_Ans_Quiz_Template/>}
                         </div>
 
                     </Box>)))}
@@ -124,6 +211,7 @@ const CreateSurvey: React.FC<any>  = () =>  {
                         >
                             <MenuItem value={'Quiz'}>Quiz</MenuItem>
                             <MenuItem value={'Type Answer'}>Type Answer</MenuItem>
+                            <MenuItem value={'Multi Answer Question'}>Multi Answer Question</MenuItem>
                         </Select>
                         </FormControl>
                     </Box>
@@ -149,7 +237,7 @@ const CreateSurvey: React.FC<any>  = () =>  {
                         </Box>
                     </Grid>
                     <Box sx={{m:2}} >
-                        <Button color='warning' variant="contained" sx = {{color:'#52DB4B', backgroundColor:'#DB7A35'}}>Save</Button>
+                        <Button color='warning' variant="contained" sx = {{color:'#52DB4B', backgroundColor:'#DB7A35'}} href='/surveys'>Save</Button>
                     </Box>
                 </Box>
 

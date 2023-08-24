@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, Input, InputLabel, InputAdornment, FormControl, Checkbox} from '@mui/material';
 
-const FillAnswer: React.FC<any> = (
+const FillAnswerRadioBtn: React.FC<any> = (
     {answerLabel, value}) => {
 
   const [checked, setChecked] = React.useState(true);
@@ -17,7 +17,8 @@ const FillAnswer: React.FC<any> = (
           {answerLabel}
         </InputLabel>
         <Input
-          id="input-with-icon-adornment" placeholder="Fill in your answer" 
+          id="input-with-icon-adornment" placeholder="Fill in your answer"
+          sx = {{ fontSize: '18px', fontWeight: 'bold', color: '#8d6e63', textShadow: '1px 1px #ffffff', marginRight: '10px', paddingTop: '5px' }} 
           startAdornment={
             <InputAdornment position="start">
               <Checkbox
@@ -25,6 +26,7 @@ const FillAnswer: React.FC<any> = (
                 checked={checked}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'controlled' }}
+                
               />
             </InputAdornment>
           }
@@ -34,4 +36,4 @@ const FillAnswer: React.FC<any> = (
   );
 }
 
-export default FillAnswer
+export default FillAnswerRadioBtn

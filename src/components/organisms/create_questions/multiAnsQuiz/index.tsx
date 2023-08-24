@@ -10,7 +10,7 @@ interface Props {
     onAnswer: (answer: string) => void;
 }
   
-const Quiz_Template: React.FC<any> = (
+const Multi_Ans_Quiz_Template: React.FC<any> = (
     {}) => {
         const theme = createTheme();
         const [inputs, setInputs] = useState<{ label: string; value: number; placeholder: string; checked: boolean }[]>([{ label: '', value: 1, placeholder: '', checked: false }]);
@@ -31,9 +31,7 @@ const Quiz_Template: React.FC<any> = (
     return (
         <Box sx = {{display: 'flex', justifyContent: 'center', textAlign: '-webkit-center' }}>
             
-            
-
-            <Card className="custom-card" sx = {{
+            <Card sx = {{
                 backgroundImage: `url('https://www.transparenttextures.com/patterns/leather.png')`,
                 backgroundColor: '#f5deb3',
                 border: 2,
@@ -41,11 +39,8 @@ const Quiz_Template: React.FC<any> = (
                 borderRadius: '10px',
                 boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.25)',
                 padding: '20px',}}>
-            <CardContent>
-                <TextField
-                label="Question"
-                variant="outlined"
-                fullWidth
+                <CardContent>
+                    <TextField id="filled-basic" label="Question" variant="filled" 
                     sx={{
                     fontSize: '24px',
                     fontWeight: 'bold',
@@ -55,38 +50,25 @@ const Quiz_Template: React.FC<any> = (
                     border: '2px solid #8d6e63',
                     borderRadius: '5px',
                     padding: '10px',
-                    marginBottom: '20px',}}
-                />                
-                <FormControl component="fieldset">
-                <FormLabel component="legend">Radio Button Group</FormLabel>
-                <RadioGroup>
+                    marginBottom: '20px',}} />
+                    <List>
+
                     {inputs.map((input, index) => (
-                    <FormControl key={index}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                        <FormControlLabel
-                            control={<Radio />}
-                            label=""
-                            value={input.value}
-                            checked={input.checked}
-                            onChange={() => handleInputChange(index)}
-                            sx = {{ fontSize: '18px', fontWeight: 'bold', color: '#8d6e63', textShadow: '1px 1px #ffffff', marginRight: '10px', paddingTop: '5px' }}
-                        />
-                        <Input
-                            placeholder={`Input ${input.value}`}
-                            onChange={(event) => handleInputChange(index)}
-                        />
-                        </Box>
-                    </FormControl>
+                    <ListItem key={index}>
+                        <FillAnswer answerLabel = {''} value={input.value} />
+                    </ListItem>
                     ))}
-                </RadioGroup>
-                </FormControl>
-            </CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                <Button onClick={handleAddInput} sx={{ backgroundColor: '#8d6e63', color: '#ffffff', border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer' }}>Add Input</Button>
-            </Box>
+
+                    </List>
+
+
+                </CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                    <Button onClick={handleAddInput} sx={{ backgroundColor: '#8d6e63', color: '#ffffff', border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer' }}>Add Input</Button>
+                </Box>
             </Card>
         </Box>
     );
 };
   
-export default Quiz_Template;
+export default Multi_Ans_Quiz_Template;

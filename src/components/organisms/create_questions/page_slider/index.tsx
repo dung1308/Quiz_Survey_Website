@@ -32,33 +32,27 @@ const SliderComponent: React.FC<SliderProps> = ({ slides, setSlideIndex, addData
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Box sx={{ display: 'flex', flexDirection: 'row-reverse', alignItems: 'center'}}>
-          <Box sx={{ mt: 2, flexDirection: 'row-reverse', alignItems: 'center', height: '100vh'  }}>
-
-
-            {/* Button Add Slide */}
-            <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center', height: '100vh' }}>
-                <Button onClick={addSlide} sx={{ backgroundColor: 'primary.main', color: 'white' }}>
-                  Add Slide
-                </Button>
-            </Box>
-
-          
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'flex-end',  }}>
+        {/* Pages */}
+        <Tooltip title={slideData.map((slide, index) => `${index + 1}. ${slide.no}`).join('\n')}>
+          <Box sx={{ flexDirection: 'row-reverse', alignItems: 'center', height: 'calc(100vh - 40px)' }}>
+            {slideData.map((slide, index) => (
+              <Card
+                sx={{ p: 2, m: 2, marginBottom:'2', width: '75%', textAlign: 'center', ':hover': { boxShadow: 20 } }}
+                key={index}
+                onClick={() => handleCardClick(index)}
+              >
+                <h2>{slide.no}</h2>
+              </Card>
+            ))}
           </Box>
-
-          {/* Pages */}
-          <Tooltip title={slideData.map((slide, index) => `${index + 1}. ${slide.no}`).join('\n')}>
-          <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center', height: '100vh' }}>
-          {slideData.map((slide, index) => (
-                            <Card  sx={{ p: 2, m:2, width:3/4, textAlign:'center', ':hover': {
-                              boxShadow: 20}}} key={index} 
-                            onClick={() => handleCardClick(index)}
-                            >
-                              <h2>{slide.no}</h2>
-                            </Card>
-          ))}
-          </Box>
-          </Tooltip>
+        </Tooltip>
+        <Box sx={{ position: 'fixed', bottom: '20px', left:'1px', display: 'flex', justifyContent: 'center' }}>
+          {/* Button Add Slide */}
+          <Button onClick={addSlide} sx={{ backgroundColor: 'primary.main', color: 'white' }}>
+            Add Slide
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

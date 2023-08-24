@@ -1,6 +1,6 @@
 import React, {} from 'react';
 import Layout from '../../components/templates/layout';
-import {Box, Container, CssBaseline, Grid, Typography, SelectChangeEvent} from '@mui/material';
+import {Button, Box, Container, CssBaseline, Grid, Typography, SelectChangeEvent} from '@mui/material';
 import Timer_Answer from '../../components/atoms/timer';
 import Quiz_Answer from '../../components/organisms/answer_questions/quiz';
 import SliderComponent_Answer from '../../components/organisms/answer_questions/page_slider';
@@ -125,7 +125,14 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                         </div>
 
                     </Box>)))}
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                        <Button className="submit-button" sx={{ backgroundColor: '#8d6e63', color: '#ffffff', 
+                        border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer' }} 
+                        onClick={() => console.log('Submit button clicked!')
+                        }
+                        href='/'>Submit</Button>
                     </Box>
+                </Box>
                 
 
                 {/*Setup Type, Timer*/}
@@ -138,7 +145,7 @@ const AnswerPage: React.FC<any>  = (time) =>  {
                     height: '100vh',
                     backgroundColor: '#5770B2', flexDirection: 'column', justifyContent: 'end',
                     textAlign: '-webkit-center',
-                    overflow: 'auto',
+                    
                 }}
                 >
 

@@ -30,9 +30,9 @@ const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, 
 
           {/* Pages */}
           <Tooltip title={slideData.map((slide, index) => `${index + 1}. ${slide.no}`).join('\n')}>
-          <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center', height: '100vh' }}>
+          <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center' }}>
           {slideData.map((slide, index) => (
-                            <Card sx={{ p: 2, m:2, width:3/4, textAlign:'center', ':hover': {
+                            <Card sx={{p: 2, m:2, width:3/4, textAlign:'center', ':hover': {
                               boxShadow: 20}}} key={index} 
                             onClick={() => handleCardClick(index)}
                             >
