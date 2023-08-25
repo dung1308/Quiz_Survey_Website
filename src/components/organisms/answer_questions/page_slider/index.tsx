@@ -14,9 +14,11 @@ interface SliderProps {
 
 const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, scrollRefs}) => {
   const [slideData, setSlideData] = useState(slides);
+  const [slidePos, setSlidePos] = useState(0);
   
 
   const handleCardClick = (no: number) => {
+    setSlidePos(no);
     setSlideIndex(no);
     scrollRefs.current[no]?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -32,13 +34,19 @@ const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, 
           <Tooltip title={slideData.map((slide, index) => `${index + 1}. ${slide.no}`).join('\n')}>
           <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center' }}>
           {slideData.map((slide, index) => (
-                            <Card sx={{p: 2, m:2, width:3/4, textAlign:'center', ':hover': {
-                              boxShadow: 20}}} key={index} 
+                            <div ref={(el) => (scrollRefs.current[index] = el)}>
+                            <Card sx={{p: 2, m:2, width:3/4, textAlign:'center', 
+                            ':hover': {boxShadow: 20},
+                            borderColor: slidePos === index ? '#ADD8E6' : '',
+                            borderWidth: slidePos === index ? 4 : 1,
+                            borderStyle: 'solid',
+                            backgroundColor: slidePos === index ? 'lightgray' : '', }} key={index} 
                             onClick={() => handleCardClick(index)}
                             >
                               <h2>{slide.no}</h2>
                               <p>{slide.type}</p>
                             </Card>
+                            </div>
           ))}
           </Box>
           </Tooltip>
