@@ -3,7 +3,7 @@ import {Switch,Box, Button,Table, styled, TableBody, TableCell, tableCellClasses
 import Layout from '../../components/templates/layout';
 import StyledTableCell from '../../components/molecules/TableCellStyle';
 import RowComponent from '../../components/organisms/rowComponent';
-
+import JSONdata from "../../data/data.json";
 
 function createData(
     id: number,
@@ -12,25 +12,33 @@ function createData(
     category: string,
     join: number,
     status: string,
+    startDate: string,
+    endDate: string,
     enableStatus: boolean,
+
   ) {
-    return { id, name, owner, category, join, status, enableStatus };
+    return { id, name, owner, category, join, status, startDate, endDate, enableStatus };
   }
   const rows = [
-    createData(1, 'Muscle', 'PE teacher', 'PE', 0, 'composing', true),
-    createData(2, 'Muscle Survey', 'PE teacher', 'Math', 0, 'published', false),
-    createData(3, 'Push-up Survey', 'PE teacher', 'Math', 0, 'cancelled', true),
-    createData(4, 'Squat Survey', 'PE teacher', 'Math', 0, 'expired', false),
-    createData(5, 'Warm-up Survey', 'PE teacher', 'Math', 0, 'expired', true),
+    createData((+JSONdata[0].surveyId), JSONdata[0].surveyName, 'PE teacher', 'PE', 0, 'composing', '20/1/2022','20/3/2022', true),
+    createData((+JSONdata[1].surveyId), 'Muscle Survey', 'PE teacher', 'Math', 0, 'published', '20/1/2022','20/3/2022' ,false),
+    createData(3, 'Push-up Survey', 'PE teacher', 'Math', 0, 'cancelled', '20/1/2022','20/3/2022' ,true),
+    createData(4, 'Squat Survey', 'PE teacher', 'Math', 0, 'expired', '20/1/2022','20/3/2022' ,false),
+    createData(5, 'Warm-up Survey', 'PE teacher', 'Math', 0, 'expired', '20/1/2022','20/3/2022' ,true),
   ];
+  const dataset = JSONdata.map((data)=>{
+
+  });
 
 function Surveys() {
+    const [newRow, setNewRow] = useState()
     
     return (
         <>
             <Layout/>
             <Box m={2}>
-            <Button variant="contained" color="success" href='/create'>
+            <Button variant="contained" color="success" href='/create' 
+            sx = {{backgroundColor:'lightgreen', color:'white',':hover': { backgroundColor: 'limegreen'} }}>
                                     Create
             </Button>
             </Box>
@@ -48,8 +56,8 @@ function Surveys() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => (
-                          <RowComponent row = {row} status = {row.enableStatus}/>
+                        {rows.map((row, index) => (
+                          <RowComponent row = {row} index={index} status = {row.enableStatus}/>
                         ))}
                     </TableBody>
                     </Table>

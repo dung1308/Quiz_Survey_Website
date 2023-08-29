@@ -37,7 +37,7 @@ const AppBarSignIn:React.FC = () => {
     };
   
     return (
-        <AppBar position="static" style = {{ background: '#B6C4CE' }}>
+        <AppBar position="static" style = {{ background: '#B6C4CE', }}>
         <Container maxWidth="xl" >
           <Toolbar  sx={{justifyContent: 'space-between'}}>
           <Box sx={{ flexGrow: 1, display:{ xs: 'none', md: 'flex', mr: 1 } }}>

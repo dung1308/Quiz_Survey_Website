@@ -23,7 +23,9 @@ const Multi_Ans_Quiz_Answer: React.FC<any> = (
             borderColor: '#8d6e63',
             borderRadius: '10px',
             boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.25)',
-            padding: '20px',}}>
+            padding: '20px',
+            width:'100%',
+            maxWidth: '500px'}}>
                 <CardContent>
                     <Typography sx={{
                     fontSize: '24px',

@@ -14,7 +14,6 @@ const questions = [
         choices: ['Paris', 'London', 'New York'],
         type: 'Quiz',
         answer: 'Paris',
-        select: false,
     },
     {
         no:2,
@@ -52,11 +51,14 @@ const questions = [
 ];
 
 
-const slides = questions.map(x=>({no: x.no, type: x.type}))
+const slides = questions.map(x=>({
+    question: x.question,
+    choices: x.choices,
+    type: x.type,
+    answer: x.answer,}))
 
 
-const AnswerPage: React.FC<any>  = (time) =>  {
-    time = 1000
+const AnswerPage: React.FC<any>  = (time = 1000) =>  {
     const [data, setData] = React.useState(questions); // Temporary Database
     const [seed, setSeed] = React.useState(1); // Reload State
     const scrollRefs = React.useRef<Array<HTMLDivElement | null>>([]);

@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Box, Card, Button, Tooltip } from '@mui/material';
 
 interface Slide {
-  no: number;
+  question: string,
+  choices: any,
   type: string;
+  answer: any,
 }
 
 interface SliderProps {
@@ -31,7 +33,6 @@ const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, 
           </Box>
 
           {/* Pages */}
-          <Tooltip title={slideData.map((slide, index) => `${index + 1}. ${slide.no}`).join('\n')}>
           <Box sx = {{flexDirection: 'row-reverse', alignItems: 'center' }}>
           {slideData.map((slide, index) => (
                             <div ref={(el) => (scrollRefs.current[index] = el)}>
@@ -43,13 +44,12 @@ const SliderComponent_Answer: React.FC<SliderProps> = ({ slides, setSlideIndex, 
                             backgroundColor: slidePos === index ? 'lightgray' : '', }} key={index} 
                             onClick={() => handleCardClick(index)}
                             >
-                              <h2>{slide.no}</h2>
-                              <p>{slide.type}</p>
+                              <h2>{index+1}</h2>
+                              <p>{slide.question}</p>
                             </Card>
                             </div>
           ))}
           </Box>
-          </Tooltip>
       </Box>
     </Box>
   );

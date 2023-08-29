@@ -1,0 +1,122 @@
+[
+  {
+    "surveyId": "1",
+    "surveyName": "Test_Survey",
+    "owner": "Tester",
+    "category": "Test",
+    "startDate": "2023-05-24",
+    "endDate": "2023-10-23",
+    "status": "composing",
+    "enableStatus": false,
+    "questions": [
+      {
+        "no": 1,
+        "question": "What is the largest planet in our solar system?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Multi Answer Question",
+        "answer": ["Jupiter", "Mars"]
+      },
+      {
+        "no": 2,
+        "question": "1",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Quiz",
+        "answer": ["Jupiter"]
+      },
+      {
+        "no": 3,
+        "question": "3system?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Multi Answer Question",
+        "answer": ["Jupiter"]
+      },
+      {
+        "no": 4,
+        "question": "4?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Type Answer",
+        "answer": []
+      }
+    ]
+  },
+  {
+    "surveyId": "2",
+    "surveyName": "Test_Survey 2",
+    "owner": "Tester",
+    "category": "Test",
+    "startDate": "2023-05-24",
+    "endDate": "2023-10-23",
+    "status": "composing",
+    "enableStatus": false,
+    "questions": [
+      {
+        "no": 1,
+        "question": "What is the largest planet in our solar system?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Multi Answer Question",
+        "answer": ["Jupiter", "Mars"]
+      },
+      {
+        "no": 2,
+        "question": "1",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Quiz",
+        "answer": ["Jupiter"]
+      },
+      {
+        "no": 3,
+        "question": "3system?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Multi Answer Question",
+        "answer": ["Jupiter"]
+      },
+      {
+        "no": 4,
+        "question": "4?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Type Answer",
+        "answer": []
+      }
+    ]
+  },
+  {
+    "surveyId": "3",
+    "surveyName": "Test_Survey 3",
+    "owner": "Tester",
+    "category": "Test",
+    "startDate": "2023-05-24",
+    "endDate": "2023-10-23",
+    "status": "composing",
+    "enableStatus": true,
+    "questions": [
+      {
+        "no": 1,
+        "question": "What is the largest planet in our solar system?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Multi Answer Question",
+        "answer": ["Jupiter", "Mars"]
+      },
+      {
+        "no": 2,
+        "question": "1",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Quiz",
+        "answer": ["Jupiter"]
+      },
+      {
+        "no": 3,
+        "question": "3system?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Multi Answer Question",
+        "answer": ["Jupiter"]
+      },
+      {
+        "no": 4,
+        "question": "4?",
+        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "type": "Type Answer",
+        "answer": []
+      }
+    ]
+  }
+]
