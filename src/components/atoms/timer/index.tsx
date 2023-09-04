@@ -30,8 +30,7 @@ const Timer_Answer:React.FC<Props> = ({time}) => {
         }, 1000)
     }, [timeState.time]);
     return (
-        <h2>{`${timeState.minutes}: 
-        ${timeState.seconds <=10 ? `0${timeState.seconds}` : timeState.seconds}`}</h2>
+        <h2>{`${timeState.minutes}:${timeState.seconds < 10 ? `0${timeState.seconds}` : timeState.seconds}`}</h2>
     )
 }
 

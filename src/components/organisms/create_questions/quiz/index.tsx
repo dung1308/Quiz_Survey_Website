@@ -49,6 +49,7 @@ const Quiz_Template: React.FC<any> = (
             answers.push('');
             setAnswers(answers)
             setChoices(answers)}
+            
             // setAnswers((question:any) => {
                 
             //     return question; // because you want updated state for anything watching for changes
@@ -62,7 +63,7 @@ const Quiz_Template: React.FC<any> = (
     return (
                 <FormControl component="fieldset">
                 <FormLabel component="legend">Radio Button Group</FormLabel>
-                <RadioGroup onChange={(args) => {setQuestion({ ...question, answer: args.target.value });}
+                <RadioGroup onChange={(args) => {setQuestion({ ...question, answer: [args.target.value] });}
                 } >
                     
                     {choices.map((answer:string, index:number) =>

@@ -58,6 +58,7 @@ const QuizCard: React.FC<any> = ({question, setQuestion}: any) => {
               padding: "10px",
               marginBottom: "20px",
             }}
+            
             defaultValue={question.question}
             value={question.question}
             onChange={(args) =>
@@ -89,7 +90,7 @@ const QuizCard: React.FC<any> = ({question, setQuestion}: any) => {
                         }}/>;
   
               default:
-                return <p>Error</p>;
+                return <p>Choose a question type</p>;
             }
           })()}
         </CardContent>

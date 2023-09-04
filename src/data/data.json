@@ -1,11 +1,12 @@
 [
   {
-    "surveyId": "1",
+    "surveyId": "124332",
     "surveyName": "Test_Survey",
     "owner": "Tester",
     "category": "Test",
-    "startDate": "2023-05-24",
-    "endDate": "2023-10-23",
+    "timer": "15:29",
+    "startDate": "2022-04-17T14:20",
+    "endDate": "2022-07-17T15:30",
     "status": "composing",
     "enableStatus": false,
     "questions": [
@@ -18,8 +19,8 @@
       },
       {
         "no": 2,
-        "question": "1",
-        "choices": ["Mars", "Jupiter", "Venus", "Earth"],
+        "question": "This is a type of system",
+        "choices": ["hello", "Hu", "Venus", "Earth"],
         "type": "Quiz",
         "answer": ["Jupiter"]
       },
@@ -40,12 +41,13 @@
     ]
   },
   {
-    "surveyId": "2",
+    "surveyId": "23434",
     "surveyName": "Test_Survey 2",
     "owner": "Tester",
     "category": "Test",
-    "startDate": "2023-05-24",
-    "endDate": "2023-10-23",
+    "timer": "15:29",
+    "startDate": "2022-04-17T10:30",
+    "endDate": "2022-07-17T15:30",
     "status": "composing",
     "enableStatus": false,
     "questions": [
@@ -80,12 +82,13 @@
     ]
   },
   {
-    "surveyId": "3",
+    "surveyId": "32523525",
     "surveyName": "Test_Survey 3",
     "owner": "Tester",
     "category": "Test",
-    "startDate": "2023-05-24",
-    "endDate": "2023-10-23",
+    "timer": "15:29",
+    "startDate": "2022-04-17T8:20",
+    "endDate": "2022-07-17T15:40",
     "status": "composing",
     "enableStatus": true,
     "questions": [

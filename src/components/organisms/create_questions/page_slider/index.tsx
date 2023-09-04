@@ -69,7 +69,7 @@ const SliderComponent: React.FC<SliderProps> = ({ slides, setSlideIndex, slideIn
   }
 
   // Line break when number of characters reaching MAX_CHARS
-  const MAX_CHARS = 20;
+  const MAX_CHARS = 15;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -99,7 +99,10 @@ const SliderComponent: React.FC<SliderProps> = ({ slides, setSlideIndex, slideIn
                 
                 <h2>{index+1}</h2>
                 <Typography >
-                  {slide.question.match(new RegExp(`.{1,${MAX_CHARS}}`, 'g'))?.join('\n')}
+                  {/* {(slide.question.match(new RegExp(`.{1,${MAX_CHARS}}`, 'g'))?.join('\n'))?.substring(0,50)} */}
+                  {slide.question.length >= 30
+                  ? `${slide.question.substring(0, 30)}...`
+                  : slide.question}
                   </Typography>
               </Card>
 

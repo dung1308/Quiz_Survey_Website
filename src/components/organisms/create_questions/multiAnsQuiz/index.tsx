@@ -109,7 +109,8 @@ const Multi_Ans_Quiz_Template: React.FC<any> = (
     return (        <List>
                         {choices.map((answer:string, index:number) => (
                         <ListItem key={index}>
-                            <FillAnswer answers={answers} index={index} setAnswers={setAnswers} setChoices={setChoices}/>
+                            <FillAnswer answers={answers} index={index} setAnswers={setAnswers} 
+                            setChoices={setChoices} setQuestion = {setQuestion} question = {question}/>
 
                             <Button onClick={()=>handleRemoveChoice(index)} 
                             sx={{ backgroundColor: 'secondary.main', color: 'white', marginRight: '10px',borderRadius: 30 }}>

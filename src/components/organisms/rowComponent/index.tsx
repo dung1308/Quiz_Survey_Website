@@ -1,17 +1,26 @@
 import React, {useState} from 'react';
-import {Box, Button} from '@mui/material';
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from '@mui/material';
 import StyledTableCell from '../../molecules/TableCellStyle';
 import StyledTableRow from '../../molecules/StyledTableRow';
+import { getSurveyByID, createSurvey1, getSurveys, updatedJSON,  } from '../../../services/dataService/dataService';
 
 
 
-
-const RowComponent:React.FC<any> = ({row, index, status}) => {
+const RowComponent:React.FC<any> = ({row, index, status, userId}) => {
     const [enabled, setEnabled] = useState<Boolean>(status)
+    const [open, setOpen] = useState(false);
     const buttonHandler = () => {
         setEnabled(status => !status)
-        console.log(enabled)
     }
+
+    const buttonInviteWindowOpen = () => {
+      setOpen(true)
+    }
+
+    const buttonInviteWindowClose = () => {
+      setOpen(false)
+    }
+    
     return (
       <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
@@ -22,7 +31,7 @@ const RowComponent:React.FC<any> = ({row, index, status}) => {
       <StyledTableCell align="right">{row.category}</StyledTableCell>
       <StyledTableCell align="center">
           <Box sx={{justifyContent: 'space-between'}}>
-          <Button variant="contained" color="secondary" href='/edit/{index}' size="small" 
+          <Button variant="contained" color="secondary" href={`/edit/${row.id}`} size="small" 
           sx={{marginLeft: 2,
                backgroundColor: 'lightblue',
                color: '#333',
@@ -32,7 +41,7 @@ const RowComponent:React.FC<any> = ({row, index, status}) => {
           </Button>
           
           
-          <Button variant="contained" color="primary" href='/answer_page' size="small" 
+          <Button variant="contained" color="primary" href={`/answer_page/${row.id}/${userId}`} size="small" 
           sx={{marginLeft: 2,
             backgroundColor: 'lightgreen',
             color: 'white',
@@ -42,7 +51,7 @@ const RowComponent:React.FC<any> = ({row, index, status}) => {
           </Button>
           
           
-          <Button variant="contained" color="success" href='/answer_page' size="small"
+          <Button variant="contained" color="success" size="small" onClick={buttonInviteWindowOpen}
           sx={{marginLeft: 2,
             backgroundColor: 'lightpink',
             color: '#333',
@@ -66,7 +75,30 @@ const RowComponent:React.FC<any> = ({row, index, status}) => {
           
       </StyledTableCell>
       <StyledTableCell align="center">{row.status}</StyledTableCell>
+      <Dialog open={open} onClose={buttonInviteWindowClose}>
+        <DialogTitle>Subscribe</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here. We
+            will send updates occasionally.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={buttonInviteWindowClose}>Cancel</Button>
+          <Button onClick={buttonInviteWindowClose}>Subscribe</Button>
+        </DialogActions>
+      </Dialog>
   </StyledTableRow>
+  
     )
   }
 export default RowComponent;

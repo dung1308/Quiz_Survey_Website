@@ -2,12 +2,23 @@ import React from 'react';
 import {Box, Input, InputLabel, InputAdornment, FormControl, Checkbox} from '@mui/material';
 
 const FillAnswer: React.FC<any> = (
-    {answers, index, setAnswers, setChoices}) => {
+    {answers, index, setAnswers, setChoices, setQuestion, question}) => {
 
-  const [checked, setChecked] = React.useState(true);
+  const [checked, setChecked] = React.useState(false);
 
-  const handleChange = () => {
+  const handleChangeAnswer = (event:React.ChangeEvent<HTMLInputElement>) => {
     setChecked(checked => !checked);
+    if (checked===true){
+      question.answer.push(event?.target.value)
+      setQuestion(question)
+
+    }
+    else if (checked===false){
+
+    }
+
+  
+    console.log(question.answer)
   };
   const handleChangeChoiceByID = (event:React.ChangeEvent<HTMLInputElement>, no:number) =>
         {
@@ -35,7 +46,7 @@ const FillAnswer: React.FC<any> = (
               <Checkbox
                 value={index}
                 checked={checked}
-                onChange={handleChange}
+                onChange={e => handleChangeAnswer(e)}
                 inputProps={{ 'aria-label': 'controlled' }}
                 
               />
