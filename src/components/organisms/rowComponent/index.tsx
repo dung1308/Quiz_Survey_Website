@@ -41,7 +41,7 @@ const RowComponent:React.FC<any> = ({row, index, status, userId}) => {
           </Button>
           
           
-          <Button variant="contained" color="primary" href={`/answer_page/${row.id}/${userId}`} size="small" 
+          <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small" 
           sx={{marginLeft: 2,
             backgroundColor: 'lightgreen',
             color: 'white',

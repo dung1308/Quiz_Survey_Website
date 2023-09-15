@@ -16,7 +16,10 @@ import Type_Answer from "../../components/organisms/answer_questions/type_questi
 import Multi_Ans_Quiz_Answer from "../../components/organisms/answer_questions/multiAnsQuiz";
 import { useParams } from "react-router-dom";
 import {
+  GetQuestionBankById,
+  GetQuestionsByQuestionBankId,
   Question,
+  QuestionBank,
   Survey,
   getSurveyByID,
 } from "../../services/dataService/dataService";
@@ -68,81 +71,101 @@ const questions_sample = [
 
 const AnswerPage: React.FC<any> = () => {
   const params = useParams();
+  const [questionBank, setQuestionBank] = React.useState<QuestionBank>();
+  const [loading, setLoading] = React.useState(true);
+  const [questionAPI, setQuestionAPI] = React.useState();
 
   const [tempSur, setTempSur] = React.useState<{
-      surveyId: string;
-      surveyName: string;
-      owner: string;
-      category: string;
-      timer: string;
-      startDate: string;
-      endDate: string;
-      status: string;
-      enableStatus: boolean;
-      questions: {
-        no: number;
-        question: string;
-        choices: string[];
-        type: string;
-        answer: string[];
-      }[];
-    }>({
-      surveyId: "",
-      surveyName: "Geography of Countries",
-      owner: "Random",
-      category: "Survey",
-      timer: "15:20",
-      startDate: "2023/02/02",
-      endDate: "2023/07/07",
-      status: "composing",
-      enableStatus: false,
-      questions: [
-        {
-          no: 1,
-          question: "What is the capital of France?",
-          choices: ["Paris", "London", "New York"],
-          type: "Quiz",
-          answer: ["Paris", "London"],
-        },
-      ],
-    });
+    surveyId: string;
+    surveyName: string;
+    owner: string;
+    categoryId: number;
+    timer: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+    enableStatus: boolean;
+    questions: {
+      no: number;
+      question: string;
+      choices: string[];
+      type: string;
+      answer: string[];
+    }[];
+  }>({
+    surveyId: "",
+    surveyName: "Geography of Countries",
+    owner: "Random",
+    categoryId: 1,
+    timer: "15:20",
+    startDate: "2023/02/02",
+    endDate: "2023/07/07",
+    status: "composing",
+    enableStatus: false,
+    questions: [
+      {
+        no: 1,
+        question: "What is the capital of France?",
+        choices: ["Paris", "London", "New York"],
+        type: "Quiz",
+        answer: ["Paris", "London"],
+      },
+    ],
+  });
 
   const [data, setData] = React.useState<Question[]>(questions_sample); // Temporary Database
   const [time, setTime] = React.useState<number>(100);
 
   const calculateTime = (time: any) => {
     let matches = time.match(/\d+/g);
-    const totalTime = ((+matches[0]) * 60 + (+matches[1]));
+    const totalTime = +matches[0] * 60 + +matches[1];
     return totalTime;
   };
-
-  useEffect(() => {
-    if (params.surveyId !== undefined) {
-      const newSur: Survey = getSurveyByID(params.surveyId);
-      const definedQuestion: Question[] = newSur.questions;
-      if (params.surveyId !== undefined) {
-        setTempSur({
-          surveyId: newSur.surveyId,
-          surveyName: newSur.surveyName,
-          owner: newSur.owner,
-          category: newSur.category,
-          timer: newSur.timer,
-          startDate: newSur.startDate,
-          endDate: newSur.endDate,
-          status: newSur.status,
-          enableStatus: false,
-          questions: newSur.questions,
-        });
-        setData(definedQuestion);
-      }
-    }
-  }, [params.surveyId]);
-  const slides = data.map((x) => ({
-    question: x.question,
-    choices: x.choices,
-    type: x.type,
-    answer: x.answer,
+  const mappedQuestions = questionBank?.questionDTOs?.map((questionDTO, index) => ({
+    no: questionDTO.id,
+    question: questionDTO.questionName,
+    choices: questionDTO.choices,
+    type: questionDTO.type,
+    answer: questionDTO.answers,
   }));
+  const fetchData = async () => {
+    if (questionBank !== undefined){
+        setTempSur({
+          surveyId: questionBank.id.toString(),
+          surveyName: questionBank.surveyName,
+          owner: questionBank.owner,
+          categoryId: questionBank.categoryListId,
+          timer: questionBank.timer,
+          startDate: questionBank.startDate,
+          endDate: questionBank.endDate,
+          status: questionBank.status,
+          enableStatus: questionBank.enableStatus,
+          questions: mappedQuestions || [],
+      })};
+      setData(tempSur.questions);
+  };
+  useEffect(() => {
+    fetchData();
+  }, [params.surveyId]);
+  useEffect(() => {
+    setLoading(true);
+    if (params.surveyId !== undefined)
+    {GetQuestionsByQuestionBankId(+params.surveyId).then((data) => {
+      setQuestionBank(data);
+      setLoading(false);
+      console.log(data)
+    });}
+  }, []);
+
+  const slides = data
+    ? data.map((x) => ({
+        question: x.question,
+        choices: x.choices,
+        type: x.type,
+        answer: x.answer,
+      }))
+    : [];
+
   const [seed, setSeed] = React.useState(1); // Reload State
   const scrollRefs = React.useRef<Array<HTMLDivElement | null>>([]);
 

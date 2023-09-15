@@ -17,7 +17,7 @@ import Layout from "../../components/templates/layout";
 import StyledTableCell from "../../components/molecules/TableCellStyle";
 import RowComponent from "../../components/organisms/rowComponent";
 import JSONdata from "../../data/data.json";
-import { dataSevice } from "../../services/dataService/dataService";
+import { GetQuestionBankByUserId, QuestionBank, dataSevice } from "../../services/dataService/dataService";
 import {
   getSurveyByID,
   getSurveys,
@@ -65,30 +65,45 @@ function createData(
 //   enableStatus: false,
 // }));
 
+
 function Surveys() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<any>([]);
-  const userId = "120";
+  const [questionBank, setQuestionBank] = useState<QuestionBank[]>([]);
+  const [userId, setUserId] = useState(1)
+  const [categoryId, setCategoryId] = useState(1)
+
+
+
 
   useEffect(() => {
-    const surveys = getSurveys();
-    const newRows = surveys.map((data) =>
+    setLoading(true);
+    GetQuestionBankByUserId(userId, categoryId).then((data) => {
+      setQuestionBank(data);
+      setLoading(false);
+      console.log(data)
+    });
+  }, [userId, categoryId]);
+
+  useEffect(() => {
+    const newRows = questionBank.map((data) =>
       createData(
-        data.surveyId,
+        data.id.toString(),
         data.surveyName,
         data.owner,
         data.category,
         data.status,
         data.startDate,
         data.endDate,
-        false
+        data.enableStatus
       )
     );
     setRows(newRows)
-  }, []);
+  }, [questionBank]);
 
   const handleCreateSurvey = () => {
-    navigate("/create");
+    navigate(`/${userId}/create`);
   };
 
   return (
@@ -109,6 +124,9 @@ function Surveys() {
         </Button>
       </Box>
       <Box m={2}>
+      {loading ? (
+          <p>Loading...</p>
+        ) : (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
@@ -128,6 +146,7 @@ function Surveys() {
             </TableBody>
           </Table>
         </TableContainer>
+        )}
       </Box>
     </>
   );

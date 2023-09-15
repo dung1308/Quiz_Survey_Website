@@ -21,6 +21,7 @@
 
 import JSONdata from "../../data/data.json";
 import axios from "axios";
+import React from "react";
 
 export interface Survey {
   surveyId: string;
@@ -68,7 +69,7 @@ export function getSurveyId() {
     localStorage.setItem("myData", ostr);
     data = JSON.parse(ostr || "[]") as Survey[];
   }
-  return data.map((newData)=>newData.surveyId);
+  return data.map((newData) => newData.surveyId);
 }
 
 export function setSurveys(surveys: Survey[]): Survey[] {
@@ -78,18 +79,10 @@ export function setSurveys(surveys: Survey[]): Survey[] {
   return data;
 }
 
-export function setSurveyById(id:string,survey: Survey): Survey[] {
-  const surveys = getSurveys();
-  const index = surveys.findIndex(x => x.surveyId === id);
-  surveys[index] = survey
-  const data = setSurveys(surveys);
-  return data;
-}
-
 export function getSurveyByID(id: string): Survey {
   const surveys = getSurveys();
-  const survey_searched = surveys.find(x => x.surveyId === id);
-  if (survey_searched === undefined){
+  const survey_searched = surveys.find((x) => x.surveyId === id);
+  if (survey_searched === undefined) {
     return {
       surveyId: "",
       surveyName: "Geography of Countries",
@@ -307,3 +300,171 @@ export class dataSevice {
 //   console.error('Lỗi khi đọc file JSON:', error);
 // });
 // }
+
+interface Role {
+  id: number;
+  roleName: string;
+  permission: string;
+}
+interface Category {
+  id: number;
+  categoryName: string;
+}
+interface QuestionDTO {
+  id: number;
+  questionName: string;
+  choices: string[];
+  type: string;
+  answers: string[];
+  score: number;
+  questionBankId: number;
+}
+interface SurveyCode {
+  surveyCode: string;
+}
+
+export class QuestionBank {
+  id: number;
+  surveyCode: string;
+  surveyName: string;
+  owner: string;
+  category: string;
+  timer: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  enableStatus: boolean;
+  categoryListId: number;
+  questionDTOs: QuestionDTO[];
+
+  constructor(data: any) {
+    this.id = data.id;
+    this.surveyCode = data.surveyCode;
+    this.surveyName = data.surveyName;
+    this.owner = data.owner;
+    this.category = data.category;
+    this.timer = data.timer;
+    this.startDate = data.startDate;
+    this.endDate = data.endDate;
+    this.status = data.status;
+    this.enableStatus = data.enableStatus;
+    this.categoryListId = data.categoryListId;
+    this.questionDTOs = data.questionDTOs;
+  }
+}
+
+export async function GetRoles(): Promise<Role[]> {
+  return axios
+    .get<Role[]>("https://localhost:7232/Roles")
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetCategories(): Promise<Category[]> {
+  return axios
+    .get<Category[]>("https://localhost:7232/Categories")
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetSurveyCodes(): Promise<SurveyCode[]> {
+  return axios
+    .get<SurveyCode[]>("https://localhost:7232/GetSurveyCode")
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+// export async function GetQuestionBankById(id: number): Promise<QuestionBank[]> {
+//   return axios
+//       .get<QuestionBank[]>(`https://localhost:7232/GetQuestionBank/${id}`)
+//       .then((response) => {
+//         return response.data;
+//       })
+//       .catch((error) => {
+//         console.log(error);
+//         return [];
+//       });
+// }
+export async function GetQuestionBankById(id: number) {
+  return axios
+    .get(`https://localhost:7232/GetQuestionBank/${id}`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
+}
+
+export async function GetQuestionBankByUserId(
+  userId: number,
+  categoryId: number
+): Promise<QuestionBank[]> {
+  return axios
+    .get<QuestionBank[]>(
+      `https://localhost:7232/User/${userId}/Category/${categoryId}/GetQuestionBank`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export function CreateQuestionBank(id: string, survey: Survey): Survey[] {
+  const surveys = getSurveys();
+  const index = surveys.findIndex((x) => x.surveyId === id);
+  surveys[index] = survey;
+  const data = setSurveys(surveys);
+  return data;
+}
+
+export function setSurveyById(id: string, survey: Survey): Survey[] {
+  const surveys = getSurveys();
+  const index = surveys.findIndex((x) => x.surveyId === id);
+  surveys[index] = survey;
+  const data = setSurveys(surveys);
+  return data;
+}
+
+export async function GetQuestionsByQuestionBankId(questionBankId: number) {
+  return axios
+    .get(`https://localhost:7232/GetQuestionBank/${questionBankId}/Question`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function deleteQuestionById(id: string): Promise<Boolean> {
+  return axios
+    .get(`https://localhost:7232/DeleteQuestion?id=${id}`)
+    .then((response) => {
+      return true;
+    })
+    .catch((error) => {
+      console.log(error);
+      return false;
+    });
+}

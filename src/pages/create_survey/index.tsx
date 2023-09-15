@@ -24,6 +24,9 @@ import SliderComponent from "../../components/organisms/create_questions/page_sl
 import { useNavigate, useParams } from "react-router-dom";
 import QuizCard from "../../components/organisms/QuizCard";
 import {
+  GetCategories,
+  GetQuestionBankById,
+  QuestionBank,
   Survey,
   createSurvey1,
   getSurveyByID,
@@ -52,6 +55,7 @@ interface Slide {
   type: string;
   answer: string[];
 }
+
 //const slides = questions_test.map(x=>({no: x.no, question: x.question, choices:x.choices, type: x.type, answer:x.answer}))
 //const slides = questions.map(x=>({no: x.no, type: x.question}))
 
@@ -65,7 +69,7 @@ const CreateSurvey: React.FC<any> = () => {
     surveyId: string;
     surveyName: string;
     owner: string;
-    category: string;
+    categoryId: number;
     timer: string;
     startDate: string;
     endDate: string;
@@ -82,7 +86,7 @@ const CreateSurvey: React.FC<any> = () => {
     surveyId: "",
     surveyName: "Geography of Countries",
     owner: "Random",
-    category: "Survey",
+    categoryId: 1,
     timer: "15:20",
     startDate: "2023/02/02",
     endDate: "2023/07/07",
@@ -158,7 +162,11 @@ const CreateSurvey: React.FC<any> = () => {
 
   const [type, setType] = React.useState("");
 
-  const [category, setCategory] = React.useState("");
+  const [categories, setCategories] = React.useState<
+    { id: number; categoryName: string }[]
+  >([{ id: 1, categoryName: "Quiz" }]);
+
+  const [categoryId, setCategoryId] = React.useState<number>(0);
 
   const handleChange = (index: number, event: SelectChangeEvent) => {
     setDataType(index, event.target.value as string);
@@ -171,9 +179,13 @@ const CreateSurvey: React.FC<any> = () => {
     setTempSur({ ...tempSur, surveyName: e.target.value });
   };
 
-  const handleChangeCategorySurvey = (e: SelectChangeEvent<string>) => {
-    setTempSur({ ...tempSur, category: e.target.value });
+  // const handleChangeCategorySurvey = (e: SelectChangeEvent<string>) => {
+  //   setTempSur({ ...tempSur, categoryId: e.target.value });
 
+  // };
+
+  const handleChangeCategorySurvey = (event: SelectChangeEvent<number>) => {
+    setCategoryId((+event.target.value));
   };
 
   const handleChangeTimerSurvey = (e: Dayjs | null) => {
@@ -237,38 +249,38 @@ const CreateSurvey: React.FC<any> = () => {
       setTempSur(tempSur);
     }
 
-    const listID = getSurveys().map((survey) => survey.surveyId);
-    if (listID.includes(tempSur.surveyId)) {
-      setSurveyById(tempSur.surveyId, tempSur);
-    } else {
-      tempSur.questions = data;
-      createSurvey1(tempSur);
-    }
-    //saveSurvey(getSurvey());
+    // const listID = getSurveys().map((survey) => survey.surveyId);
+    // if (listID.includes(tempSur.surveyId)) {
+    //   setSurveyById(tempSur.surveyId, tempSur);
+    // } else {
+    //   tempSur.questions = data;
+    //   createSurvey1(tempSur);
+    // }
+    // //saveSurvey(getSurvey());
 
-    console.log(localStorage.getItem("myData"));
+    // console.log(localStorage.getItem("myData"));
     navigate("/surveys");
   };
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (params.surveyId !== undefined) {
-      const newSur: Survey = getSurveyByID(params.surveyId);
+      const newSur = await GetQuestionBankById(+params.surveyId);
 
       setTempSur({
-        surveyId: newSur.surveyId,
+        surveyId: newSur.id.toString(),
         surveyName: newSur.surveyName,
         owner: newSur.owner,
-        category: newSur.category,
+        categoryId: newSur.categoryId,
         timer: newSur.timer,
         startDate: newSur.startDate,
         endDate: newSur.endDate,
         status: newSur.status,
-        enableStatus: false,
+        enableStatus: newSur.enableStatus,
         questions: newSur.questions,
       });
 
       setData(
-        newSur.questions.map((question) => ({
+        newSur.questions.map((question: any) => ({
           no: question.no,
           question: question.question,
           choices: question.choices,
@@ -288,7 +300,16 @@ const CreateSurvey: React.FC<any> = () => {
         }))
       );
     }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [params.surveyId]);
+  React.useEffect(() => {
+    GetCategories().then((data) => {
+      setCategories(data);
+    });
+  }, []);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -472,7 +493,6 @@ const CreateSurvey: React.FC<any> = () => {
                 sx={{ marginBottom: "10px" }}
                 onChange={(e) => handleChangeNameSurvey(e)}
               />
-
               {/* Setup Category */}
               <FormControl fullWidth sx={{ backgroundColor: "#FFFFFF" }}>
                 <InputLabel
@@ -483,7 +503,7 @@ const CreateSurvey: React.FC<any> = () => {
                   {"Category"}
                 </InputLabel>
                 <Select
-                  value={category}
+                  value={categoryId}
                   label="question type"
                   onChange={(e) => handleChangeCategorySurvey(e)}
                   sx={{
@@ -492,36 +512,20 @@ const CreateSurvey: React.FC<any> = () => {
                     paddingRight: "20px",
                   }}
                 >
-                  <MenuItem
-                    value={"PE"}
-                    sx={{
-                      backgroundColor: "#FFFFFF",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    PE
-                  </MenuItem>
-                  <MenuItem
-                    value={"Physics"}
-                    sx={{
-                      backgroundColor: "#FFFFFF",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    Physics
-                  </MenuItem>
-                  <MenuItem
-                    value={"Programming"}
-                    sx={{
-                      backgroundColor: "#FFFFFF",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    Programming
-                  </MenuItem>
+                  {categories.map((category) => (
+                    <MenuItem
+                      key={category.id}
+                      value={category.id}
+                      sx={{
+                        backgroundColor: "#FFFFFF",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {category.categoryName}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
-
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["TimePicker", "TimePicker"]}>
                   <TimePicker
