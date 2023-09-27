@@ -17,7 +17,7 @@ import Layout from "../../components/templates/layout";
 import StyledTableCell from "../../components/molecules/TableCellStyle";
 import RowComponent from "../../components/organisms/rowComponent";
 import JSONdata from "../../data/data.json";
-import { GetQuestionBankByUserId, QuestionBank, dataSevice } from "../../services/dataService/dataService";
+import { GetCategories, GetQuestionBankByUserId, QuestionBank, dataSevice } from "../../services/dataService/dataService";
 import {
   getSurveyByID,
   getSurveys,
@@ -32,7 +32,9 @@ function createData(
   status: string,
   startDate: string,
   endDate: string,
-  enableStatus: boolean
+  enableStatus: boolean,
+  categoryListId: number,
+  surveyCode: string,
 ) {
   return {
     id,
@@ -43,7 +45,14 @@ function createData(
     startDate,
     endDate,
     enableStatus,
+    categoryListId,
+    surveyCode
   };
+}
+
+interface Category {
+  id: number;
+  categoryName: string;
 }
 // const rows = [
 //   createData((+JSONdata[0].surveyId), JSONdata[0].surveyName, 'PE teacher', 'PE', 0, 'composing', '20/1/2022','20/3/2022', true),
@@ -71,35 +80,59 @@ function Surveys() {
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<any>([]);
   const [questionBank, setQuestionBank] = useState<QuestionBank[]>([]);
-  const [userId, setUserId] = useState(1)
-  const [categoryId, setCategoryId] = useState(1)
+  const [userId, setUserId] = useState(1);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  const getCategoryNameById = (id: number) => {
+    const category = categories.find((entity) => entity.id === id);
+    return category ? category.categoryName : '.......';
+  };
 
 
 
 
   useEffect(() => {
     setLoading(true);
-    GetQuestionBankByUserId(userId, categoryId).then((data) => {
-      setQuestionBank(data);
+    GetQuestionBankByUserId(userId).then((data) => {
+      setQuestionBank(data.reverse());
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000)
       setLoading(false);
       console.log(data)
     });
-  }, [userId, categoryId]);
+  }, [userId]);
+
+  // useEffect(() => {
+  //   setLoading(true);
+  //   setTimeout(() => {})
+  //   GetCategories().then((data) => {
+  //     setCategories(data);
+  //     setLoading(false);
+  //     console.log(data);
+  //   });
+  // }, []);
+
 
   useEffect(() => {
-    const newRows = questionBank.map((data) =>
+    setLoading(true);
+    if (categories !== undefined)
+    {const newRows = questionBank.map((data) =>
       createData(
         data.id.toString(),
         data.surveyName,
         data.owner,
-        data.category,
+        data.categoryName,
         data.status,
         data.startDate,
         data.endDate,
-        data.enableStatus
+        data.enableStatus,
+        data.categoryListId,
+        data.surveyCode
       )
     );
-    setRows(newRows)
+    setRows(newRows)}
+    setLoading(false);
   }, [questionBank]);
 
   const handleCreateSurvey = () => {
@@ -127,7 +160,7 @@ function Surveys() {
       {loading ? (
           <p>Loading...</p>
         ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx = {{overflow: 'auto'}}>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
@@ -141,7 +174,7 @@ function Surveys() {
             </TableHead>
             <TableBody>
               {rows.map((row:any, index:number) => (
-                <RowComponent row={row} index={index} userId = {userId} />
+                <RowComponent row={row} index={index} userId = {userId} questionBank = {questionBank} />
               ))}
             </TableBody>
           </Table>

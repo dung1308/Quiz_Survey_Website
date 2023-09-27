@@ -10,26 +10,52 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import Layout from "../../components/templates/layout";
-import { GetRoles } from "../../services/dataService/dataService";
+import { CreateUser, GetRoles } from "../../services/dataService/dataService";
+import { useNavigate } from "react-router-dom";
+
+interface UserDTO {
+  id: number;
+  userName: string;
+  password: string;
+  email: string;
+  roleId: number;
+}
 
 const SignUp: React.FC = () => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState<{ id: number; roleName: string, permission: string }>({ id: 0, roleName: "", permission: "" });
-  const [roles, setRoles] = useState<{ id: number; roleName: string }[]>([])
+  const [role, setRole] = useState<{
+    id: number;
+    roleName: string;
+    permission: string;
+  }>({ id: 0, roleName: "", permission: "" });
+  const [roles, setRoles] = useState<{ id: number; roleName: string }[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const passwordsMatch = () => {
+    return password === confirmPassword;
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    // Submit the form data to the server
-    // ...
     setLoading(false);
+    if (!passwordsMatch()) {
+      setErrorMessage("Passwords do not match");
+      // Show an error message or prevent form submission
+      return;
+    }
+    
   };
   const handleRoleChange = (event: SelectChangeEvent<string>) => {
-    const selectedRole = roles.find((role) => role.id === parseInt(event.target.value));
+    const selectedRole = roles.find(
+      (role) => role.id === parseInt(event.target.value)
+    );
     if (selectedRole) {
       setRole({
         id: selectedRole.id,
@@ -37,6 +63,21 @@ const SignUp: React.FC = () => {
         permission: selectedRole.roleName,
       });
     }
+  };
+  const handleRegister = () => {
+    if (!passwordsMatch()) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+    const user: UserDTO = {
+      id: 0,
+      userName: name,
+      password: password,
+      email: email,
+      roleId: role.id,
+    };
+    CreateUser(user);
+    navigate("/");
   };
 
   React.useEffect(() => {
@@ -47,12 +88,12 @@ const SignUp: React.FC = () => {
   return (
     <>
       <Layout />
-      <div
-        style={{ margin: "auto", width: "50%" }}
-      >
+      <div style={{ margin: "auto", width: "50%" }}>
         <div style={{ padding: "10px", marginBottom: "20px" }}>
-        <h1 style={{ color: "#333", textAlign: "center", margin: "0" }}>Sign Up Form</h1>
-      </div>
+          <h1 style={{ color: "#333", textAlign: "center", margin: "0" }}>
+            Sign Up Form
+          </h1>
+        </div>
         <form
           style={{
             display: "flex",
@@ -111,11 +152,14 @@ const SignUp: React.FC = () => {
           >
             <InputLabel htmlFor="confirmPassword">Confirm Password</InputLabel>
             <Input
-              id="password"
+              id="confirmPassword"
               type="password"
               onChange={(event) => setConfirmPassword(event.target.value)}
             />
           </FormControl>
+          {errorMessage && (
+            <p style={{ color: "red", margin: "5px 0 0 0" }}>{errorMessage}</p>
+          )}
           <FormControl
             required
             style={{ margin: "10px", padding: "10px", width: "50%" }}
@@ -142,6 +186,7 @@ const SignUp: React.FC = () => {
             type="submit"
             variant="contained"
             disabled={loading}
+            onClick={handleRegister}
           >
             Register
           </Button>

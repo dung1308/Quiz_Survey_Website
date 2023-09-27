@@ -1,24 +1,48 @@
 import React, {useState} from 'react';
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from '@mui/material';
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography} from '@mui/material';
 import StyledTableCell from '../../molecules/TableCellStyle';
 import StyledTableRow from '../../molecules/StyledTableRow';
 import { getSurveyByID, createSurvey1, getSurveys, updatedJSON,  } from '../../../services/dataService/dataService';
+import { useNavigate } from 'react-router-dom';
 
 
 
 const RowComponent:React.FC<any> = ({row, index, status, userId}) => {
+    const navigate = useNavigate();
+
     const [enabled, setEnabled] = useState<Boolean>(status)
     const [open, setOpen] = useState(false);
+    const [openJoin, setOpenJoin] = useState(false);
+    const [joinSurveyCode, setJoinSurveyCode] = useState("");
+    const [wrongSurveyCode, setWrongSurveyCode] = useState(false);
     const buttonHandler = () => {
         setEnabled(status => !status)
     }
 
+    const buttonJoinWindowOpen = () => {
+      setOpenJoin(true)
+    }
+
+    const buttonJoinWindowClose = () => {
+      setOpenJoin(false)
+    }
+
     const buttonInviteWindowOpen = () => {
       setOpen(true)
+      setWrongSurveyCode(false)
     }
 
     const buttonInviteWindowClose = () => {
       setOpen(false)
+      setWrongSurveyCode(false)
+    }
+
+    const handleJoin = () => {
+      if (joinSurveyCode === row.surveyCode){
+        console.log(true);
+        navigate(`/answer_page/${userId}/${row.id}`);
+      }
+      else setWrongSurveyCode(true)
     }
     
     return (
@@ -41,7 +65,8 @@ const RowComponent:React.FC<any> = ({row, index, status, userId}) => {
           </Button>
           
           
-          <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small" 
+          {/* <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small"  */}
+          <Button variant="contained" color="primary" onClick={buttonJoinWindowOpen} size="small" 
           sx={{marginLeft: 2,
             backgroundColor: 'lightgreen',
             color: 'white',
@@ -69,7 +94,7 @@ const RowComponent:React.FC<any> = ({row, index, status, userId}) => {
             ':hover': { backgroundColor: '#ccc' }}}
 
           >
-          {enabled? "Enabled": 'Disabled'}
+          {enabled? "Disabled": 'Enabled'}
           </Button>
           </Box>
           
@@ -95,6 +120,33 @@ const RowComponent:React.FC<any> = ({row, index, status, userId}) => {
         <DialogActions>
           <Button onClick={buttonInviteWindowClose}>Cancel</Button>
           <Button onClick={buttonInviteWindowClose}>Subscribe</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openJoin} onClose={buttonJoinWindowClose}>
+        <DialogTitle>Subscribe</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter the survey code
+          </DialogContentText>
+          {wrongSurveyCode && (
+            <Typography variant="caption" color="error">
+              Wrong Survey Code. Try Again
+            </Typography>
+          )}
+          <TextField
+            autoFocus
+            margin="dense"
+            id="Code"
+            label="Code"
+            fullWidth
+            variant="standard"
+            onChange={(e: any) => {setJoinSurveyCode(e.target.value)}}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={buttonJoinWindowClose}>Cancel</Button>
+          <Button onClick={handleJoin}>Join</Button>
         </DialogActions>
       </Dialog>
   </StyledTableRow>

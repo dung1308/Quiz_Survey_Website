@@ -310,6 +310,39 @@ interface Category {
   id: number;
   categoryName: string;
 }
+
+interface ResultShowDTO {
+  id: number;
+  onAnswers: string[];
+  resultScore: number;
+  questionId: number;
+  questionBankInteractId: number;
+}
+
+interface UserDTO {
+  id: number;
+  userName: string;
+  password: string;
+  email: string;
+  roleId: number;
+}
+
+export class Interaction {
+  id: number;
+  resultScores: number;
+  userId: number;
+  questionBankId: number;
+  resultShowDTOs: ResultShowDTO[];
+
+  constructor(data: any) {
+    this.id = data.id;
+    this.resultScores = data.resultScores;
+    this.userId = data.userId;
+    this.questionBankId = data.questionBankId;
+    this.resultShowDTOs = data.resultShowDTOs;
+  }
+}
+
 interface QuestionDTO {
   id: number;
   questionName: string;
@@ -319,22 +352,20 @@ interface QuestionDTO {
   score: number;
   questionBankId: number;
 }
-interface SurveyCode {
-  surveyCode: string;
-}
 
 export class QuestionBank {
   id: number;
   surveyCode: string;
   surveyName: string;
   owner: string;
-  category: string;
   timer: string;
   startDate: string;
   endDate: string;
   status: string;
   enableStatus: boolean;
   categoryListId: number;
+  categoryName: string;
+  dateTimeNow: string;
   questionDTOs: QuestionDTO[];
 
   constructor(data: any) {
@@ -342,13 +373,14 @@ export class QuestionBank {
     this.surveyCode = data.surveyCode;
     this.surveyName = data.surveyName;
     this.owner = data.owner;
-    this.category = data.category;
     this.timer = data.timer;
     this.startDate = data.startDate;
     this.endDate = data.endDate;
     this.status = data.status;
     this.enableStatus = data.enableStatus;
     this.categoryListId = data.categoryListId;
+    this.categoryName = data.categoryName;
+    this.dateTimeNow = data.dateTimeNow;
     this.questionDTOs = data.questionDTOs;
   }
 }
@@ -356,6 +388,18 @@ export class QuestionBank {
 export async function GetRoles(): Promise<Role[]> {
   return axios
     .get<Role[]>("https://localhost:7232/Roles")
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetCurrentDate(): Promise<string> {
+  return axios
+    .get("https://localhost:7232/GetCurrentDate")
     .then((response) => {
       return response.data;
     })
@@ -376,17 +420,14 @@ export async function GetCategories(): Promise<Category[]> {
       return [];
     });
 }
-
-export async function GetSurveyCodes(): Promise<SurveyCode[]> {
-  return axios
-    .get<SurveyCode[]>("https://localhost:7232/GetSurveyCode")
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-      return [];
-    });
+export async function getSurveyCodes() {
+  try {
+    const response = await axios.get("https://localhost:7232/GetSurveyCode");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
 }
 
 // export async function GetQuestionBankById(id: number): Promise<QuestionBank[]> {
@@ -400,6 +441,18 @@ export async function GetSurveyCodes(): Promise<SurveyCode[]> {
 //         return [];
 //       });
 // }
+export async function GetLatestInteractByUserAndQuestionBank(userId: number, questionBankId: number): Promise<Interaction> {
+  return axios
+    .get(`https://localhost:7232/User/${userId}/QuestionBank/${questionBankId}/questionBankInteractLatest`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
+}
+
 export async function GetQuestionBankById(id: number) {
   return axios
     .get(`https://localhost:7232/GetQuestionBank/${id}`)
@@ -413,6 +466,22 @@ export async function GetQuestionBankById(id: number) {
 }
 
 export async function GetQuestionBankByUserId(
+  userId: number
+): Promise<QuestionBank[]> {
+  return axios
+    .get<QuestionBank[]>(
+      `https://localhost:7232/User/${userId}/GetQuestionBank`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetQuestionBankByUserAndCategory(
   userId: number,
   categoryId: number
 ): Promise<QuestionBank[]> {
@@ -429,20 +498,88 @@ export async function GetQuestionBankByUserId(
     });
 }
 
-export function CreateQuestionBank(id: string, survey: Survey): Survey[] {
-  const surveys = getSurveys();
-  const index = surveys.findIndex((x) => x.surveyId === id);
-  surveys[index] = survey;
-  const data = setSurveys(surveys);
-  return data;
+export async function CreateQuestionBank(questionBank: QuestionBank) {
+  try {
+    const response = await axios.post(
+      "https://localhost:7232/AddQuestionBank",
+      questionBank
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-export function setSurveyById(id: string, survey: Survey): Survey[] {
-  const surveys = getSurveys();
-  const index = surveys.findIndex((x) => x.surveyId === id);
-  surveys[index] = survey;
-  const data = setSurveys(surveys);
-  return data;
+export async function CreateQuestionBankByUserId(
+  userId: number,
+  questionBank: QuestionBank
+) {
+  try {
+    const response = await axios.post(
+      `https://localhost:7232/user/${userId}/AddQuestionBankAndInteract`,
+      questionBank
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function CreateCategory(
+  category: Category
+) {
+  try {
+    const response = await axios.post(
+      `https://localhost:7232/AddCategory`,
+      category
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function CreateUser(
+  user: UserDTO
+) {
+  try {
+    const response = await axios.post(
+      `https://localhost:7232/AddUser`,
+      user
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function CreateAnswer(
+  questionBankInteract: Interaction
+) {
+  try {
+    const response = await axios.post(
+      `https://localhost:7232/CreateAnswer`,
+      questionBankInteract
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function setQuestionBankById(
+  id: number,
+  questionBank: QuestionBank
+) {
+  try {
+    const response = await axios.put(
+      `https://localhost:7232/UpdateQuestionBank?id=${id}`,
+      questionBank
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function GetQuestionsByQuestionBankId(questionBankId: number) {
@@ -459,7 +596,7 @@ export async function GetQuestionsByQuestionBankId(questionBankId: number) {
 
 export async function deleteQuestionById(id: string): Promise<Boolean> {
   return axios
-    .get(`https://localhost:7232/DeleteQuestion?id=${id}`)
+    .delete(`https://localhost:7232/DeleteQuestion?id=${id}`)
     .then((response) => {
       return true;
     })

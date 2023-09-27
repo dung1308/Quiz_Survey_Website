@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface Slide {
+  no: string,
   question: string,
   choices: string[],
   type: string;
@@ -32,6 +33,7 @@ const SliderComponent: React.FC<SliderProps> = ({ slides, setSlideIndex, slideIn
   
   const addSlide = () => {
     const newSlide: Slide = {
+      no: '0',
       question: '',
       choices:['','','',''],
       type: 'Quiz',

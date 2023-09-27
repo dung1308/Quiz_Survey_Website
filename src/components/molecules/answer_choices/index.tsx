@@ -1,22 +1,47 @@
-import React from 'react';
-import {Box, Input, InputLabel, InputAdornment, FormControl, Checkbox, Typography, FormControlLabel} from '@mui/material';
-
-const AnswerChoice: React.FC<any> = (
-    {answerLabel, answer, value}) => {
-
+import React from "react";
+import {
+  Box,
+  Input,
+  InputLabel,
+  InputAdornment,
+  FormControl,
+  Checkbox,
+  Typography,
+  FormControlLabel,
+} from "@mui/material";
+// answerLabel, answer, value
+const AnswerChoice: React.FC<any> = ({
+  index,
+  setQuestion,
+  question,
+}) => {
   const [checked, setChecked] = React.useState(false);
 
   const handleChange = () => {
-    setChecked(checked => !checked);
+    setChecked((checked) => !checked);
+  };
+
+  const handleChangeAnswer = (index:number) => {
+    setChecked((checked: any) => !checked);
+    if (!checked === true) {
+      question.answer.push(question.choices[index]);
+      setQuestion(question);
+    } else if (!checked === false) {
+      question.answer = question.answer.filter(
+        (a: any) => a !== question.choices[index]
+      );
+      setQuestion(question);
+    }
+    console.log(question.answer);
   };
 
   return (
-    <Box sx={{ '& > :not(style)': { m: 1 } }}>
-      <FormControl variant="standard">
+    <Box sx={{ "& > :not(style)": { m: 1 } }}>
+      {/* <FormControl variant="standard">
         <InputLabel htmlFor="input-with-icon-adornment">
           {answerLabel}
         </InputLabel>
-        <Input
+        <Input disabled = {true}
           id="input-with-icon-adornment" value = {answer}
           startAdornment={
             <InputAdornment position="start">
@@ -28,17 +53,65 @@ const AnswerChoice: React.FC<any> = (
               />
             </InputAdornment>
           }
-        />
-        {/* <FormControlLabel
+        /> */}
+      {/* <FormControlLabel
             control={<Checkbox value={value}
             checked={checked}
             onChange={handleChange}
             inputProps={{ 'aria-label': 'controlled' }} />}
             label={<Typography variant="body1">{answer}</Typography>}
     /> */}
-      </FormControl>
+      {/* </FormControl> */}
+      <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        marginBottom: "10px",
+      }}
+    >
+      <Checkbox
+        checked={checked}
+        inputProps={{ "aria-label": "controlled" }}
+        onChange={() => handleChangeAnswer(index)}
+        sx={{
+          fontSize: "18px",
+          fontWeight: "bold",
+          color: "#8d6e63",
+          textShadow: "1px 1px #ffffff",
+          marginRight: "10px",
+          paddingTop: "5px",
+        }}
+      />
+      <Box
+        sx={{
+          backgroundColor: "#f5f5f5",
+          border: "1px solid gray",
+          borderRadius: "5px",
+          padding: "10px",
+          marginBottom: "20px",
+          width: "100%",
+        }}
+      >
+        <Typography
+          variant="body1"
+          component="div"
+          sx={{
+            "& .Mui-disabled": {
+              color: "gray",
+              backgroundColor: "#f5f5f5",
+              border: "1px solid gray",
+              borderRadius: "5px",
+              padding: "10px",
+              marginBottom: "20px",
+            },
+          }}
+        >
+          {question.choices[index]}
+        </Typography>
+      </Box>
+      </label>
     </Box>
   );
-}
+};
 
-export default AnswerChoice
+export default AnswerChoice;

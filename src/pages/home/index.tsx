@@ -42,7 +42,7 @@ function Home() {
     return (
       <>
         <Layout/>
-          <Box m={2}>
+          {/* <Box m={2}>
               <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 700 }} aria-label="customized table">
                   <TableHead>
@@ -71,7 +71,8 @@ function Home() {
                   </TableBody>
                   </Table>
               </TableContainer>
-          </Box>
+          </Box> */}
+          <h2>Press Survey to show all surveys</h2>
       </>
     );
   }

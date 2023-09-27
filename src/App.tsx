@@ -10,6 +10,7 @@ import Login from './pages/login';
 import SignUp from './pages/signup';
 import AnswerPage from './pages/answerPage';
 import CreateSurvey from './pages/create_survey';
+import Category from './pages/category';
 
 const themeLight = createTheme({
   palette: {
@@ -40,6 +41,7 @@ const App: React.FC = () => {
               <Route path = "/surveys" element = {<Surveys/>} />
               <Route path = "/report" element = {<Report/>} />
               <Route path = "/about" element = {<About/>} />
+              <Route path = "/category" element = {<Category/>} />
               <Route path = "/login" element = {<Login/>} />
               <Route path = "/signup" element = {<SignUp/>} />
               <Route path = "/answer_page/:userId/:surveyId/" element = {<AnswerPage/>} />

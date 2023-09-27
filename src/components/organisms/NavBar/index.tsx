@@ -12,7 +12,8 @@ import PPJ_Group from '../../../assets/images/PPJ_Group.png';
 const AppBarSignIn:React.FC = () => {
     const pages= [{name:'Survey', link: "/surveys"}
     ,{name:'Report', link: "/report"}
-    ,{name:'About', link: "/about"}];
+    ,{name:'About', link: "/about"}
+    ,{name:'Category', link: "/category"}];
     const loginPages = [{name:'Login', link: "/login"}
                   ,{name:'Sign Up', link: "/signup"}];
     /*useState pages*/
