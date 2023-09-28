@@ -22,24 +22,18 @@ import {
   updatedJSON,
   setStatusAfterJoin,
   setEnableStatusQuestionBank,
-  GetQuestionBankByUserId,
 } from "../../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import dayjs, { Dayjs } from "dayjs";
 
-const RowComponent: React.FC<any> = ({
+const RowComponent_Group: React.FC<any> = ({
   row,
   index,
-  status,
-  userId,
-  questionBank,
   userData,
-  setQuestionBank,
 }) => {
   const navigate = useNavigate();
 
-  const [enabled, setEnabled] = useState<Boolean>(status);
   const [open, setOpen] = useState(false);
   const [openJoin, setOpenJoin] = useState(false);
   const [joinSurveyCode, setJoinSurveyCode] = useState("");
@@ -53,18 +47,6 @@ const RowComponent: React.FC<any> = ({
   const [isOwner, setIsOwner] = useState(
     (row.owner ?? "1") === (userData.userName ?? "1")
   );
-  const buttonHandler = async () => {
-    // setEnabled((status) => !status);
-    // setLoading(true);
-    setEnabled((status) => !status);
-    await setEnableStatusQuestionBank(row.id, !enabled).then((data) => {
-      GetQuestionBankByUserId(userData.id).then((data) => {
-        setQuestionBank(data.reverse());
-        console.log(data)
-      });
-      console.log(`https://localhost:7232/UpdateEnabledStatus?id=${row.id}&enableStatus=${!enabled}`)
-    });
-  };
 
   const buttonJoinWindowOpen = () => {
     setOpenJoin(true);
@@ -84,16 +66,6 @@ const RowComponent: React.FC<any> = ({
     setWrongSurveyCode(false);
   };
 
-  const handleJoin = async () => {
-    if (joinSurveyCode === row.surveyCode) {
-      await setStatusAfterJoin(userData.id, row.id).then((data) => {
-        if (typeof data === "string" && data !== "") {
-          return;
-        }
-        navigate(`/answer_page/${userData.id}/${row.id}`);
-      });
-    } else setWrongSurveyCode(true);
-  };
 
   return (
     <StyledTableRow key={row.id}>
@@ -126,7 +98,7 @@ const RowComponent: React.FC<any> = ({
 
           {/* <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small"  */}
           <Button
-            disabled={joinDisable || !enabled}
+            disabled={joinDisable}
             variant="contained"
             color="primary"
             onClick={buttonJoinWindowOpen}
@@ -156,22 +128,7 @@ const RowComponent: React.FC<any> = ({
             invite
           </Button>
 
-          <Button
-            disabled={enable_Edit_Disable}
-            variant="contained"
-            color={enabled ? "warning" : "error"}
-            onClick={buttonHandler}
-            size="small"
-            sx={{
-              marginLeft: 2,
-              backgroundColor: enabled ? "#e0e0e0" : "#ccc",
-              color: enabled ? "#333" : "#666",
-              opacity: enabled ? 1 : 0.5,
-              ":hover": { backgroundColor: "#ccc" },
-            }}
-          >
-            {enabled && !enable_Edit_Disable ? "Disabled" : "Enabled"}
-          </Button>
+          
         </Box>
       </StyledTableCell>
       <StyledTableCell align="center">{row.status}</StyledTableCell>
@@ -211,35 +168,7 @@ const RowComponent: React.FC<any> = ({
           <Button onClick={buttonInviteWindowClose}>Subscribe</Button>
         </DialogActions>
       </Dialog>
-
-      <Dialog open={openJoin} onClose={buttonJoinWindowClose}>
-        <DialogTitle>Subscribe</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Enter the survey code</DialogContentText>
-          {wrongSurveyCode && (
-            <Typography variant="caption" color="error">
-              Wrong Survey Code. Try Again
-            </Typography>
-          )}
-          <TextField
-            autoFocus
-            margin="dense"
-            id="Code"
-            label="Code"
-            fullWidth
-            variant="standard"
-            onChange={(e: any) => {
-              setJoinSurveyCode(e.target.value);
-            }}
-          />
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={buttonJoinWindowClose}>Cancel</Button>
-          <Button onClick={handleJoin}>Join</Button>
-        </DialogActions>
-      </Dialog>
     </StyledTableRow>
   );
 };
-export default RowComponent;
+export default RowComponent_Group;

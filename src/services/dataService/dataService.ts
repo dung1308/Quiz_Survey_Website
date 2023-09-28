@@ -59,6 +59,7 @@ export function getSurveys(): Survey[] {
   return data;
 }
 
+
 export function getSurveyId() {
   const objStr = localStorage.getItem("myData");
   let data: Survey[] = JSON.parse(objStr || "null");
@@ -319,12 +320,31 @@ interface ResultShowDTO {
   questionBankInteractId: number;
 }
 
-interface UserDTO {
+export class UserDTO {
   id: number;
   userName: string;
   password: string;
   email: string;
   roleId: number;
+
+  constructor(
+    id: number,
+    userName: string,
+    password: string,
+    email: string,
+    roleId: number
+  ) {
+    this.id = id;
+    this.userName = userName;
+    this.password = password;
+    this.email = email;
+    this.roleId = roleId;
+  }
+}
+
+interface LoginUserDTO {
+  userName: string;
+  password: string;
 }
 
 export class Interaction {
@@ -430,6 +450,16 @@ export async function getSurveyCodes() {
   }
 }
 
+export async function getUserNames() {
+  try {
+    const response = await axios.get("https://localhost:7232/GetUserNames");
+    return response.data;
+  } catch (error) {
+    console.log((error as Error).message);
+    return [];
+  }
+}
+
 // export async function GetQuestionBankById(id: number): Promise<QuestionBank[]> {
 //   return axios
 //       .get<QuestionBank[]>(`https://localhost:7232/GetQuestionBank/${id}`)
@@ -441,15 +471,37 @@ export async function getSurveyCodes() {
 //         return [];
 //       });
 // }
-export async function GetLatestInteractByUserAndQuestionBank(userId: number, questionBankId: number): Promise<Interaction> {
+export async function GetLatestInteractByUserAndQuestionBank(
+  userId: number,
+  questionBankId: number
+): Promise<Interaction> {
   return axios
-    .get(`https://localhost:7232/User/${userId}/QuestionBank/${questionBankId}/questionBankInteractLatest`)
+    .get(
+      `https://localhost:7232/User/${userId}/QuestionBank/${questionBankId}/questionBankInteractLatest`
+    )
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
       console.log(error);
       return null;
+    });
+}
+
+export async function LoginData(user: LoginUserDTO): Promise<UserDTO> {
+  return axios
+    .post("https://localhost:7232/LoginUser", user)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log(error.response.data);
+        return error.response.data;
+      } else {
+        console.log(error);
+        return null;
+      }
     });
 }
 
@@ -471,6 +523,22 @@ export async function GetQuestionBankByUserId(
   return axios
     .get<QuestionBank[]>(
       `https://localhost:7232/User/${userId}/GetQuestionBank`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetDistinctQuestionBankByUser(
+  userId: number,
+): Promise<QuestionBank[]> {
+  return axios
+    .get<QuestionBank[]>(
+      `https://localhost:7232/User/${userId}/GetQuestionBankInteractByUserDistinct`
     )
     .then((response) => {
       return response.data;
@@ -525,9 +593,7 @@ export async function CreateQuestionBankByUserId(
   }
 }
 
-export async function CreateCategory(
-  category: Category
-) {
+export async function CreateCategory(category: Category) {
   try {
     const response = await axios.post(
       `https://localhost:7232/AddCategory`,
@@ -538,24 +604,24 @@ export async function CreateCategory(
     console.error(error);
   }
 }
-
-export async function CreateUser(
-  user: UserDTO
-) {
-  try {
-    const response = await axios.post(
-      `https://localhost:7232/AddUser`,
-      user
-    );
-    console.log(response.data);
-  } catch (error) {
-    console.error(error);
-  }
+export async function CreateUser(user: UserDTO) {
+  return axios
+    .post(`https://localhost:7232/Register`, user)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log(error.response.data);
+        return error.response.data;
+      } else {
+        console.log(error);
+        return null;
+      }
+    });
 }
 
-export async function CreateAnswer(
-  questionBankInteract: Interaction
-) {
+export async function CreateAnswer(questionBankInteract: Interaction) {
   try {
     const response = await axios.post(
       `https://localhost:7232/CreateAnswer`,
@@ -580,6 +646,40 @@ export async function setQuestionBankById(
   } catch (error) {
     console.error(error);
   }
+}
+
+export async function setEnableStatusQuestionBank(
+  id: number,
+  enableStatus: Boolean
+) {
+  return axios
+    .put(
+      `https://localhost:7232/UpdateEnabledStatus?id=${id}&enableStatus=${enableStatus}`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
+}
+
+export async function setStatusAfterJoin(
+  userId: number,
+  questionBankId: number
+) {
+  return axios
+    .put(
+      `https://localhost:7232/UpdateStatusAfterJoin?userId=${userId}&questionBankId=${questionBankId}`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
 }
 
 export async function GetQuestionsByQuestionBankId(questionBankId: number) {

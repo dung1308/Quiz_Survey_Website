@@ -58,11 +58,13 @@ const Quiz_Choice: React.FC<any> = ({
     console.log("Choice:",choices[index])
     choices[index] = event.target.value;
     setChoices(choices);
+    console.log("Current Answer: ",currentAnswer)
     if (currentAnswer) {
+      console.log(event.target.value)
       // update answer array with new choice
       // const answerIndex = answers.indexOf(currentAnswer);
       // answers[answerIndex] = event.target.value;
-      setAnswers([newChoice])
+      setAnswers([event.target.value])
       console.log("Quiz Answers:", answers)
     }
     

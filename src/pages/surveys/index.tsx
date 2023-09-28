@@ -17,7 +17,7 @@ import Layout from "../../components/templates/layout";
 import StyledTableCell from "../../components/molecules/TableCellStyle";
 import RowComponent from "../../components/organisms/rowComponent";
 import JSONdata from "../../data/data.json";
-import { GetCategories, GetQuestionBankByUserId, QuestionBank, dataSevice } from "../../services/dataService/dataService";
+import { GetCategories, GetQuestionBankByUserId, QuestionBank, UserDTO, dataSevice } from "../../services/dataService/dataService";
 import {
   getSurveyByID,
   getSurveys,
@@ -82,6 +82,8 @@ function Surveys() {
   const [questionBank, setQuestionBank] = useState<QuestionBank[]>([]);
   const [userId, setUserId] = useState(1);
   const [categories, setCategories] = useState<Category[]>([]);
+  const newData = localStorage.getItem("currentUser") ?? JSON.stringify(new UserDTO(0, "", "", "", 0));
+  const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
 
   const getCategoryNameById = (id: number) => {
     const category = categories.find((entity) => entity.id === id);
@@ -93,15 +95,14 @@ function Surveys() {
 
   useEffect(() => {
     setLoading(true);
-    GetQuestionBankByUserId(userId).then((data) => {
+    setUserData(JSON.parse(newData));
+    console.log(userData)
+    GetQuestionBankByUserId(userData.id).then((data) => {
       setQuestionBank(data.reverse());
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000)
       setLoading(false);
       console.log(data)
     });
-  }, [userId]);
+  }, [setUserData]);
 
   // useEffect(() => {
   //   setLoading(true);
@@ -136,7 +137,7 @@ function Surveys() {
   }, [questionBank]);
 
   const handleCreateSurvey = () => {
-    navigate(`/${userId}/create`);
+    navigate(`/${userData.id}/create`);
   };
 
   return (
@@ -168,13 +169,14 @@ function Surveys() {
                 <StyledTableCell align="right">Name</StyledTableCell>
                 <StyledTableCell align="right">Owner</StyledTableCell>
                 <StyledTableCell align="right">Category</StyledTableCell>
+                <StyledTableCell align="right">Expired Date</StyledTableCell>
                 <StyledTableCell align="center">Actions</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((row:any, index:number) => (
-                <RowComponent row={row} index={index} userId = {userId} questionBank = {questionBank} />
+                <RowComponent setQuestionBank={setQuestionBank} row={row} index={index} userId = {userId} questionBank = {questionBank} status = {row.enableStatus} userData = {userData} />
               ))}
             </TableBody>
           </Table>

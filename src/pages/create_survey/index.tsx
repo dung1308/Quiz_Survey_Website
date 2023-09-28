@@ -254,12 +254,20 @@ const CreateSurvey: React.FC<any> = () => {
   //const [data, setData] = React.useState(questions); // Use for edit page
   const [seed, setSeed] = React.useState(1); // Reload State
   const [open, setOpen] = React.useState(false);
+  const [openSurveyCode, setOpenSurveyCode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [loadingAll, setLoadingAll] = React.useState(false);
 
   const handleClickOpen = () => {
     if (errorSave === false) setOpen(true);
     else setErrorDialog(true);
+  };
+  const handleCloseSurveyCode = () => {
+    setOpenSurveyCode(false);
+  };
+
+  const handleOpenSurveyCode = () => {
+    setOpenSurveyCode(true);
   };
 
   const handleClose = () => {
@@ -458,7 +466,7 @@ const CreateSurvey: React.FC<any> = () => {
     questionBankId: 0,
   }));
 
-  const fetchCreate = () => {
+  const fetchCreate = async () => {
     //console.log(mappedQuestionBanks);
 
     const questionBankrs: QuestionBank = {
@@ -467,8 +475,8 @@ const CreateSurvey: React.FC<any> = () => {
       surveyName: tempSur.surveyName,
       owner: tempSur.owner,
       timer: tempSur.timer,
-      startDate: tempSur.startDate,
-      endDate: tempSur.endDate,
+      startDate: dayjs(tempSur.startDate, "MM-DD-YYYY HH:mm").format("MM-DD-YYYYTHH:mm"),
+      endDate: dayjs(tempSur.endDate, "MM-DD-YYYY HH:mm").format("MM-DD-YYYYTHH:mm"),
       status: tempSur.status,
       enableStatus: tempSur.enableStatus,
       categoryListId: tempSur.categoryId, // categoryListId: tempSur.categoryId, There is context error in here
@@ -479,7 +487,7 @@ const CreateSurvey: React.FC<any> = () => {
 
     console.log(questionBankrs);
     if (params.userId !== undefined) {
-      CreateQuestionBankByUserId(Number(params.userId), questionBankrs).then(
+      await CreateQuestionBankByUserId(Number(params.userId), questionBankrs).then(
         (data) => {
           setSaveState(false);
           setQuestionBank(questionBankrs)
@@ -502,7 +510,7 @@ const CreateSurvey: React.FC<any> = () => {
     })
   );
 
-  const fetchUpdate = () => {
+  const fetchUpdate = async () => {
     //console.log(mappedQuestionBanks);
 
     const questionBankrs: QuestionBank = {
@@ -524,7 +532,7 @@ const CreateSurvey: React.FC<any> = () => {
 
     //Update(Number(params.userId), Number(tempSur.surveyId),questionBankrs);
     // console.log("This is edit");
-    setQuestionBankById(Number(tempSur.surveyId), questionBankrs).then(
+    await setQuestionBankById(Number(tempSur.surveyId), questionBankrs).then(
       (data) => {
         setSaveState(false);
         setQuestionBank(questionBankrs)
@@ -1027,7 +1035,7 @@ const CreateSurvey: React.FC<any> = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleSave}>Save</Button>
+              <Button onClick={handleOpenSurveyCode}>Save</Button>
             </DialogActions>
           </Dialog>
 
@@ -1041,6 +1049,17 @@ const CreateSurvey: React.FC<any> = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseErrorDialog}>OK</Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={openSurveyCode} onClose={handleCloseSurveyCode}>
+            <DialogTitle>Survey Code</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Your Survey Code is {questionBank.surveyCode}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleSave}>Save</Button>
             </DialogActions>
           </Dialog>
         </Container>

@@ -107,7 +107,7 @@ const Quiz_Template: React.FC<any> = ({
               handleRemoveChoice={handleRemoveChoice}
               index={index}
               choices={choices}
-              setAnswers={setOnAnswerQuizCard}
+              setAnswers={setAnswers}
               setChoices={setChoices}
               setErrorSave={(isError: boolean) => {
                 handleChildError(index, isError);

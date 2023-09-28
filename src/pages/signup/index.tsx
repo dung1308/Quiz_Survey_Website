@@ -25,6 +25,7 @@ const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = React.useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,7 +51,6 @@ const SignUp: React.FC = () => {
       // Show an error message or prevent form submission
       return;
     }
-    
   };
   const handleRoleChange = (event: SelectChangeEvent<string>) => {
     const selectedRole = roles.find(
@@ -76,8 +76,13 @@ const SignUp: React.FC = () => {
       email: email,
       roleId: role.id,
     };
-    CreateUser(user);
-    navigate("/");
+    CreateUser(user).then((data) => {
+      if (typeof data === "string") {
+        setError(data);
+        return;
+      }
+      navigate("/");
+    });
   };
 
   React.useEffect(() => {
@@ -94,6 +99,13 @@ const SignUp: React.FC = () => {
             Sign Up Form
           </h1>
         </div>
+        {error !== "" && (
+          <div style={{ padding: "10px", marginBottom: "20px" }}>
+            <h2 style={{ color: "#FA1140", textAlign: "center", margin: "0" }}>
+              {error}
+            </h2>
+          </div>
+        )}
         <form
           style={{
             display: "flex",
