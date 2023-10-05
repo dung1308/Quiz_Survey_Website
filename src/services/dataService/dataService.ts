@@ -59,7 +59,6 @@ export function getSurveys(): Survey[] {
   return data;
 }
 
-
 export function getSurveyId() {
   const objStr = localStorage.getItem("myData");
   let data: Survey[] = JSON.parse(objStr || "null");
@@ -302,10 +301,15 @@ export class dataSevice {
 // });
 // }
 
-interface Role {
+export class Role {
   id: number;
   roleName: string;
   permission: string;
+  constructor(id: number, roleName: string, permission: string) {
+    this.id = id;
+    this.roleName = roleName;
+    this.permission = permission;
+  }
 }
 interface Category {
   id: number;
@@ -347,6 +351,54 @@ interface LoginUserDTO {
   password: string;
 }
 
+interface ReportDTO {
+  questionBankId: number;
+  surveyName: string;
+  userName: string;
+  resultScores: number;
+}
+
+export class ReportWithPages {
+  pagedItems: ReportDTO[];
+  pages: number;
+
+  constructor(data: any) {
+    this.pagedItems = data.pagedItems;
+    this.pages = data.pages;
+  }
+}
+
+interface ItemsDTO {
+  id: number,
+  questionBankId: number,
+  userId: number,
+  surveyName: string,
+  userName: string,
+  ownerName: string,
+  resultScores: number
+}
+
+interface MultipleReportDTO {
+  questionBankId: number,
+  userId: number,
+  surveyName: string,
+  userName: string,
+  ownerName: string,
+  items: ItemsDTO[],
+}
+
+export class MultipleReportWithPagination {
+  pages: number;
+  numOfItems: number;
+  data: MultipleReportDTO[];
+
+  constructor(data: any) {
+    this.pages = data.pages;
+    this.numOfItems = data.numOfItems;
+    this.data = data.data;
+  }
+}
+
 export class Interaction {
   id: number;
   resultScores: number;
@@ -363,6 +415,30 @@ export class Interaction {
   }
 }
 
+export class InviteUserDTO {
+  id: number;
+  resultScores: number;
+  userId: number;
+  questionBankId: number;
+
+  constructor(
+    id: number,
+    resultScores: number,
+    userId: number,
+    questionBankId: number
+  ) {
+    this.id = id;
+    this.resultScores = resultScores;
+    this.userId = userId;
+    this.questionBankId = questionBankId;
+  }
+}
+
+interface ScoreListDTO {
+  id: number;
+  score: number;
+}
+
 interface QuestionDTO {
   id: number;
   questionName: string;
@@ -371,6 +447,16 @@ interface QuestionDTO {
   answers: string[];
   score: number;
   questionBankId: number;
+}
+
+interface ScoreListDTO {
+  id: number;
+  score: number;
+}
+
+interface DefaultScoreDTO {
+  scoreList: ScoreListDTO;
+  totalScore: number;
 }
 
 export class QuestionBank {
@@ -385,6 +471,7 @@ export class QuestionBank {
   enableStatus: boolean;
   categoryListId: number;
   categoryName: string;
+  userId: number;
   dateTimeNow: string;
   questionDTOs: QuestionDTO[];
 
@@ -400,6 +487,7 @@ export class QuestionBank {
     this.enableStatus = data.enableStatus;
     this.categoryListId = data.categoryListId;
     this.categoryName = data.categoryName;
+    this.userId = data.userId;
     this.dateTimeNow = data.dateTimeNow;
     this.questionDTOs = data.questionDTOs;
   }
@@ -414,6 +502,18 @@ export async function GetRoles(): Promise<Role[]> {
     .catch((error) => {
       console.log(error);
       return [];
+    });
+}
+
+export async function GetRoleById(roleId: number) {
+  return axios
+    .get<Role>(`https://localhost:7232/Role/${roleId}`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
     });
 }
 
@@ -460,6 +560,18 @@ export async function getUserNames() {
   }
 }
 
+export async function GetUserNameById(userId: number): Promise<UserDTO> {
+  return axios
+    .get(`https://localhost:7232/User/${userId}`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
+}
+
 // export async function GetQuestionBankById(id: number): Promise<QuestionBank[]> {
 //   return axios
 //       .get<QuestionBank[]>(`https://localhost:7232/GetQuestionBank/${id}`)
@@ -488,6 +600,22 @@ export async function GetLatestInteractByUserAndQuestionBank(
     });
 }
 
+export async function GetDefaultScores(
+  questionBankId: number
+): Promise<DefaultScoreDTO> {
+  return axios
+    .get(
+      `https://localhost:7232/GetScoreAndTotalScore?questionBankId=${questionBankId}`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
 export async function LoginData(user: LoginUserDTO): Promise<UserDTO> {
   return axios
     .post("https://localhost:7232/LoginUser", user)
@@ -505,7 +633,7 @@ export async function LoginData(user: LoginUserDTO): Promise<UserDTO> {
     });
 }
 
-export async function GetQuestionBankById(id: number) {
+export async function GetQuestionBankById(id: number): Promise<QuestionBank> {
   return axios
     .get(`https://localhost:7232/GetQuestionBank/${id}`)
     .then((response) => {
@@ -533,12 +661,141 @@ export async function GetQuestionBankByUserId(
     });
 }
 
-export async function GetDistinctQuestionBankByUser(
-  userId: number,
-): Promise<QuestionBank[]> {
+export async function GetAllQuestionBanks(): Promise<QuestionBank[]> {
   return axios
-    .get<QuestionBank[]>(
+    .get<QuestionBank[]>("https://localhost:7232/GetQuestionBank")
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+
+
+
+
+export async function GetDistinctQuestionBankInteractByUser(
+  userId: number
+): Promise<ReportDTO[]> {
+  return axios
+    .get<ReportDTO[]>(
       `https://localhost:7232/User/${userId}/GetQuestionBankInteractByUserDistinct`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetDistinctReportsByOwner(
+  userId: number,
+  pageSize: number,
+  pageNumber: number
+): Promise<ReportWithPages> {
+  return axios
+    .get(
+      `https://localhost:7232/GetReportDistinctByOwner?userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+    )
+    .then((response) => {
+      if (
+        response.data.pagedItems !== undefined &&
+        response.data.pagedItems !== null
+      ) {
+        return new ReportWithPages(response.data);
+      } else {
+        return new ReportWithPages({ pagedItems: [], pages: 0 });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new ReportWithPages({ reportDTO: [], pages: 0 });
+    });
+}
+
+export async function GetMultipleReports(
+  permission:string,
+  userId: number,
+  pageSize: number,
+  pageNumber: number
+): Promise<MultipleReportWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetQuestionBankInteracts?permission=${permission}&userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+    )
+    .then((response) => {
+      if (
+        response.data.data !== undefined &&
+        response.data.data !== null
+      ) {
+        return new MultipleReportWithPagination(response.data);
+      } else {
+        return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+    });
+}
+
+export async function GetMultipleReportsForAdmin(
+  userId: number,
+  pageSize: number,
+  pageNumber: number
+): Promise<MultipleReportWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetQuestionBankInteractsForAdmin?userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+    )
+    .then((response) => {
+      if (
+        response.data.data !== undefined &&
+        response.data.data !== null
+      ) {
+        return new MultipleReportWithPagination(response.data);
+      } else {
+        return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+    });
+}
+
+
+
+export async function GetInteractionsByUserAndQuestionBank(
+  userId: number,
+  questionBankId: number
+): Promise<Interaction[]> {
+  return axios
+    .get<Interaction[]>(
+      `https://localhost:7232/User/${userId}/QuestionBank/${questionBankId}/questionBankInteracts`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetLimitedInteractionsByUserAndQuestionBank(
+  userId: number,
+  questionBankId: number,
+  limitedNumber: number
+): Promise<Interaction[]> {
+  return axios
+    .get<Interaction[]>(
+      `https://localhost:7232/GetQuestionBankInteractsUpTo?userId=${userId}&questionBankId=${questionBankId}&limitNumber=${limitedNumber}`
     )
     .then((response) => {
       return response.data;
@@ -579,12 +836,12 @@ export async function CreateQuestionBank(questionBank: QuestionBank) {
 }
 
 export async function CreateQuestionBankByUserId(
-  userId: number,
+  // userId: number,
   questionBank: QuestionBank
 ) {
   try {
     const response = await axios.post(
-      `https://localhost:7232/user/${userId}/AddQuestionBankAndInteract`,
+      `https://localhost:7232/AddQuestionBankAndInteract`,
       questionBank
     );
     console.log(response.data);
@@ -621,6 +878,18 @@ export async function CreateUser(user: UserDTO) {
     });
 }
 
+export async function InviteUser(userName: string, invietUser: InviteUserDTO) {
+  try {
+    const response = await axios.post(
+      `https://localhost:7232/InviteUser?userName=${userName}`,
+      invietUser
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function CreateAnswer(questionBankInteract: Interaction) {
   try {
     const response = await axios.post(
@@ -631,6 +900,25 @@ export async function CreateAnswer(questionBankInteract: Interaction) {
   } catch (error) {
     console.error(error);
   }
+}
+
+export async function CreateAnswerAnonymous(
+  questionBankInteract: Interaction
+): Promise<Interaction> {
+  return axios
+    .post(`https://localhost:7232/CreateAnswerAnonymous`, questionBankInteract)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log(error.response.data);
+        return error.response.data;
+      } else {
+        console.log(error);
+        return null;
+      }
+    });
 }
 
 export async function setQuestionBankById(

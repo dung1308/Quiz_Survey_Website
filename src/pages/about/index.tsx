@@ -5,7 +5,7 @@ import Layout from '../../components/templates/layout';
 const About: React.FC  = () =>  {
     return(
         <>
-            <Layout/>
+            {/* <Layout/> */}
             <div>
                 <h1>about</h1>
             </div>

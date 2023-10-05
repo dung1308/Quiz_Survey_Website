@@ -8,10 +8,15 @@ interface Props {
   onAnswer: (answer: string) => void;
 }
 
-const Typing_Answer_Template: React.FC<any> = ({ setQuestion, question }) => {
+const Typing_Answer_Template: React.FC<any> = ({
+  setQuestion,
+  question,
+  hasAnswered,
+}) => {
   return (
     <TextField
-      placeholder="Fill in your answer"
+      disabled={hasAnswered}
+      placeholder={hasAnswered ? "" : "Fill in your answer"}
       multiline
       rows={8}
       maxRows={10}
@@ -25,8 +30,10 @@ const Typing_Answer_Template: React.FC<any> = ({ setQuestion, question }) => {
         paddingTop: "5px",
       }}
       onChange={(e: any) => {
-        setQuestion({ ...question, answer: [e.target.value] });
-        console.log(question.answer)
+        // const defaultValue = e.target.value === "" ? "..." : [e.target.value];
+        // console.log(question.answer)
+        setQuestion({ ...question, answer: e.target.value ?? "..." });
+        console.log(question.answer);
       }}
     />
   );

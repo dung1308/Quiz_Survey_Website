@@ -40,9 +40,9 @@ const Timer_Answer: React.FC<Props> = ({ time, overTime, setOverTime }) => {
   }, [timeState.time]);
 
   return (
-    <h2>
+    <h1>
       {`${timeState.hours}:${timeState.minutes < 10 ? `0${timeState.minutes}` : timeState.minutes}:${timeState.seconds < 10 ? `0${timeState.seconds}` : timeState.seconds}`}
-    </h2>
+    </h1>
   );
 };
 

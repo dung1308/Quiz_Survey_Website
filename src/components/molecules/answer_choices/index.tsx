@@ -9,19 +9,27 @@ import {
   Typography,
   FormControlLabel,
 } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
 // answerLabel, answer, value
 const AnswerChoice: React.FC<any> = ({
   index,
   setQuestion,
   question,
+  rightAnswers,
+  questionIndex,
+  hasAnswered,
 }) => {
+  const currentAnswer = rightAnswers[questionIndex].includes(
+    question.choices[index]
+  );
+  // const currentAnswer = question.answer.find((a: string) => a === question.choices[index]);
   const [checked, setChecked] = React.useState(false);
 
   const handleChange = () => {
     setChecked((checked) => !checked);
   };
 
-  const handleChangeAnswer = (index:number) => {
+  const handleChangeAnswer = (index: number) => {
     setChecked((checked: any) => !checked);
     if (!checked === true) {
       question.answer.push(question.choices[index]);
@@ -63,52 +71,54 @@ const AnswerChoice: React.FC<any> = ({
     /> */}
       {/* </FormControl> */}
       <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "10px",
-      }}
-    >
-      <Checkbox
-        checked={checked}
-        inputProps={{ "aria-label": "controlled" }}
-        onChange={() => handleChangeAnswer(index)}
-        sx={{
-          fontSize: "18px",
-          fontWeight: "bold",
-          color: "#8d6e63",
-          textShadow: "1px 1px #ffffff",
-          marginRight: "10px",
-          paddingTop: "5px",
-        }}
-      />
-      <Box
-        sx={{
-          backgroundColor: "#f5f5f5",
-          border: "1px solid gray",
-          borderRadius: "5px",
-          padding: "10px",
-          marginBottom: "20px",
-          width: "100%",
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "10px",
         }}
       >
-        <Typography
-          variant="body1"
-          component="div"
+        {currentAnswer && hasAnswered && <DoneIcon />}
+        <Checkbox
+          disabled={hasAnswered}
+          checked={checked}
+          inputProps={{ "aria-label": "controlled" }}
+          onChange={() => handleChangeAnswer(index)}
           sx={{
-            "& .Mui-disabled": {
-              color: "gray",
-              backgroundColor: "#f5f5f5",
-              border: "1px solid gray",
-              borderRadius: "5px",
-              padding: "10px",
-              marginBottom: "20px",
-            },
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "#8d6e63",
+            textShadow: "1px 1px #ffffff",
+            marginRight: "10px",
+            paddingTop: "5px",
+          }}
+        />
+        <Box
+          sx={{
+            backgroundColor: "#f5f5f5",
+            border: "1px solid gray",
+            borderRadius: "5px",
+            padding: "10px",
+            marginBottom: "20px",
+            width: "100%",
           }}
         >
-          {question.choices[index]}
-        </Typography>
-      </Box>
+          <Typography
+            variant="body1"
+            component="div"
+            sx={{
+              "& .Mui-disabled": {
+                color: "gray",
+                backgroundColor: "#f5f5f5",
+                border: "1px solid gray",
+                borderRadius: "5px",
+                padding: "10px",
+                marginBottom: "20px",
+              },
+            }}
+          >
+            {question.choices[index]}
+          </Typography>
+        </Box>
       </label>
     </Box>
   );

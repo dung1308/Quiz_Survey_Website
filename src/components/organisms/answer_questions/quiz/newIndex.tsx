@@ -28,6 +28,9 @@ const Quiz_Type_Answer: React.FC<any> = ({
   setQuestion,
   setOnAnswerQuizCard,
   question,
+  rightAnswers,
+  questionIndex,
+  hasAnswered,
 }: any) => {
   // const [answers_Quiz, setAnswers_Quiz] = useState(answers);
 
@@ -49,57 +52,60 @@ const Quiz_Type_Answer: React.FC<any> = ({
   // const [answers, setAnswers] = useState(
   //   question.answer.map((choice: string) => String(choice))
   // );
-//   const [loading, setLoading] = useState(false);
+  //   const [loading, setLoading] = useState(false);
   const setAnswers = (editAnswer: any) => {
     setQuestion({ ...question, answer: editAnswer });
   };
 
-//   const handleRemoveChoice = (no: number) => {
-//     console.log(no);
-//     if (choices.length > 2) {
-//       setLoading(true);
-//       // question.answer.filter((e: any) => e !== choices[no]);
+  //   const handleRemoveChoice = (no: number) => {
+  //     console.log(no);
+  //     if (choices.length > 2) {
+  //       setLoading(true);
+  //       // question.answer.filter((e: any) => e !== choices[no]);
 
-//       console.log(choices[no]);
-//       choices.splice(no, 1);
-//       console.log(choices);
-//       setChoices(choices);
-//       console.log(choices);
-//       setTimeout(() => {
-//         setLoading(false);
-//       }, 1000);
-//     }
-//   };
+  //       console.log(choices[no]);
+  //       choices.splice(no, 1);
+  //       console.log(choices);
+  //       setChoices(choices);
+  //       console.log(choices);
+  //       setTimeout(() => {
+  //         setLoading(false);
+  //       }, 1000);
+  //     }
+  //   };
 
-//   const handleAddInput = () => {
-//     if (choices.length < 8) {
-//       // answers.push("");
-//       choices.push("");
-//       // setAnswers(answers);
-//       setChoices(choices);
-//     }
-//   };
-//   useEffect(() => {
-//     setErrorSave(errorStatesQuiz.some((state: any) => state));
-//   }, [errorStatesQuiz]);
+  //   const handleAddInput = () => {
+  //     if (choices.length < 8) {
+  //       // answers.push("");
+  //       choices.push("");
+  //       // setAnswers(answers);
+  //       setChoices(choices);
+  //     }
+  //   };
+  //   useEffect(() => {
+  //     setErrorSave(errorStatesQuiz.some((state: any) => state));
+  //   }, [errorStatesQuiz]);
 
   return (
     <FormControl component="fieldset">
-        <RadioGroup
-          onChange={(args) => {
-            setQuestion({ ...question, answer: [args.target.value] });
-          }}
-        >
-          {choices.map((choice: string, index: number) => (
-            <Quiz_Answer_Choice
-              index={index}
-              choices={choices}
-              setAnswers={setAnswers}
-              setChoices={setChoices}
-              question={question}
-            />
-          ))}
-        </RadioGroup>
+      <RadioGroup
+        onChange={(args) => {
+          setQuestion({ ...question, answer: [args.target.value] });
+        }}
+      >
+        {choices.map((choice: string, index: number) => (
+          <Quiz_Answer_Choice
+            index={index}
+            choices={choices}
+            setAnswers={setAnswers}
+            setChoices={setChoices}
+            question={question}
+            rightAnswers={rightAnswers}
+            questionIndex={questionIndex}
+            hasAnswered={hasAnswered}
+          />
+        ))}
+      </RadioGroup>
     </FormControl>
   );
 };

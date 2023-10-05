@@ -27,11 +27,7 @@ import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import dayjs, { Dayjs } from "dayjs";
 
-const RowComponent_Group: React.FC<any> = ({
-  row,
-  index,
-  userData,
-}) => {
+const RowComponent_Group: React.FC<any> = ({ row, index, userData }) => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -66,12 +62,19 @@ const RowComponent_Group: React.FC<any> = ({
     setWrongSurveyCode(false);
   };
 
-
   return (
     <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
         {row.id}
       </StyledTableCell>
+      {row.length > 1 && (
+        row[0].shift().map((content: any, index: number) => (
+          <StyledTableCell align="right">{content}</StyledTableCell>
+        ))
+      )}
+      {/* {row[0].map((content: any, index: number) => (
+        <StyledTableCell align="right">{row.name}</StyledTableCell>
+      ))} */}
       <StyledTableCell align="right">{row.name}</StyledTableCell>
       <StyledTableCell align="right">{row.owner}</StyledTableCell>
       <StyledTableCell align="right">{row.category}</StyledTableCell>
@@ -95,79 +98,9 @@ const RowComponent_Group: React.FC<any> = ({
           >
             edit
           </Button>
-
-          {/* <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small"  */}
-          <Button
-            disabled={joinDisable}
-            variant="contained"
-            color="primary"
-            onClick={buttonJoinWindowOpen}
-            size="small"
-            sx={{
-              marginLeft: 2,
-              backgroundColor: "lightgreen",
-              color: "white",
-              ":hover": { backgroundColor: "limegreen" },
-            }}
-          >
-            Join
-          </Button>
-
-          <Button
-            variant="contained"
-            color="success"
-            size="small"
-            onClick={buttonInviteWindowOpen}
-            sx={{
-              marginLeft: 2,
-              backgroundColor: "lightpink",
-              color: "#333",
-              ":hover": { backgroundColor: "pink" },
-            }}
-          >
-            invite
-          </Button>
-
-          
         </Box>
       </StyledTableCell>
       <StyledTableCell align="center">{row.status}</StyledTableCell>
-      <Dialog open={open} onClose={buttonInviteWindowClose}>
-        <DialogTitle>Subscribe</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-        </DialogContent>
-        <Tooltip title={`Survey Code is: ${row.surveyCode}`}>
-          <Badge
-            badgeContent=""
-            sx={{
-              width: "10px",
-              height: "10px",
-              "border-radius": "50%",
-            }}
-          >
-            <IconButton>
-              <QuestionMarkIcon />
-            </IconButton>
-          </Badge>
-        </Tooltip>
-        <DialogActions>
-          <Button onClick={buttonInviteWindowClose}>Cancel</Button>
-          <Button onClick={buttonInviteWindowClose}>Subscribe</Button>
-        </DialogActions>
-      </Dialog>
     </StyledTableRow>
   );
 };

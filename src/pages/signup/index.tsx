@@ -92,7 +92,7 @@ const SignUp: React.FC = () => {
   }, []);
   return (
     <>
-      <Layout />
+      {/* <Layout /> */}
       <div style={{ margin: "auto", width: "50%" }}>
         <div style={{ padding: "10px", marginBottom: "20px" }}>
           <h1 style={{ color: "#333", textAlign: "center", margin: "0" }}>

@@ -23,6 +23,8 @@ import {
   setStatusAfterJoin,
   setEnableStatusQuestionBank,
   GetQuestionBankByUserId,
+  InviteUser,
+  InviteUserDTO,
 } from "../../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
@@ -42,8 +44,11 @@ const RowComponent: React.FC<any> = ({
   const [enabled, setEnabled] = useState<Boolean>(status);
   const [open, setOpen] = useState(false);
   const [openJoin, setOpenJoin] = useState(false);
+  const [inviteUserName, setInviteUserName] = useState("");
   const [joinSurveyCode, setJoinSurveyCode] = useState("");
-  const [wrongSurveyCode, setWrongSurveyCode] = useState(false);
+  const [isBusyAnswer, setIsBusyAnswer] = useState(false);
+  const [errorInvite, setErrorInvite] = useState("");
+
   const [joinDisable, setJoinDisable] = useState(
     row.status === "Early" || row.status === "Expired"
   );
@@ -53,6 +58,7 @@ const RowComponent: React.FC<any> = ({
   const [isOwner, setIsOwner] = useState(
     (row.owner ?? "1") === (userData.userName ?? "1")
   );
+
   const buttonHandler = async () => {
     // setEnabled((status) => !status);
     // setLoading(true);
@@ -60,9 +66,13 @@ const RowComponent: React.FC<any> = ({
     await setEnableStatusQuestionBank(row.id, !enabled).then((data) => {
       GetQuestionBankByUserId(userData.id).then((data) => {
         setQuestionBank(data.reverse());
-        console.log(data)
+        console.log(data);
       });
-      console.log(`https://localhost:7232/UpdateEnabledStatus?id=${row.id}&enableStatus=${!enabled}`)
+      console.log(
+        `https://localhost:7232/UpdateEnabledStatus?id=${
+          row.id
+        }&enableStatus=${!enabled}`
+      );
     });
   };
 
@@ -72,27 +82,45 @@ const RowComponent: React.FC<any> = ({
 
   const buttonJoinWindowClose = () => {
     setOpenJoin(false);
+    setIsBusyAnswer(false);
   };
 
   const buttonInviteWindowOpen = () => {
     setOpen(true);
-    setWrongSurveyCode(false);
+    setIsBusyAnswer(false);
   };
 
   const buttonInviteWindowClose = () => {
     setOpen(false);
-    setWrongSurveyCode(false);
+    setIsBusyAnswer(false);
   };
 
+  const handleInvite = async () => {
+    const newUser = new InviteUserDTO(0, 0, userData.id, row.id);
+    await InviteUser(inviteUserName, newUser).then((data) => {
+
+      buttonInviteWindowClose();
+    });
+  };
+  //   InviteUser(new InviteUserDTO(0,0, userData.id, row.id))
+  // }
+
   const handleJoin = async () => {
-    if (joinSurveyCode === row.surveyCode) {
-      await setStatusAfterJoin(userData.id, row.id).then((data) => {
-        if (typeof data === "string" && data !== "") {
-          return;
-        }
-        navigate(`/answer_page/${userData.id}/${row.id}`);
-      });
-    } else setWrongSurveyCode(true);
+    // if (joinSurveyCode === row.surveyCode) {
+    const busyUserId = localStorage.getItem("busyUser") ?? JSON.stringify(0);
+    console.log(busyUserId)
+    if ((+busyUserId) === userData.id){
+      setIsBusyAnswer(true)
+      return
+    }
+    localStorage.setItem("busyUser", JSON.stringify(userData.id));
+    await setStatusAfterJoin(userData.id, row.id).then((data) => {
+      if (typeof data === "string" && data !== "") {
+        return;
+      }
+      navigate(`/answer_page/${row.id}`);
+    });
+    // } else setWrongSurveyCode(true);
   };
 
   return (
@@ -102,6 +130,7 @@ const RowComponent: React.FC<any> = ({
       </StyledTableCell>
       <StyledTableCell align="right">{row.name}</StyledTableCell>
       <StyledTableCell align="right">{row.owner}</StyledTableCell>
+      <StyledTableCell align="right">{row.surveyCode}</StyledTableCell>
       <StyledTableCell align="right">{row.category}</StyledTableCell>
       <StyledTableCell align="right">
         {dayjs(row.endDate, "MM-DD-YYYY HH:mm").format("MM-DD-YYYY")}
@@ -126,7 +155,7 @@ const RowComponent: React.FC<any> = ({
 
           {/* <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small"  */}
           <Button
-            disabled={joinDisable || !enabled}
+            disabled={((joinDisable && row.owner !== userData.userName) || !enabled)}
             variant="contained"
             color="primary"
             onClick={buttonJoinWindowOpen}
@@ -141,7 +170,7 @@ const RowComponent: React.FC<any> = ({
             Join
           </Button>
 
-          <Button
+          {userData.userName === row.owner && <Button
             variant="contained"
             color="success"
             size="small"
@@ -154,7 +183,22 @@ const RowComponent: React.FC<any> = ({
             }}
           >
             invite
-          </Button>
+          </Button>}
+
+          {/* <Button
+            variant="contained"
+            color="success"
+            size="small"
+            onClick={buttonInviteWindowOpen}
+            sx={{
+              marginLeft: 2,
+              backgroundColor: "lightpink",
+              color: "#333",
+              ":hover": { backgroundColor: "pink" },
+            }}
+          >
+            invite
+          </Button> */}
 
           <Button
             disabled={enable_Edit_Disable}
@@ -176,23 +220,24 @@ const RowComponent: React.FC<any> = ({
       </StyledTableCell>
       <StyledTableCell align="center">{row.status}</StyledTableCell>
       <Dialog open={open} onClose={buttonInviteWindowClose}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>Invitation</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
+            Please enter the username you want the person to join your survey
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
+            id="userName"
+            label="userName"
             fullWidth
             variant="standard"
+            onChange={(e) => {
+              setInviteUserName(e.target.value);
+            }}
           />
         </DialogContent>
-        <Tooltip title={`Survey Code is: ${row.surveyCode}`}>
+        {/* <Tooltip title={`Survey Code is: ${row.surveyCode}`}>
           <Badge
             badgeContent=""
             sx={{
@@ -205,23 +250,25 @@ const RowComponent: React.FC<any> = ({
               <QuestionMarkIcon />
             </IconButton>
           </Badge>
-        </Tooltip>
+        </Tooltip> */}
         <DialogActions>
           <Button onClick={buttonInviteWindowClose}>Cancel</Button>
-          <Button onClick={buttonInviteWindowClose}>Subscribe</Button>
+          <Button onClick={handleInvite}>Invite</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={openJoin} onClose={buttonJoinWindowClose}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>Join Survey ?</DialogTitle>
         <DialogContent>
-          <DialogContentText>Enter the survey code</DialogContentText>
-          {wrongSurveyCode && (
+          <DialogContentText>
+            Do you want to answer this survey
+          </DialogContentText>
+          {isBusyAnswer && (
             <Typography variant="caption" color="error">
-              Wrong Survey Code. Try Again
+              You are busy answering a survey. Complete your survey first before joining
             </Typography>
           )}
-          <TextField
+          {/* <TextField
             autoFocus
             margin="dense"
             id="Code"
@@ -231,7 +278,7 @@ const RowComponent: React.FC<any> = ({
             onChange={(e: any) => {
               setJoinSurveyCode(e.target.value);
             }}
-          />
+          /> */}
         </DialogContent>
 
         <DialogActions>

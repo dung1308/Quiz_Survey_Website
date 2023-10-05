@@ -25,12 +25,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import QuizCard from "../../components/organisms/QuizCard";
 import {
   CreateQuestionBank,
+  
   CreateQuestionBankByUserId,
+  
   GetCategories,
   GetCurrentDate,
   GetQuestionBankById,
   QuestionBank,
+  Role,
   Survey,
+  UserDTO,
   createSurvey1,
   getSurveyByID,
   getSurveyCodes,
@@ -79,6 +83,17 @@ interface QuestionDTO {
 const CreateSurvey: React.FC<any> = () => {
   //get ID from URL
   const params = useParams();
+
+  const newData =
+    localStorage.getItem("currentUser") ??
+    JSON.stringify(
+      new UserDTO(0, "Anonymous", "Anonymous", "Anonymous@Anonymous.com", 0)
+    );
+  const newRole =
+    localStorage.getItem("Role") ??
+    JSON.stringify(new Role(0, "Anonymous", "Anonymous"));
+  const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
+  const [roleData, setRoleData] = useState<Role>(JSON.parse(newRole));
 
   // useState Question Bank from API
   const [questionBank, setQuestionBank] = useState<QuestionBank>(
@@ -183,9 +198,11 @@ const CreateSurvey: React.FC<any> = () => {
     surveyName: "Geography of Countries",
     owner: "Random",
     categoryId: 1,
-    timer: "01:20",
+    timer: "00:05",
     startDate: dayjs(questionBank.dateTimeNow).format("MM-DD-YYYY HH:mm"),
-    endDate: dayjs(questionBank.dateTimeNow).add(7, 'day').format("MM-DD-YYYY HH:mm"),
+    endDate: dayjs(questionBank.dateTimeNow)
+      .add(7, "day")
+      .format("MM-DD-YYYY HH:mm"),
     status: "composing",
     enableStatus: false,
     questions: [
@@ -209,7 +226,7 @@ const CreateSurvey: React.FC<any> = () => {
   //   "2023-06-19 15:30"
   // );
   const [endDate, setEndDate] = React.useState<Dayjs | null>(
-    dayjs(questionBank.dateTimeNow).add(7, 'day')
+    dayjs(questionBank.dateTimeNow).add(7, "day")
   );
   // const [endDate, setEndDate] = React.useState<string | null>(
   //   "2023-06-19 15:30"
@@ -270,6 +287,10 @@ const CreateSurvey: React.FC<any> = () => {
     setOpenSurveyCode(true);
   };
 
+  const handleSurveyCodeOk = () => {
+    navigate("/surveys");
+  };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -307,6 +328,12 @@ const CreateSurvey: React.FC<any> = () => {
   const handleChange = (index: number, event: SelectChangeEvent) => {
     setDataType(index, event.target.value as string);
     setType(event.target.value);
+    console.log(event.target.value);
+    if ((event.target.value as string) === "Quiz") {
+      data[index].answer = [data[index].answer[0]];
+      setData(data);
+    }
+    console.log("Answer Afer Type Change: ", data[index].answer);
   };
 
   const handleChangeNameSurvey = (
@@ -365,7 +392,9 @@ const CreateSurvey: React.FC<any> = () => {
       // console.log(e)
       // console.log(dayjs(questionBank.dateTimeNow))
 
-      const isSameAsCurrentDate = dayjs(e).isSame(dayjs(currentDate, "MM/DD/YYYY HH:mm"));
+      const isSameAsCurrentDate = dayjs(e).isSame(
+        dayjs(currentDate, "MM/DD/YYYY HH:mm")
+      );
       console.log(questionBank.dateTimeNow);
 
       setIsStartDateAfterValid(isSameAsCurrentDate || isAfterCurrentDate);
@@ -394,14 +423,18 @@ const CreateSurvey: React.FC<any> = () => {
       tempSur.endDate = formattedTime;
       setTempSur({ ...tempSur, endDate: formattedTime });
 
-      const isAfterCurrentDate = e.isAfter(dayjs(currentDate, "MM/DD/YYYY HH:mm"));
+      const isAfterCurrentDate = e.isAfter(
+        dayjs(currentDate, "MM/DD/YYYY HH:mm")
+      );
 
-      const isSameAsCurrentDate = e.isSame(dayjs(currentDate, "MM/DD/YYYY HH:mm"));
-      const isAfterStartDate = e.isAfter(dayjs(tempSur.startDate, "MM-DD-YYYY HH:mm"));
-      setIsEndDateAfterValid( 
-        (isAfterCurrentDate || isSameAsCurrentDate)
-        &&
-        isAfterStartDate
+      const isSameAsCurrentDate = e.isSame(
+        dayjs(currentDate, "MM/DD/YYYY HH:mm")
+      );
+      const isAfterStartDate = e.isAfter(
+        dayjs(tempSur.startDate, "MM-DD-YYYY HH:mm")
+      );
+      setIsEndDateAfterValid(
+        (isAfterCurrentDate || isSameAsCurrentDate) && isAfterStartDate
       );
     }
   };
@@ -471,31 +504,38 @@ const CreateSurvey: React.FC<any> = () => {
 
     const questionBankrs: QuestionBank = {
       id: 0,
-      surveyCode: generateRandomString(surveyCodes, 10).toString(),
+      surveyCode: "string",
       surveyName: tempSur.surveyName,
       owner: tempSur.owner,
       timer: tempSur.timer,
-      startDate: dayjs(tempSur.startDate, "MM-DD-YYYY HH:mm").format("MM-DD-YYYYTHH:mm"),
-      endDate: dayjs(tempSur.endDate, "MM-DD-YYYY HH:mm").format("MM-DD-YYYYTHH:mm"),
+      startDate: dayjs(tempSur.startDate, "MM-DD-YYYY HH:mm").format(
+        "MM-DD-YYYYTHH:mm"
+      ),
+      endDate: dayjs(tempSur.endDate, "MM-DD-YYYY HH:mm").format(
+        "MM-DD-YYYYTHH:mm"
+      ),
       status: tempSur.status,
       enableStatus: tempSur.enableStatus,
       categoryListId: tempSur.categoryId, // categoryListId: tempSur.categoryId, There is context error in here
       categoryName: "string",
+      userId: userData.id,
       dateTimeNow: "string",
       questionDTOs: mappedQuestionBanks,
     };
 
     console.log(questionBankrs);
-    if (params.userId !== undefined) {
-      await CreateQuestionBankByUserId(Number(params.userId), questionBankrs).then(
-        (data) => {
-          setSaveState(false);
-          setQuestionBank(questionBankrs)
-          setSaveState(true);
-          navigate("/surveys")
-        }
-      );
-    }
+    // if (params.userId !== undefined) {
+      await CreateQuestionBankByUserId(
+        // Number(params.userId),
+        questionBankrs
+      ).then((data) => {
+        setSaveState(false);
+        setQuestionBank(questionBankrs);
+        setSaveState(true);
+        navigate("/surveys")
+        // handleOpenSurveyCode();
+      });
+    // }
   };
 
   const mappedQuestionBanksExisted: QuestionDTO[] = data.map(
@@ -526,6 +566,7 @@ const CreateSurvey: React.FC<any> = () => {
       categoryListId: tempSur.categoryId, // categoryListId: tempSur.categoryId, There is context error in here
       categoryName: "string",
       dateTimeNow: "string",
+      userId: userData.id,
       questionDTOs: mappedQuestionBanksExisted,
     };
     // console.log(questionBankrs);
@@ -535,9 +576,10 @@ const CreateSurvey: React.FC<any> = () => {
     await setQuestionBankById(Number(tempSur.surveyId), questionBankrs).then(
       (data) => {
         setSaveState(false);
-        setQuestionBank(questionBankrs)
+        setQuestionBank(questionBankrs);
         setSaveState(true);
         navigate("/surveys")
+        // handleOpenSurveyCode();
       }
     );
   };
@@ -623,16 +665,16 @@ const CreateSurvey: React.FC<any> = () => {
       // console.log(tempSur);
     }
   };
-  useEffect(() => {
-    getSurveyCodes()
-      .then((surveyCoders) => {
-        //console.log(surveyCoders);
-        setSurveyCodes(surveyCoders);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   getSurveyCodes()
+  //     .then((surveyCoders) => {
+  //       //console.log(surveyCoders);
+  //       setSurveyCodes(surveyCoders);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -679,7 +721,7 @@ const CreateSurvey: React.FC<any> = () => {
   return (
     <Box sx={{ width: "100%" }}>
       <CssBaseline />
-      <Layout />
+      {/* <Layout /> */}
       {loadingAll ? (
         <p>Loading...</p>
       ) : (
@@ -1035,7 +1077,7 @@ const CreateSurvey: React.FC<any> = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleOpenSurveyCode}>Save</Button>
+              <Button onClick={handleSave}>Save</Button>
             </DialogActions>
           </Dialog>
 
@@ -1051,7 +1093,7 @@ const CreateSurvey: React.FC<any> = () => {
               <Button onClick={handleCloseErrorDialog}>OK</Button>
             </DialogActions>
           </Dialog>
-          <Dialog open={openSurveyCode} onClose={handleCloseSurveyCode}>
+          {/* <Dialog open={openSurveyCode} onClose={handleCloseSurveyCode}>
             <DialogTitle>Survey Code</DialogTitle>
             <DialogContent>
               <DialogContentText>
@@ -1059,9 +1101,9 @@ const CreateSurvey: React.FC<any> = () => {
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleSave}>Save</Button>
+              <Button onClick={handleSurveyCodeOk}>Ok</Button>
             </DialogActions>
-          </Dialog>
+          </Dialog> */}
         </Container>
       )}
     </Box>

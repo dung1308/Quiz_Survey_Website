@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/templates/layout";
 import {
   Button,
@@ -22,13 +22,17 @@ import Multi_Ans_Quiz_Answer from "../../components/organisms/answer_questions/m
 import { useNavigate, useParams } from "react-router-dom";
 import {
   CreateAnswer,
+  CreateAnswerAnonymous,
+  GetDefaultScores,
   GetLatestInteractByUserAndQuestionBank,
   GetQuestionBankById,
   GetQuestionsByQuestionBankId,
   Interaction,
   Question,
   QuestionBank,
+  Role,
   Survey,
+  UserDTO,
   getSurveyByID,
 } from "../../services/dataService/dataService";
 import QuizCard_Answer from "../../components/organisms/answer_questions/QuizCard";
@@ -86,15 +90,54 @@ interface ResultShowDTO {
   questionBankInteractId: number;
 }
 
+interface ScoreListDTO {
+  id: number;
+  score: number;
+}
+
 const AnswerPage: React.FC<any> = () => {
   const params = useParams();
+
+  const newData =
+    localStorage.getItem("currentUser") ??
+    JSON.stringify(new UserDTO(0, "", "", "", 0));
+  const newRole =
+    localStorage.getItem("Role") ?? JSON.stringify(new Role(0, "", ""));
+  const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
+  const [roleData, setRoleData] = useState<Role>(JSON.parse(newRole));
+
   const [questionBank, setQuestionBank] = React.useState<QuestionBank>();
   const [loading, setLoading] = React.useState(true);
   const [loadingSubmit, setLoadingSubmit] = React.useState(true);
   const [questionAPI, setQuestionAPI] = React.useState();
+  const [rightAnswers, setRightAnswers] = React.useState([[""]]);
+  const [hasSubmitted, setHasSubmitted] = React.useState(false);
   const [openResult, setOpenResult] = React.useState(false);
   const [finalResult, setFinalResult] = React.useState(0.0);
+  const [scoreList, setScoreList] = React.useState<ScoreListDTO[]>([]);
+  const [totalScore, setTotalScore] = React.useState(0.0);
+  const [hasAnswered, setHasAnswered] = React.useState(false);
+
   const navigate = useNavigate();
+
+  // Delete item if change page
+  let isLeavingPage = false;
+
+  function handleBeforeUnload() {
+    if (!isLeavingPage) {
+      // localStorage.setItem("wrong", JSON.stringify("no"));
+      localStorage.removeItem("busyUser");
+    }
+    // else localStorage.removeItem("wrong");
+  }
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  function handleLoad() {
+    isLeavingPage = true;
+  }
+
+  window.addEventListener("load", handleLoad);
 
   const [tempSur, setTempSur] = React.useState<{
     surveyId: string;
@@ -183,6 +226,8 @@ const AnswerPage: React.FC<any> = () => {
           answer: [],
         }))
       );
+      // const one = newSur.questionDTOs.map((question) => (question.answers))
+      setRightAnswers(newSur.questionDTOs.map((question) => question.answers));
       setTempSur({
         surveyId: newSur.id.toString(),
         surveyName: newSur.surveyName,
@@ -274,26 +319,47 @@ const AnswerPage: React.FC<any> = () => {
     })
   );
 
-  const fetchCreateAnswer = () => {
+  const fetchCreateAnswer = async () => {
     //console.log(mappedQuestionBanks);
 
     const questionBankInteract: Interaction = {
       id: 0,
       resultScores: 0,
-      userId: +(params.userId ?? 0),
+      userId: +(userData.id ?? 0),
       questionBankId: +(params.surveyId ?? 0),
       resultShowDTOs: mappedResultShowExisted,
     };
 
-    CreateAnswer(questionBankInteract).then((index) => {
-      GetLatestInteractByUserAndQuestionBank(
-        +(params.userId ?? 0),
-        +(params.surveyId ?? 0)
-      ).then((data) => {
-        setFinalResult(data.resultScores);
-        handleOpenResult();
+    if (localStorage.getItem("currentUser") === null) {
+      console.log(true);
+      await CreateAnswerAnonymous(questionBankInteract).then((anonyData) => {
+        if (typeof anonyData === "string") return;
+        setFinalResult(+anonyData.resultScores ?? 0);
+        console.log(anonyData.resultScores);
+        GetDefaultScores(+(params.surveyId ?? 0)).then((data) => {
+          setTotalScore(data.totalScore);
+          GetLatestInteractByUserAndQuestionBank(
+            +(userData.id ?? 0),
+            +(params.surveyId ?? 0)
+          ).then((data) => {
+            handleOpenResult();
+          });
+        });
       });
-    });
+    } else {
+      await CreateAnswer(questionBankInteract).then((index) => {
+        GetDefaultScores(+(params.surveyId ?? 0)).then((data) => {
+          setTotalScore(data.totalScore);
+          GetLatestInteractByUserAndQuestionBank(
+            +(userData.id ?? 0),
+            +(params.surveyId ?? 0)
+          ).then((data) => {
+            setFinalResult(data.resultScores ?? 0);
+            handleOpenResult();
+          });
+        });
+      });
+    }
     console.log(questionBankInteract);
 
     // Update(Number(params.userId), Number(tempSur.surveyId),questionBankrs);
@@ -304,6 +370,8 @@ const AnswerPage: React.FC<any> = () => {
   const handleSubmit = () => {
     fetchCreateAnswer();
     handleCloseOverTime();
+    localStorage.removeItem("busyUser");
+    setHasSubmitted(true);
     handleCloseSubmit();
     // setTimeout(() => {
     //   GetLatestInteractByUserAndQuestionBank(
@@ -323,13 +391,14 @@ const AnswerPage: React.FC<any> = () => {
   };
   const handleResultOk = () => {
     setOpenResult(false);
-    navigate("/surveys");
+    // navigate("/surveys");
+    setHasAnswered(true);
   };
 
   return (
     <>
       <CssBaseline />
-      <Layout />
+      {/* <Layout /> */}
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -382,6 +451,9 @@ const AnswerPage: React.FC<any> = () => {
                   <h1 className="text-center">Question {index + 1}</h1>
                   <QuizCard_Answer
                     question={question}
+                    rightAnswers={rightAnswers}
+                    hasAnswered={hasAnswered}
+                    questionIndex={index}
                     setQuestion={(incomingQ: any) => {
                       setData(
                         data.map((currentQ, indexQ) =>
@@ -423,43 +495,75 @@ const AnswerPage: React.FC<any> = () => {
 
           <Box
             sx={{
-              width: 1 / 4,
+              width: "25%",
               height: "100vh",
-              backgroundColor: "#5770B2",
+              backgroundColor: "#F5F5F5",
+              display: "flex",
               flexDirection: "column",
-              justifyContent: "end",
-              textAlign: "-webkit-center",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              padding: "20px",
             }}
           >
-            {/*Timer*/}
-
+            {/*Survey Name*/}
             <Grid
+              container
+              spacing={2}
               sx={{
-                backgroundColor: "#C4C4C4",
-                width: 1 / 2,
+                backgroundColor: "#F5F5F5",
+                width: "100%",
                 textAlign: "center",
-                m: 2,
+                padding: "10px",
+                marginBottom: "10px",
+                paddingTop: "20px",
+                paddingBottom: "20px",
+                "@media (max-width: 600px)": {
+                  paddingTop: "10px",
+                  paddingBottom: "10px",
+                },
               }}
             >
-              <Typography variant="h5" sx={{ color: "#2AA789" }}>
-                Timer
-              </Typography>
+              <Grid item xs={6}>
+                <Typography variant="h5" sx={{ color: "#2AA789" }}>
+                  Survey Name:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h6">{questionBank?.surveyName}</Typography>
+              </Grid>
+
+              {/*Username*/}
+              <Grid item xs={6}>
+                <Typography variant="h5" sx={{ color: "#2AA789" }}>
+                  Username:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h6">
+                  {userData.userName !== "" ? userData.userName : "Anonymous"}
+                </Typography>
+              </Grid>
+
+              {/*Timer*/}
+              {!hasAnswered && (
+                <>
+                  <Grid item xs={6}>
+                    <Typography variant="h5" sx={{ color: "#2AA789" }}>
+                      Timer:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Timer_Answer
+                      time={calculateTime(tempSur.timer)}
+                      overTime={overTime}
+                      setOverTime={setOverTime}
+                    />
+                  </Grid>
+                </>
+              )}
             </Grid>
 
-            <Grid
-              sx={{
-                backgroundColor: "#C4C4C4",
-                width: 1 / 2,
-                textAlign: "center",
-              }}
-            >
-              <Timer_Answer
-                time={calculateTime(tempSur.timer)}
-                overTime={overTime}
-                setOverTime={setOverTime}
-              />
-            </Grid>
-
+            {/*Submit Button*/}
             <Grid
               sx={{
                 display: "flex",
@@ -467,20 +571,37 @@ const AnswerPage: React.FC<any> = () => {
                 marginTop: "20px",
               }}
             >
-              <Button
-                className="submit-button"
-                sx={{
-                  backgroundColor: "#8d6e63",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "5px",
-                  padding: "10px 20px",
-                  cursor: "pointer",
-                }}
-                onClick={handleOpenSubmit}
-              >
-                Submit
-              </Button>
+              {!hasAnswered ? (
+                <Button
+                  className="submit-button"
+                  sx={{
+                    backgroundColor: "#8d6e63",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "5px",
+                    padding: "10px 20px",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleOpenSubmit}
+                >
+                  Submit
+                </Button>
+              ) : (
+                <Button
+                  className="submit-button"
+                  sx={{
+                    backgroundColor: "#8d6e63",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "5px",
+                    padding: "10px 20px",
+                    cursor: "pointer",
+                  }}
+                  href="/surveys"
+                >
+                  Return to Survey
+                </Button>
+              )}
             </Grid>
           </Box>
           <Dialog open={openSubmit} onClose={handleCloseSubmit}>
@@ -496,18 +617,6 @@ const AnswerPage: React.FC<any> = () => {
             </DialogActions>
           </Dialog>
 
-          <Dialog open={openResult} onClose={handleCloseResult}>
-            <DialogTitle>Result Score of your test survey</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Your Score Are {finalResult}
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleResultOk}>Ok</Button>
-            </DialogActions>
-          </Dialog>
-
           <Dialog open={overTime} onClose={handleCloseOverTime}>
             <DialogTitle>Overtime</DialogTitle>
             <DialogContent>
@@ -515,6 +624,18 @@ const AnswerPage: React.FC<any> = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleSubmit}>Submit</Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog open={openResult} onClose={handleCloseResult}>
+            <DialogTitle>Result Score of your test survey</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Your Score Are {finalResult}/{totalScore}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleResultOk}>Ok</Button>
             </DialogActions>
           </Dialog>
         </Container>

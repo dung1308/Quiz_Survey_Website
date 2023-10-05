@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import Leather from "../../assets/images/leather.png";
-import { LoginData, UserDTO } from "../../services/dataService/dataService";
+import { GetRoleById, LoginData, UserDTO } from "../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 
 interface LoginUserDTO {
@@ -43,7 +43,7 @@ const Login: React.FC = () => {
       userName: username,
       password: password,
     };
-    await LoginData(user).then((data: any) => {
+    await LoginData(user).then(async (data: any) => {
       if (typeof data === "string") {
         setError(data);
         return;
@@ -57,14 +57,17 @@ const Login: React.FC = () => {
         setUserData(newUserDataNew);
         console.log(newUserDataNew);
         console.log(userData);
-        navigate("/");
+        await GetRoleById(newUserDataNew.roleId).then((newRoleData) => {
+          localStorage.setItem("Role", JSON.stringify(newRoleData));
+          navigate("/");
+        })
       }
     });
   };
 
   return (
     <>
-      <Layout />
+      {/* <Layout /> */}
       {/* <Box
         sx={{
           width: 3 / 5,

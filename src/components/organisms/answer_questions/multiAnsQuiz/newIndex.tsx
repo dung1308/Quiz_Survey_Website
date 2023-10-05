@@ -33,6 +33,9 @@ const Multi__Type_For_Answer: React.FC<any> = ({
   setQuestion,
   question,
   setOnAnswerQuizCard,
+  rightAnswers,
+  questionIndex,
+  hasAnswered,
 }) => {
   const setAnswers = (editAnswer: any) => {
     setQuestion({ ...question, answer: editAnswer });
@@ -49,6 +52,9 @@ const Multi__Type_For_Answer: React.FC<any> = ({
             // setChoices={setChoices}
             setQuestion={setQuestion}
             question={question}
+            rightAnswers={rightAnswers}
+            questionIndex={questionIndex}
+            hasAnswered = {hasAnswered}
           />
         </ListItem>
       ))}
