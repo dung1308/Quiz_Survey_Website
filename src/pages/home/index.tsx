@@ -104,7 +104,7 @@ function Home() {
   };
   return (
     <>
-      {/* <Layout /> */}
+      <Layout />
       <Box
         sx={{
           display: "flex",

@@ -36,7 +36,7 @@ const App: React.FC = () => {
   const [light, setLight] = React.useState(true);
   return (
     <>
-    <Layout/>
+    {/* <Layout/> */}
       {/*<script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossOrigin="anonymous"/>*/}
             <Routes>
               <Route path = "/" element = {<Home/>} />
@@ -47,7 +47,7 @@ const App: React.FC = () => {
               <Route path = "/login" element = {<Login/>} />
               <Route path = "/signup" element = {<SignUp/>} />
               <Route path = "/answer_page/:surveyId/" element = {<AnswerPage/>} />
-              <Route path = "/:userId/create" element = {<CreateSurvey/>} />
+              <Route path = "/create" element = {<CreateSurvey/>} />
               <Route path = "/edit/:surveyId" element = {<CreateSurvey/>} />
             </Routes>
     </>

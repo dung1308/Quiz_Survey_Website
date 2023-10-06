@@ -523,7 +523,7 @@ const CreateSurvey: React.FC<any> = () => {
       questionDTOs: mappedQuestionBanks,
     };
 
-    console.log(questionBankrs);
+    // console.log("This is questionBankrs", questionBankrs);
     // if (params.userId !== undefined) {
       await CreateQuestionBankByUserId(
         // Number(params.userId),
@@ -721,7 +721,7 @@ const CreateSurvey: React.FC<any> = () => {
   return (
     <Box sx={{ width: "100%" }}>
       <CssBaseline />
-      {/* <Layout /> */}
+      <Layout />
       {loadingAll ? (
         <p>Loading...</p>
       ) : (

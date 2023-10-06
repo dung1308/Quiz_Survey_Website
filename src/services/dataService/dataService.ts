@@ -399,6 +399,22 @@ export class MultipleReportWithPagination {
   }
 }
 
+interface DataAnswerDTO {
+  id: number,
+  questionName: string,
+  result: number,
+  onAnswers: string[],
+  rightAnswers: string[],
+}
+
+export class AnswerReport {
+  data: DataAnswerDTO[]
+
+  constructor(data: any) {
+    this.data = data.data;
+  }
+}
+
 export class Interaction {
   id: number;
   resultScores: number;
@@ -744,6 +760,30 @@ export async function GetMultipleReports(
     });
 }
 
+export async function GetAnswerReports(
+  questionBankInteractId:number,
+): Promise<AnswerReport> {
+  return axios
+    .get(
+      `https://localhost:7232/GetAnswerReport?questionBankInteractsId=${questionBankInteractId}`
+    )
+    .then((response) => {
+      if (
+        response.data.data !== undefined &&
+        response.data.data !== null
+      ) {
+        return new AnswerReport(response.data);
+      } else {
+        return new AnswerReport({ data: [] });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new AnswerReport({ data: [] });
+    });
+}
+
+
 export async function GetMultipleReportsForAdmin(
   userId: number,
   pageSize: number,
@@ -778,6 +818,22 @@ export async function GetInteractionsByUserAndQuestionBank(
   return axios
     .get<Interaction[]>(
       `https://localhost:7232/User/${userId}/QuestionBank/${questionBankId}/questionBankInteracts`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
+export async function GetInteractionsByInteractId(
+  questionBankInteractId:number
+): Promise<Interaction> {
+  return axios
+    .get(
+      `https://localhost:7232/questionBankInteracts/${questionBankInteractId}`
     )
     .then((response) => {
       return response.data;
@@ -892,7 +948,7 @@ export async function InviteUser(userName: string, invietUser: InviteUserDTO) {
 
 export async function CreateAnswer(questionBankInteract: Interaction) {
   try {
-    const response = await axios.post(
+    const response = await axios.post<Interaction>(
       `https://localhost:7232/CreateAnswer`,
       questionBankInteract
     );
@@ -906,7 +962,7 @@ export async function CreateAnswerAnonymous(
   questionBankInteract: Interaction
 ): Promise<Interaction> {
   return axios
-    .post(`https://localhost:7232/CreateAnswerAnonymous`, questionBankInteract)
+    .post<Interaction>(`https://localhost:7232/CreateAnswerAnonymous`, questionBankInteract)
     .then((response) => {
       return response.data;
     })

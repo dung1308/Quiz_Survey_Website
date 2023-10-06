@@ -27,29 +27,45 @@ import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import dayjs, { Dayjs } from "dayjs";
 
-const RowComponent_Report_Answer: React.FC<any> = ({ row, index, userData, handleShowSurveyResults }) => {
+const RowComponent_Report_Answer: React.FC<any> = ({
+  row,
+  index,
+  userData,
+}) => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [openJoin, setOpenJoin] = useState(false);
-  
-  const buttonShowSurveys = () => {
-    // handleShowSurveyResults(userData.id, row.questionBankId, 5)
-    handleShowSurveyResults(index, row.questionBankId)
-  }
+
+  // const buttonShowSurveys = () => {
+  //   // handleShowSurveyResults(userData.id, row.questionBankId, 5)
+  //   handleShowSurveyResults(index, row.questionBankId)
+  // }
 
   return (
     <StyledTableRow key={row.id}>
-      <StyledTableCell component="th" scope="row">
-        {row.questionBankId}
+      <StyledTableCell
+        component="th"
+        scope="row"
+        style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+      >
+        {row.id}
+      </StyledTableCell>
+      <StyledTableCell component="th" scope="row" align="left">
+        {row.questionName}
       </StyledTableCell>
       <StyledTableCell component="th" scope="row" align="right">
-        {row.surveyName}
+        {row.result ?? 0}
       </StyledTableCell>
       <StyledTableCell component="th" scope="row" align="right">
-        {row.userName}
+        {row.onAnswers.length > 0 ? row.onAnswers.join(", ") : "No Answer"}
       </StyledTableCell>
-      <StyledTableCell align="right">
+      <StyledTableCell component="th" scope="row" align="right">
+        {row.rightAnswers.length > 0
+          ? row.rightAnswers.join(", ")
+          : "No Answer"}
+      </StyledTableCell>
+      {/* <StyledTableCell align="right">
         <Box sx={{ justifyContent: "space-between" }}>
           <Button
             variant="contained"
@@ -66,7 +82,7 @@ const RowComponent_Report_Answer: React.FC<any> = ({ row, index, userData, handl
             Show Survey Results
           </Button>
         </Box>
-      </StyledTableCell>
+      </StyledTableCell> */}
       {/* <StyledTableCell align="center">{row.status}</StyledTableCell> */}
     </StyledTableRow>
   );

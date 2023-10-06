@@ -221,12 +221,12 @@ function Surveys() {
   }, [questionBank]);
 
   const handleCreateSurvey = () => {
-    navigate(`/${userData.id}/create`);
+    navigate(`/create`);
   };
 
   return (
     <>
-      {/* <Layout /> */}
+      <Layout />
       <Box m={2}>
         {roleData.permission === "All" ? (
           <Button

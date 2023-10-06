@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Radio,
   FormControlLabel,
@@ -9,180 +9,105 @@ import {
   RadioGroup,
   Card,
   CardContent,
-  List,
-  ListItem,
   Box,
   Button,
   Grid,
   TextField,
-  Typography,
+  List,
+  ListItem,
 } from "@mui/material";
-import AnswerChoice from "../../../molecules/answer_choices";
+import FillAnswer from "../../../molecules/fillAnswer";
+import { createTheme } from "@mui/material/styles";
+import RemoveIcon from "@mui/icons-material/Remove";
+import Quiz_Choice from "../../../molecules/quiz_choice";
+import Quiz_Answer_Choice from "../../../molecules/answer_quiz_choices";
 
-interface Props {
-  question: string;
-  choices: string[];
-  answer: string;
-  onAnswer: (answer: string) => void;
-}
+const Quiz_Type_Answer: React.FC<any> = ({
+  choices,
+  setChoices,
+  setQuestion,
+  setOnAnswerQuizCard,
+  question,
+  rightAnswers,
+  questionIndex,
+  hasAnswered,
+}: any) => {
+  // const [answers_Quiz, setAnswers_Quiz] = useState(answers);
 
-const Quiz_Answer: React.FC<any> = ({ index, question, answers, setQuestion }) => {
-  const [inputs, setInputs] = React.useState<
-    { label: string; value: number; placeholder: string; checked: boolean }[]
-  >([{ label: "", value: 1, placeholder: "", checked: false }]);
+  // const handleChangeChoiceByID = (event:React.ChangeEvent<HTMLInputElement>, no:number) =>
+  // {
 
-  const handleAddInput = () => {
-    const newInput = {
-      label: "",
-      value: inputs.length + 1,
-      placeholder: "",
-      checked: false,
-    };
-    setInputs([...inputs, newInput]);
+  //     setData((data:any) => {
+  //         data[index].choices[no] = event.target.value;
+  //         return [...data]; // because you want updated state for anything watching for changes
+  //     });
+  // }
+
+  // const handleChangeAnswer = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //     setData((data:any) => {
+  //         data[index].answer = event.target.value;
+  //         return [...data]; // because you want updated state for anything watching for changes
+  //     });
+  // };
+  // const [answers, setAnswers] = useState(
+  //   question.answer.map((choice: string) => String(choice))
+  // );
+  //   const [loading, setLoading] = useState(false);
+  const setAnswers = (editAnswer: any) => {
+    setQuestion({ ...question, answer: editAnswer });
   };
-  const [selectedValue, setSelectedValue] = React.useState("a");
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue(event.target.value);
-  };
+  //   const handleRemoveChoice = (no: number) => {
+  //     console.log(no);
+  //     if (choices.length > 2) {
+  //       setLoading(true);
+  //       // question.answer.filter((e: any) => e !== choices[no]);
 
-  const handleChangeChoiceByID = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    console.log(question)
-    setQuestion({ ...question, answers: [event.target.value] })
-  };
+  //       console.log(choices[no]);
+  //       choices.splice(no, 1);
+  //       console.log(choices);
+  //       setChoices(choices);
+  //       console.log(choices);
+  //       setTimeout(() => {
+  //         setLoading(false);
+  //       }, 1000);
+  //     }
+  //   };
 
-  const handleInputChange = (index: number) => {
-    const updatedInputs = inputs.map((input, i) => ({
-      ...input,
-      checked: i === index ? !input.checked : false,
-    }));
-    setInputs(updatedInputs);
-  };
+  //   const handleAddInput = () => {
+  //     if (choices.length < 8) {
+  //       // answers.push("");
+  //       choices.push("");
+  //       // setAnswers(answers);
+  //       setChoices(choices);
+  //     }
+  //   };
+  //   useEffect(() => {
+  //     setErrorSave(errorStatesQuiz.some((state: any) => state));
+  //   }, [errorStatesQuiz]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        textAlign: "-webkit-center",
-      }}
-    >
-      <Card
-        className="custom-card"
-        sx={{
-          backgroundImage: `url('https://www.transparenttextures.com/patterns/leather.png')`,
-          backgroundColor: "#f5deb3",
-          border: 2,
-          borderColor: "#8d6e63",
-          borderRadius: "10px",
-          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
-          padding: "20px",
-          width: "100%",
-          maxWidth: "500px",
+    <FormControl component="fieldset">
+      <RadioGroup
+        onChange={(args) => {
+          setQuestion({ ...question, answer: [args.target.value] });
         }}
       >
-        <CardContent>
-          <Typography
-            sx={{
-              fontSize: "24px",
-              fontWeight: "bold",
-              color: "#8d6e63",
-              textShadow: "1px 1px #ffffff",
-              backgroundColor: "#ffffff",
-              border: "2px solid #8d6e63",
-              borderRadius: "5px",
-              padding: "10px",
-              marginBottom: "20px",
-            }}
-          >
-            {index}.{question}
-          </Typography>
-          <FormControl component="fieldset">
-            {/* <FormLabel component="legend">Radio Button Group</FormLabel> */}
-            <RadioGroup>
-              {answers.map((answer: string, index: number) => (
-                <FormControl key={index}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <FormControlLabel
-                      control={<Radio onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        handleChangeChoiceByID(e)
-                      }/>}
-                      label=""
-                      value={answer}
-                      // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      //   handleChangeChoiceByID(e)
-                      // }
-                      sx={{
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        color: "#8d6e63",
-                        textShadow: "1px 1px #ffffff",
-                        marginRight: "10px",
-                        paddingTop: "5px",
-                      }}
-                    />
-                    {/* <Input
-                            value={`${answer}`}
-                            onChange={(event) => handleInputChange(index)}
-                            disabled={true}
-                            sx={{
-                                '& .Mui-disabled': {
-                                  color: 'gray',
-                                  backgroundColor: '#f5f5f5',
-                                  border: '1px solid gray',
-                                  borderRadius: '5px',
-                                  padding: '10px',
-                                  marginBottom: '20px',
-                                },
-                                '& .Mui-disabled input': {
-                                  color: 'black',
-                                },
-                              }}
-                        /> */}
-                    <Box
-                      sx={{
-                        backgroundColor: "#f5f5f5",
-                        border: "1px solid gray",
-                        borderRadius: "5px",
-                        padding: "10px",
-                        marginBottom: "20px",
-                        width: "100%"
-                      }}
-                    >
-                      <Typography
-                        variant="body1"
-                        component="div"
-                        sx={{
-                          "& .Mui-disabled": {
-                            color: "gray",
-                            backgroundColor: "#f5f5f5",
-                            border: "1px solid gray",
-                            borderRadius: "5px",
-                            padding: "10px",
-                            marginBottom: "20px",
-                          },
-                        }}
-                      >
-                        {answer}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </FormControl>
-              ))}
-            </RadioGroup>
-          </FormControl>
-        </CardContent>
-      </Card>
-    </Box>
+        {choices.map((choice: string, index: number) => (
+          <Quiz_Answer_Choice
+            index={index}
+            choices={choices}
+            setAnswers={setAnswers}
+            setChoices={setChoices}
+            question={question}
+            rightAnswers={rightAnswers}
+            questionIndex={questionIndex}
+            hasAnswered={hasAnswered}
+          />
+        ))}
+      </RadioGroup>
+    </FormControl>
   );
 };
 
-export default Quiz_Answer;
+export default Quiz_Type_Answer;

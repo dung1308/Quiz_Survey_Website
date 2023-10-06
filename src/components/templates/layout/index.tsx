@@ -68,8 +68,11 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 }));
 
 const Layout: React.FC  = () =>  {
-    const [dark, setDark] = React.useState(false);
+   const newDark = localStorage.getItem("DarkMode") ?? JSON.stringify(false);
+    const [dark, setDark] = React.useState(JSON.parse(newDark));
+
     const handleDarkModeToggle = () => {
+      localStorage.setItem("DarkMode", JSON.stringify(!dark));
       setDark(!dark);
     };
     return(

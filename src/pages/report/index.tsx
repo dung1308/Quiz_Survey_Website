@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/templates/layout";
 import {
+  AnswerReport,
+  GetAnswerReports,
   GetDefaultScores,
   GetDistinctQuestionBankInteractByUser,
   GetDistinctReportsByOwner,
+  GetInteractionsByInteractId,
   GetInteractionsByUserAndQuestionBank,
   GetLimitedInteractionsByUserAndQuestionBank,
   GetMultipleReports,
@@ -16,7 +19,9 @@ import {
 } from "../../services/dataService/dataService";
 import {
   Box,
+  Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   Paper,
@@ -35,6 +40,7 @@ import {
 } from "@mui/base/TablePagination";
 import { styled } from "@mui/material/styles";
 import { blue, grey } from "@mui/material/colors";
+import RowComponent_Report_Answer from "../../components/organisms/rowComponentReport_Answers";
 
 function createReport(
   id: string,
@@ -191,7 +197,9 @@ const Report: React.FC = () => {
   );
   const [answerResult, setAnswerResult] = useState<ResultShowDTO[]>([]);
 
-  const [resultShowsList, setResultShowsList] = useState<ResultShowDTO[]>([]);
+  const [resultShowsList, setResultShowsList] = useState<AnswerReport>(
+    new AnswerReport({ data: [] })
+  );
 
   const [openQuestionBankResults, setOpenQuestionBankResults] = useState(false);
 
@@ -200,7 +208,6 @@ const Report: React.FC = () => {
   const [totalScore, setTotalScore] = React.useState(0.0);
 
   const [scoreList, setScoreList] = React.useState(0.0);
-
 
   const handleOpenQuestionBankResults = () => {
     setOpenQuestionBankResults(true);
@@ -236,7 +243,7 @@ const Report: React.FC = () => {
   const listTitles = [
     ["QuestionBankName", "UserName", "Show Interaction Results"],
     ["Id", "Question Bank Id", "Results", "Show Answers Results"],
-    ["Id", "Question Name", "Result", "Your Answers", "Right Answers"],
+    ["Id", "Question Name", "Result", "Your Answers"],
   ];
 
   const listContents = [
@@ -278,30 +285,42 @@ const Report: React.FC = () => {
   //   });
   // };
 
-  const handleShowSurveyResults = async (index: number, questionBankId: number) => {
+  const handleShowSurveyResults = async (
+    index: number,
+    questionBankId: number
+  ) => {
     const similarReports = questionBankInteract.data[index].items;
     console.log(similarReports);
     setSimilarQuestionBankInteract(similarReports);
     if (similarQuestionBankInteract !== undefined) {
-      await GetDefaultScores(questionBankId ?? 0).then((data) =>{
-
-        console.log("Score", data.totalScore)
-        setTotalScore((data.totalScore))
+      await GetDefaultScores(questionBankId ?? 0).then((data) => {
+        console.log("Score", data.totalScore);
+        setTotalScore(data.totalScore);
         handleOpenQuestionBankResults();
       });
     }
   };
 
   const handleResultShow = async (questionBankInteractId: number) => {
-    const selectedSurvey = similarQuestionBankInteract.find(
-      (x: any) => x.id === questionBankInteractId
-    );
-    if (selectedSurvey !== undefined) {
-      // const resultShows = selectedSurvey.resultShowDTOs ?? resultShowsList;
-      // setResultShowsList(resultShows);
-    }
-    handleCloseQuestionBankResults();
-    handleOpenAnswerResult();
+    // const selectedSurvey = similarQuestionBankInteract.find(
+    //   (x: any) => x.id === questionBankInteractId
+    // );
+    await GetAnswerReports(questionBankInteractId).then((data) => {
+      const resultShows = data;
+      console.log("Result", data);
+      setResultShowsList(resultShows);
+      handleCloseQuestionBankResults();
+      handleOpenAnswerResult();
+    });
+
+    // if (selectedSurvey !== undefined) {
+    //   const resultShows = selectedSurvey
+
+    //   // const resultShows = selectedSurvey.resultShowDTOs ?? resultShowsList;
+    //   // setResultShowsList(resultShows);
+    // }
+    // handleCloseQuestionBankResults();
+    // handleOpenAnswerResult();
   };
 
   // Pagination
@@ -436,7 +455,7 @@ const Report: React.FC = () => {
 
   return (
     <>
-      {/* <Layout /> */}
+      <Layout />
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -489,6 +508,7 @@ const Report: React.FC = () => {
       <Dialog
         open={openQuestionBankResults}
         onClose={handleCloseQuestionBankResults}
+        maxWidth={false}
       >
         <DialogTitle>Survey Results</DialogTitle>
         <DialogContent>
@@ -507,7 +527,7 @@ const Report: React.FC = () => {
                     row={row}
                     index={index}
                     userData={userData}
-                    totalScore = {totalScore}
+                    totalScore={totalScore}
                     handleResultShow={handleResultShow}
                   />
                 ))}
@@ -517,7 +537,11 @@ const Report: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={openanswerResult} onClose={handleCloseAnswerResult}>
+      <Dialog
+        open={openanswerResult}
+        onClose={handleCloseAnswerResult}
+        maxWidth={false}
+      >
         <DialogTitle>Questions Results ?</DialogTitle>
         <DialogContent>
           <TableContainer component={Paper} sx={{ overflow: "auto" }}>
@@ -527,9 +551,17 @@ const Report: React.FC = () => {
                   {listTitles[2].map((title: any, index: number) => (
                     <StyledTableCell>{title}</StyledTableCell>
                   ))}
+                  <StyledTableCell align="right">Right Answers</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
+                {resultShowsList.data.map((row: any, index: number) => (
+                  <RowComponent_Report_Answer
+                    row={row}
+                    index={index}
+                    userData={userData}
+                  />
+                ))}
                 {/* {rows.map((row:any, index:number) => (
                 <RowComponent setQuestionBank={setQuestionBank} row={row} index={index} userId = {userId} questionBank = {questionBank} status = {row.enableStatus} userData = {userData} />
               ))} */}
@@ -537,6 +569,11 @@ const Report: React.FC = () => {
             </Table>
           </TableContainer>
         </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAnswerResult}>
+            Back To Survey Results
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

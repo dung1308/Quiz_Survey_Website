@@ -67,7 +67,7 @@ const Login: React.FC = () => {
 
   return (
     <>
-      {/* <Layout /> */}
+      <Layout />
       {/* <Box
         sx={{
           width: 3 / 5,

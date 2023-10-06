@@ -103,7 +103,7 @@ const AppBarSignIn: React.FC = () => {
                 />
               }
             ></Button>
-            {pages.map((page) => (
+            {localStorage.getItem("currentUser") !== null && pages.map((page) => (
               <Button
                 variant="text"
                 key={page.name}
@@ -114,7 +114,18 @@ const AppBarSignIn: React.FC = () => {
                 {page.name}
               </Button>
             ))}
-            {roleData.permission === "All" && (
+            {/* {pages.map((page) => (
+              <Button
+                variant="text"
+                key={page.name}
+                size="large"
+                sx={{ color: "#ffg", borderRadius: 28 }}
+                href={page.link}
+              >
+                {page.name}
+              </Button>
+            ))} */}
+            {localStorage.getItem("currentUser") !== null && roleData.permission === "All" && (
               <Button
                 variant="text"
                 key={"category"}

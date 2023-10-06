@@ -312,8 +312,8 @@ const AnswerPage: React.FC<any> = () => {
   const mappedResultShowExisted: ResultShowDTO[] = data.map(
     (question, index) => ({
       id: 0,
-      onAnswers: question.answer,
-      resultScore: 0,
+      onAnswers: typeof question.answer === "string" ? ["."] : question.answer,
+      resultScore: 1,
       questionId: question.no,
       questionBankInteractId: 0,
     })
@@ -332,14 +332,21 @@ const AnswerPage: React.FC<any> = () => {
 
     if (localStorage.getItem("currentUser") === null) {
       console.log(true);
+      questionBankInteract.id = 0;
+      console.log("This is questionBankrs", questionBankInteract);
       await CreateAnswerAnonymous(questionBankInteract).then((anonyData) => {
-        if (typeof anonyData === "string") return;
-        setFinalResult(+anonyData.resultScores ?? 0);
-        console.log(anonyData.resultScores);
+        if (typeof anonyData === "string") {
+          console.log(anonyData);
+          return;
+        }
+        console.log("For anonymous: ", anonyData)
+        setFinalResult(+(anonyData.resultScores ?? "0"));
+        // console.log(anonyData.resultScores);
         GetDefaultScores(+(params.surveyId ?? 0)).then((data) => {
+          console.log(data)
           setTotalScore(data.totalScore);
           GetLatestInteractByUserAndQuestionBank(
-            +(userData.id ?? 0),
+            +(anonyData.userId ?? 0),
             +(params.surveyId ?? 0)
           ).then((data) => {
             handleOpenResult();
@@ -347,14 +354,20 @@ const AnswerPage: React.FC<any> = () => {
         });
       });
     } else {
+      console.log("For user: ", questionBankInteract);
       await CreateAnswer(questionBankInteract).then((index) => {
+        if (typeof index === "string") {
+          console.log(index);
+          return;
+        }
+        console.log("index", index);
         GetDefaultScores(+(params.surveyId ?? 0)).then((data) => {
           setTotalScore(data.totalScore);
           GetLatestInteractByUserAndQuestionBank(
             +(userData.id ?? 0),
             +(params.surveyId ?? 0)
           ).then((data) => {
-            setFinalResult(data.resultScores ?? 0);
+            setFinalResult(+(data.resultScores ?? 0));
             handleOpenResult();
           });
         });
@@ -398,7 +411,7 @@ const AnswerPage: React.FC<any> = () => {
   return (
     <>
       <CssBaseline />
-      {/* <Layout /> */}
+      <Layout />
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -597,9 +610,9 @@ const AnswerPage: React.FC<any> = () => {
                     padding: "10px 20px",
                     cursor: "pointer",
                   }}
-                  href="/surveys"
+                  href="/"
                 >
-                  Return to Survey
+                  Return to Home
                 </Button>
               )}
             </Grid>
