@@ -24,12 +24,17 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  InputAdornment,
+  MenuItem,
   Paper,
+  Select,
   Table,
   TableBody,
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
 } from "@mui/material";
 import StyledTableCell from "../../components/molecules/TableCellStyle";
 import RowComponent_Report from "../../components/organisms/rowComponentReport";
@@ -38,9 +43,11 @@ import {
   TablePagination,
   tablePaginationClasses as classes,
 } from "@mui/base/TablePagination";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { styled } from "@mui/material/styles";
 import { blue, grey } from "@mui/material/colors";
 import RowComponent_Report_Answer from "../../components/organisms/rowComponentReport_Answers";
+import StyledTableSortLabel from "../../components/molecules/TableSortStyle";
 
 function createReport(
   id: string,
@@ -164,6 +171,21 @@ const Report: React.FC = () => {
     }
     `
   );
+  const [value, setValue] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const handleChange = (event: any) => {
+    setValue(event.target.value);
+  };
+
+  const handleFilterButtonClick = () => {
+    setOpen(true);
+  };
+
+  const handleSelectClose = () => {
+    setOpen(false);
+  };
+
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<any>([]);
   const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
@@ -464,9 +486,43 @@ const Report: React.FC = () => {
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>QuestionBankId</StyledTableCell>
+                  <StyledTableCell>
+                    QuestionBankId{" "}
+                    <Button
+                      onClick={handleFilterButtonClick}
+                      startIcon={<FilterListIcon sx={{ color: "white" }} />}
+                    >
+                    </Button>
+                    <Select
+                      value={value}
+                      onChange={handleChange}
+                      open={open}
+                      onClose={handleSelectClose}
+                      // startAdornment={
+                      //   <InputAdornment position="start">
+                      //     <IconButton>
+                      //       <FilterListIcon />
+                      //     </IconButton>
+                      //   </InputAdornment>
+                      // }
+                      style={{ display: "none" }}
+                    >
+                      <MenuItem value="">Ascending</MenuItem>
+                      <MenuItem value="option1">Descending</MenuItem>
+                      {/* <MenuItem value="">All</MenuItem>
+                      <MenuItem value="option1">Option 1</MenuItem>
+                      <MenuItem value="option2">Option 2</MenuItem>
+                      <MenuItem value="option3">Option 3</MenuItem> */}
+                    </Select>
+                  </StyledTableCell>
+                  {/* <StyledTableSortLabel >Filter</StyledTableSortLabel> */}
                   {listTitles[0].map((title: any, index: number) => (
-                    <StyledTableCell align="right">{title}</StyledTableCell>
+                    <StyledTableCell align="right">
+                      {title}{" "}
+                      <IconButton>
+                        <FilterListIcon sx={{ color: "white" }} />
+                      </IconButton>
+                    </StyledTableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -517,7 +573,12 @@ const Report: React.FC = () => {
               <TableHead>
                 <TableRow>
                   {listTitles[1].map((title: any, index: number) => (
-                    <StyledTableCell>{title}</StyledTableCell>
+                    <StyledTableCell>
+                      {title}
+                      <IconButton>
+                        <FilterListIcon sx={{ color: "white" }} />
+                      </IconButton>
+                    </StyledTableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -549,7 +610,12 @@ const Report: React.FC = () => {
               <TableHead>
                 <TableRow>
                   {listTitles[2].map((title: any, index: number) => (
-                    <StyledTableCell>{title}</StyledTableCell>
+                    <StyledTableCell>
+                      {title}
+                      <IconButton>
+                        <FilterListIcon sx={{ color: "white" }} />
+                      </IconButton>
+                    </StyledTableCell>
                   ))}
                   <StyledTableCell align="right">Right Answers</StyledTableCell>
                 </TableRow>

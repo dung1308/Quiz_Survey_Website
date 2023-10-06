@@ -495,7 +495,7 @@ const CreateSurvey: React.FC<any> = () => {
     choices: question.type === "Type Answer" ? [""] : question.choices,
     type: question.type,
     answers: question.type === "Type Answer" ? [""] : question.answer,
-    score: 10,
+    score: 1,
     questionBankId: 0,
   }));
 
@@ -545,7 +545,7 @@ const CreateSurvey: React.FC<any> = () => {
       choices: question.choices,
       type: question.type,
       answers: question.answer,
-      score: 10,
+      score: 1,
       questionBankId: 0,
     })
   );

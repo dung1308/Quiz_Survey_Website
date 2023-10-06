@@ -32,7 +32,7 @@ const Typing_Answer_Template: React.FC<any> = ({
       onChange={(e: any) => {
         // const defaultValue = e.target.value === "" ? "..." : [e.target.value];
         // console.log(question.answer)
-        setQuestion({ ...question, answer: [e.target.value] ?? ["..."] });
+        setQuestion({ ...question, answer: [e.target.value === "" ? "..." : e.target.value] ?? ["..."] });
         console.log(question.answer);
       }}
     />
