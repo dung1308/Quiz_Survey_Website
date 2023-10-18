@@ -17,6 +17,7 @@ import {
 import Layout from "../../components/templates/layout";
 import {
   GetAllQuestionBanks,
+  GetAndSetParticipantForSurvey,
   QuestionBank,
   Role,
   UserDTO,
@@ -65,10 +66,18 @@ function Home() {
   const [surveyCodeJoin, setSurveyCodeJoin] = useState("");
   const [allQuestionBank, setAllQuestionBank] = useState<QuestionBank[]>([]);
   const [wrongSurveyCode, setWrongSurveyCode] = useState(false);
+  const [alreadyParticipated, setAlreadyParticipated] = useState(false);
   const newData =
     localStorage.getItem("currentUser") ??
     JSON.stringify(
-      new UserDTO(0, "Anonymous", "Anonymous", "Anonymous@Anonymous.com", 0)
+      new UserDTO(
+        0,
+        "Anonymous",
+        "Anonymous",
+        "Anonymous@Anonymous.com",
+        true,
+        0
+      )
     );
   const newRole =
     localStorage.getItem("Role") ??
@@ -77,13 +86,16 @@ function Home() {
   const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
   const [roleData, setRoleData] = useState<Role>(JSON.parse(newRole));
   const handleJoin = async (surveyId: number) => {
-    await setStatusAfterJoin(userData.id, surveyId).then((data) => {
+    // await setStatusAfterJoin(userData.id, surveyId).then((data) => {
+    await GetAndSetParticipantForSurvey(surveyId, userData.id).then((data) => {
       if (typeof data === "string" && data !== "") {
         return;
       }
       console.log("This is: ", userData);
-      console.log(userData);
-      navigate(`/answer_page/${surveyId}`);
+      console.log(data.participantIdList);
+      if (!data.participantIdList.includes(userData.id) || data.participantIdList === null)
+        navigate(`/answer_page/${surveyId}`);
+      else setAlreadyParticipated(true);
     });
   };
   const handleParticipantJoin = async () => {
@@ -131,6 +143,11 @@ function Home() {
               Wrong Survey Code. Try Again
             </Typography>
           )}
+          {alreadyParticipated && (
+            <Typography variant="caption" color="error">
+              You already particpated this survey
+            </Typography>
+          )}
           <TextField
             label="ENTER THE SURVEY CODE"
             variant="outlined"
@@ -139,7 +156,9 @@ function Home() {
             }}
             sx={{ mr: 2, width: "100%" }}
           />
-          <Button variant="contained" onClick={handleParticipantJoin}>Join</Button>
+          <Button variant="contained" onClick={handleParticipantJoin}>
+            Join
+          </Button>
         </Box>
       </Box>
     </>

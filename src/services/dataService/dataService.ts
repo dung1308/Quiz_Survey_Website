@@ -21,7 +21,7 @@
 
 import JSONdata from "../../data/data.json";
 import axios from "axios";
-import React from "react";
+// import React from "react";
 
 export interface Survey {
   surveyId: string;
@@ -235,17 +235,17 @@ export class dataSevice {
     questions: any
   ) {
     // surveyID is given random name
-    const newData = {
-      surveyId: surveyID,
-      surveyName: surveyName,
-      owner: owner,
-      category: category,
-      startDate: startDate,
-      endDate: endDate,
-      status: status,
-      enableStatus: enableStatus,
-      questions: questions,
-    };
+    // const newData = {
+    //   surveyId: surveyID,
+    //   surveyName: surveyName,
+    //   owner: owner,
+    //   category: category,
+    //   startDate: startDate,
+    //   endDate: endDate,
+    //   status: status,
+    //   enableStatus: enableStatus,
+    //   questions: questions,
+    // };
     //JSONdata.push(newData);
 
     return JSONdata;
@@ -329,6 +329,7 @@ export class UserDTO {
   userName: string;
   password: string;
   email: string;
+  isNightMode: boolean;
   roleId: number;
 
   constructor(
@@ -336,12 +337,14 @@ export class UserDTO {
     userName: string,
     password: string,
     email: string,
+    isNightMode: boolean,
     roleId: number
   ) {
     this.id = id;
     this.userName = userName;
     this.password = password;
     this.email = email;
+    this.isNightMode = isNightMode;
     this.roleId = roleId;
   }
 }
@@ -369,22 +372,26 @@ export class ReportWithPages {
 }
 
 interface ItemsDTO {
-  id: number,
-  questionBankId: number,
-  userId: number,
-  surveyName: string,
-  userName: string,
-  ownerName: string,
-  resultScores: number
+  id: number;
+  questionBankId: number;
+  userId: number;
+  surveyName: string;
+  userName: string;
+  ownerName: string;
+  ownerId: number;
+  endDate: string;
+  dateTimeNow: string;
+  resultScores: number;
+
 }
 
 interface MultipleReportDTO {
-  questionBankId: number,
-  userId: number,
-  surveyName: string,
-  userName: string,
-  ownerName: string,
-  items: ItemsDTO[],
+  questionBankId: number;
+  userId: number;
+  surveyName: string;
+  userName: string;
+  ownerName: string;
+  items: ItemsDTO[];
 }
 
 export class MultipleReportWithPagination {
@@ -400,15 +407,15 @@ export class MultipleReportWithPagination {
 }
 
 interface DataAnswerDTO {
-  id: number,
-  questionName: string,
-  result: number,
-  onAnswers: string[],
-  rightAnswers: string[],
+  id: number;
+  questionName: string;
+  result: number;
+  onAnswers: string[];
+  rightAnswers: string[];
 }
 
 export class AnswerReport {
-  data: DataAnswerDTO[]
+  data: DataAnswerDTO[];
 
   constructor(data: any) {
     this.data = data.data;
@@ -489,6 +496,8 @@ export class QuestionBank {
   categoryName: string;
   userId: number;
   dateTimeNow: string;
+  participantIdList: number[];
+  userDoneIdList: number[];
   questionDTOs: QuestionDTO[];
 
   constructor(data: any) {
@@ -505,7 +514,21 @@ export class QuestionBank {
     this.categoryName = data.categoryName;
     this.userId = data.userId;
     this.dateTimeNow = data.dateTimeNow;
+    this.participantIdList = data.participantIdList;
+    this.userDoneIdList = data.userDoneIdList;
     this.questionDTOs = data.questionDTOs;
+  }
+}
+
+export class MultipleQuestionBankWithPagination {
+  pages: number;
+  numOfItems: number;
+  data: QuestionBank[];
+
+  constructor(data: any) {
+    this.pages = data.pages;
+    this.numOfItems = data.numOfItems;
+    this.data = data.data;
   }
 }
 
@@ -677,6 +700,44 @@ export async function GetQuestionBankByUserId(
     });
 }
 
+// export async function GetQuestionBankByUserIdAscOrDes(
+//   userId: number,
+//   pageSize: number,
+//   pageNumber: number,
+//   ascendingOrNot: string
+// ): Promise<MultipleQuestionBankWithPagination> {
+//   return axios
+//     .get(
+//       `https://localhost:7232/GetQuestionBankWithPaginationAscOrDes?userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}&filterAsc=${ascendingOrNot}`
+//     )
+//     .then((response) => {
+//       return response.data;
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       return [];
+//     });
+// }
+
+export async function GetQuestionBankByUserIdAscOrDes(
+  userId: number,
+  pageSize: number,
+  pageNumber: number,
+  ascendingOrNot: string
+): Promise<MultipleQuestionBankWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetSurveysWithPaginationAscOrDes?userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}&filterAsc=${ascendingOrNot}`
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+}
+
 export async function GetAllQuestionBanks(): Promise<QuestionBank[]> {
   return axios
     .get<QuestionBank[]>("https://localhost:7232/GetQuestionBank")
@@ -688,10 +749,6 @@ export async function GetAllQuestionBanks(): Promise<QuestionBank[]> {
       return [];
     });
 }
-
-
-
-
 
 export async function GetDistinctQuestionBankInteractByUser(
   userId: number
@@ -735,43 +792,177 @@ export async function GetDistinctReportsByOwner(
 }
 
 export async function GetMultipleReports(
-  permission:string,
+  permission: string,
   userId: number,
   pageSize: number,
   pageNumber: number
 ): Promise<MultipleReportWithPagination> {
   return axios
     .get(
-      `https://localhost:7232/GetQuestionBankInteracts?permission=${permission}&userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}`
+      `https://localhost:7232/GetQuestionBankInteractsWithPagination?permission=${permission}&userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}`
     )
     .then((response) => {
-      if (
-        response.data.data !== undefined &&
-        response.data.data !== null
-      ) {
+      if (response.data.data !== undefined && response.data.data !== null) {
         return new MultipleReportWithPagination(response.data);
       } else {
-        return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+        return new MultipleReportWithPagination({
+          pages: 0,
+          numOfItems: 0,
+          data: [],
+        });
       }
     })
     .catch((error) => {
       console.log(error);
-      return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+      return new MultipleReportWithPagination({
+        pages: 0,
+        numOfItems: 0,
+        data: [],
+      });
+    });
+}
+
+export async function GetMultipleReportsAscOrDes(
+  permission: string,
+  userId: number,
+  pageSize: number,
+  pageNumber: number,
+  ascendingOrNot: string
+): Promise<MultipleReportWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetQuestionBankInteractsWithPaginationAscOrDes?permission=${permission}&userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}&filterAsc=${ascendingOrNot}`
+    )
+    .then((response) => {
+      if (response.data.data !== undefined && response.data.data !== null) {
+        return new MultipleReportWithPagination(response.data);
+      } else {
+        return new MultipleReportWithPagination({
+          pages: 0,
+          numOfItems: 0,
+          data: [],
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new MultipleReportWithPagination({
+        pages: 0,
+        numOfItems: 0,
+        data: [],
+      });
+    });
+}
+
+export async function GetMultipleReportsFilteredAscOrDes(
+  userId: number,
+  pageSize: number,
+  pageNumber: number,
+  ascendingOrNot: boolean,
+  ownerName: string,
+  surveyName: string,
+  userName: string,
+): Promise<MultipleReportWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetReportsFiltered?userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}&ascOrNot=${ascendingOrNot}&ownerName=${ownerName}&surveyName=${surveyName}&userName=${userName}`
+    )
+    .then((response) => {
+      if (response.data.data !== undefined && response.data.data !== null) {
+        return new MultipleReportWithPagination(response.data);
+      } else {
+        return new MultipleReportWithPagination({
+          pages: 0,
+          numOfItems: 0,
+          data: [],
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new MultipleReportWithPagination({
+        pages: 0,
+        numOfItems: 0,
+        data: [],
+      });
+    });
+}
+
+export async function GetMultipleReportsWithQuestionBankName(
+  permission: string,
+  userId: number,
+  pageSize: number,
+  pageNumber: number,
+  ascendingOrNot: string,
+  questionBankName: string
+): Promise<MultipleReportWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetQuestionBankInteractsWithPaginationWithQuestionBankName?permission=${permission}&userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}&filterAsc=${ascendingOrNot}&questionBankName=${questionBankName}`
+    )
+    .then((response) => {
+      if (response.data.data !== undefined && response.data.data !== null) {
+        return new MultipleReportWithPagination(response.data);
+      } else {
+        return new MultipleReportWithPagination({
+          pages: 0,
+          numOfItems: 0,
+          data: [],
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new MultipleReportWithPagination({
+        pages: 0,
+        numOfItems: 0,
+        data: [],
+      });
+    });
+}
+
+export async function GetMultipleReportsWithUserName(
+  permission: string,
+  userId: number,
+  pageSize: number,
+  pageNumber: number,
+  ascendingOrNot: string,
+  userName: string
+): Promise<MultipleReportWithPagination> {
+  return axios
+    .get(
+      `https://localhost:7232/GetQuestionBankInteractsWithPaginationWithUserName?permission=${permission}&userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}&filterAsc=${ascendingOrNot}&userName=${userName}`
+    )
+    .then((response) => {
+      if (response.data.data !== undefined && response.data.data !== null) {
+        return new MultipleReportWithPagination(response.data);
+      } else {
+        return new MultipleReportWithPagination({
+          pages: 0,
+          numOfItems: 0,
+          data: [],
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return new MultipleReportWithPagination({
+        pages: 0,
+        numOfItems: 0,
+        data: [],
+      });
     });
 }
 
 export async function GetAnswerReports(
-  questionBankInteractId:number,
+  questionBankInteractId: number
 ): Promise<AnswerReport> {
   return axios
     .get(
       `https://localhost:7232/GetAnswerReport?questionBankInteractsId=${questionBankInteractId}`
     )
     .then((response) => {
-      if (
-        response.data.data !== undefined &&
-        response.data.data !== null
-      ) {
+      if (response.data.data !== undefined && response.data.data !== null) {
         return new AnswerReport(response.data);
       } else {
         return new AnswerReport({ data: [] });
@@ -783,7 +974,6 @@ export async function GetAnswerReports(
     });
 }
 
-
 export async function GetMultipleReportsForAdmin(
   userId: number,
   pageSize: number,
@@ -794,22 +984,25 @@ export async function GetMultipleReportsForAdmin(
       `https://localhost:7232/GetQuestionBankInteractsForAdmin?userId=${userId}&pageSize=${pageSize}&pageNumber=${pageNumber}`
     )
     .then((response) => {
-      if (
-        response.data.data !== undefined &&
-        response.data.data !== null
-      ) {
+      if (response.data.data !== undefined && response.data.data !== null) {
         return new MultipleReportWithPagination(response.data);
       } else {
-        return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+        return new MultipleReportWithPagination({
+          pages: 0,
+          numOfItems: 0,
+          data: [],
+        });
       }
     })
     .catch((error) => {
       console.log(error);
-      return new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] });
+      return new MultipleReportWithPagination({
+        pages: 0,
+        numOfItems: 0,
+        data: [],
+      });
     });
 }
-
-
 
 export async function GetInteractionsByUserAndQuestionBank(
   userId: number,
@@ -829,7 +1022,7 @@ export async function GetInteractionsByUserAndQuestionBank(
 }
 
 export async function GetInteractionsByInteractId(
-  questionBankInteractId:number
+  questionBankInteractId: number
 ): Promise<Interaction> {
   return axios
     .get(
@@ -962,7 +1155,10 @@ export async function CreateAnswerAnonymous(
   questionBankInteract: Interaction
 ): Promise<Interaction> {
   return axios
-    .post<Interaction>(`https://localhost:7232/CreateAnswerAnonymous`, questionBankInteract)
+    .post<Interaction>(
+      `https://localhost:7232/CreateAnswerAnonymous`,
+      questionBankInteract
+    )
     .then((response) => {
       return response.data;
     })
@@ -990,6 +1186,21 @@ export async function setQuestionBankById(
   } catch (error) {
     console.error(error);
   }
+}
+
+export async function setNightModeUser(
+  id: number,
+  userDTO: UserDTO
+): Promise<UserDTO> {
+  return axios
+    .put(`https://localhost:7232/ChangeNightMode?id=${id}`, userDTO)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
 }
 
 export async function setEnableStatusQuestionBank(
@@ -1024,6 +1235,62 @@ export async function setStatusAfterJoin(
       console.log(error);
       return null;
     });
+}
+
+export async function GetAndSetParticipantForSurvey(
+  questionBankId: number,
+  userId: number
+): Promise<QuestionBank> {
+  return (
+    axios
+      .put(
+        `https://localhost:7232/GetAndSetParticipantList?questionBankId=${questionBankId}`,
+        new UserDTO(userId, "", "", "", false, 0)
+      )
+      // constructor(
+      //   id: number,
+      //   userName: string,
+      //   password: string,
+      //   email: string,
+      //   isNightMode: boolean,
+      //   roleId: number
+      // )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        return null;
+      })
+  );
+}
+
+export async function RemoveParticipantForSurvey(
+  questionBankId: number,
+  userId: number
+): Promise<QuestionBank> {
+  return (
+    axios
+      .put(
+        `https://localhost:7232/RemoveParticipantId?questionBankId=${questionBankId}`,
+        new UserDTO(userId, "", "", "", false, 0)
+      )
+      // constructor(
+      //   id: number,
+      //   userName: string,
+      //   password: string,
+      //   email: string,
+      //   isNightMode: boolean,
+      //   roleId: number
+      // )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        return null;
+      })
+  );
 }
 
 export async function GetQuestionsByQuestionBankId(questionBankId: number) {

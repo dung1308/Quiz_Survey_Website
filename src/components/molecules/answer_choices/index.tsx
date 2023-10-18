@@ -106,6 +106,8 @@ const AnswerChoice: React.FC<any> = ({
             variant="body1"
             component="div"
             sx={{
+              fontSize: "1vw",
+              overflow: "auto",
               "& .Mui-disabled": {
                 color: "gray",
                 backgroundColor: "#f5f5f5",
@@ -113,6 +115,11 @@ const AnswerChoice: React.FC<any> = ({
                 borderRadius: "5px",
                 padding: "10px",
                 marginBottom: "20px",
+              },
+              "@media (max-width: 601px)": {
+                fontSize: "1vw",
+                height: "2vw",
+                overflow: "auto",
               },
             }}
           >

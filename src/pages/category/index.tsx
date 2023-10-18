@@ -11,12 +11,17 @@ import {
   List,
   ListItem,
   TextField,
+  createTheme,
+  styled,
 } from "@mui/material";
 import {
   CreateCategory,
   GetCategories,
 } from "../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
+import StarIcon from "@mui/icons-material/Star";
+
+import theBox from "../../assets/images/the_Box.png";
 
 interface Category {
   id: number;
@@ -29,6 +34,59 @@ const Category: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#2196f3",
+      },
+      secondary: {
+        main: "#f50057",
+      },
+    },
+  });
+
+  const StyledBox = styled(Box)(({ theme }) => ({
+    display: "flex",
+    backgroundImage: `url(${theBox})`,
+    backgroundSize: "cover",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "50vh",
+    width: "fit-content",
+    margin: "50px auto 0",
+    // backgroundColor: theme.palette.primary.light,
+    padding: theme.spacing(2),
+    borderRadius: 4,
+    overflow: "auto",
+    marginTop: "50px",
+    position: "relative", // Add this line
+    zIndex: 1, // Add this line
+  }));
+
+  const StyledListItem = styled(ListItem)({
+    backgroundColor: "#f5f5f5",
+    borderRadius: 100,
+    position: "relative", // Add this line
+    zIndex: 2, // Add this line
+
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
+      borderRadius: 100,
+      position: "relative", // Add this line
+      zIndex: 2, // Add this line
+    },
+  });
+
+  const Star = styled(StarIcon)(({ theme }) => ({
+    position: "absolute",
+    top: "-20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    color: theme.palette.warning.main,
+    fontSize: "3rem",
+  }));
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -61,32 +119,33 @@ const Category: React.FC = () => {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "50vh",
-            width: "fit-content",
-            margin: "50px auto 0",
-            bgcolor: "primary.light",
-            p: 2,
-            borderRadius: 4,
-            overflow: "auto",
-            marginTop: "50px",
-          }}
-        >
+        // <Box
+        //   sx={{
+        //     display: "flex",
+        //     flexDirection: "column",
+        //     alignItems: "center",
+        //     justifyContent: "center",
+        //     height: "50vh",
+        //     width: "fit-content",
+        //     margin: "50px auto 0",
+        //     bgcolor: "primary.light",
+        //     p: 2,
+        //     borderRadius: 4,
+        //     overflow: "auto",
+        //     marginTop: "50px",
+        //   }}
+        // >
+        <StyledBox>
           <List sx={{ width: "100%", overflow: "auto" }}>
             {categories.map((item, index) => (
-              <ListItem key={index} sx={{ mb: 2 }}>
+              <StyledListItem key={index} sx={{ mb: 2 }}>
                 <TextField
                   disabled
                   value={item.categoryName}
                   variant="outlined"
                   fullWidth
                 />
-              </ListItem>
+              </StyledListItem>
             ))}
           </List>
           <Button
@@ -96,7 +155,8 @@ const Category: React.FC = () => {
           >
             Create Category
           </Button>
-        </Box>
+          {/* </Box> */}
+        </StyledBox>
       )}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create Category</DialogTitle>

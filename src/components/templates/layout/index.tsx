@@ -1,90 +1,140 @@
-import React, { Dispatch, SetStateAction } from 'react';
-import {Box, Paper, CssBaseline, createTheme, ThemeProvider,Button, Switch, styled} from '@mui/material';
-import AppBarSignIn from '../../organisms/NavBar';
+import React, { Dispatch, SetStateAction, useState } from "react";
+import {
+  Box,
+  Paper,
+  CssBaseline,
+  createTheme,
+  ThemeProvider,
+  Button,
+  Switch,
+  styled,
+} from "@mui/material";
+import AppBarSignIn from "../../organisms/NavBar";
+import {
+  UserDTO,
+  setNightModeUser,
+} from "../../../services/dataService/dataService";
 
 const themeLight = createTheme({
-    palette: {
-      background: {
-        default: "#e4f0e2"
-      }
-    }
-  });
-  
+  palette: {
+    background: {
+      default: "#e4f0e2",
+    },
+  },
+});
+
 const themeDark = createTheme({
-    palette: {
-      background: {
-        default: "#222222"
-      },
-      text: {
-        primary: "#334D27"
-      }
-    }
+  palette: {
+    background: {
+      default: "#222222",
+    },
+    text: {
+      primary: "#334D27",
+    },
+  },
 });
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
   height: 34,
   padding: 7,
-  '& .MuiSwitch-switchBase': {
+  "& .MuiSwitch-switchBase": {
     margin: 1,
     padding: 0,
-    transform: 'translateX(6px)',
-    '&.Mui-checked': {
-      color: '#fff',
-      transform: 'translateX(22px)',
-      '& .MuiSwitch-thumb:before': {
+    transform: "translateX(6px)",
+    "&.Mui-checked": {
+      color: "#fff",
+      transform: "translateX(22px)",
+      "& .MuiSwitch-thumb:before": {
         backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"><path fill="${encodeURIComponent(
-          '#fff',
+          "#fff"
         )}" d="M4.2 2.5l-.7 1.8-1.8.7 1.8.7.7 1.8.6-1.8L6.7 5l-1.9-.7-.6-1.8zm15 8.3a6.7 6.7 0 11-6.6-6.6 5.8 5.8 0 006.6 6.6z"/></svg>')`,
       },
-      '& + .MuiSwitch-track': {
+      "& + .MuiSwitch-track": {
         opacity: 1,
-        backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be',
+        backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
       },
     },
   },
-  '& .MuiSwitch-thumb': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#003892' : '#001e3c',
+  "& .MuiSwitch-thumb": {
+    backgroundColor: theme.palette.mode === "dark" ? "#003892" : "#001e3c",
     width: 32,
     height: 32,
-    '&:before': {
+    "&:before": {
       content: "''",
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
+      position: "absolute",
+      width: "100%",
+      height: "100%",
       left: 0,
       top: 0,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "center",
       backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"><path fill="${encodeURIComponent(
-        '#fff',
+        "#fff"
       )}" d="M9.305 1.667V3.75h1.389V1.667h-1.39zm-4.707 1.95l-.982.982L5.09 6.072l.982-.982-1.473-1.473zm10.802 0L13.927 5.09l.982.982 1.473-1.473-.982-.982zM10 5.139a4.872 4.872 0 00-4.862 4.86A4.872 4.872 0 0010 14.862 4.872 4.872 0 0014.86 10 4.872 4.872 0 0010 5.139zm0 1.389A3.462 3.462 0 0113.471 10a3.462 3.462 0 01-3.473 3.472A3.462 3.462 0 016.527 10 3.462 3.462 0 0110 6.528zM1.665 9.305v1.39h2.083v-1.39H1.666zm14.583 0v1.39h2.084v-1.39h-2.084zM5.09 13.928L3.616 15.4l.982.982 1.473-1.473-.982-.982zm9.82 0l-.982.982 1.473 1.473.982-.982-1.473-1.473zM9.305 16.25v2.083h1.389V16.25h-1.39z"/></svg>')`,
     },
   },
-  '& .MuiSwitch-track': {
+  "& .MuiSwitch-track": {
     opacity: 1,
-    backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be',
+    backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
     borderRadius: 20 / 2,
   },
 }));
 
-const Layout: React.FC  = () =>  {
-   const newDark = localStorage.getItem("DarkMode") ?? JSON.stringify(false);
-    const [dark, setDark] = React.useState(JSON.parse(newDark));
+const Layout: React.FC = () => {
+  const newDark = localStorage.getItem("DarkMode") ?? JSON.stringify(false);
+  const [dark, setDark] = React.useState(JSON.parse(newDark));
 
-    const handleDarkModeToggle = () => {
+  const newData =
+    localStorage.getItem("currentUser") ??
+    JSON.stringify(
+      new UserDTO(
+        0,
+        "Anonymous",
+        "Anonymous",
+        "Anonymous@Anonymous.com",
+        true,
+        0
+      )
+    );
+  const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
+
+  let isLeavingPage = false;
+
+  // function handleBeforeUnload() {
+  //   if (isLeavingPage) {
+  //     // localStorage.setItem("wrong", JSON.stringify("no"));
+  //     // localStorage.removeItem("busyUser");
+  //     setUserData({ ...userData, isNightMode: dark })
+  //     setNightModeUser(userData.id, userData)
+  //   }
+  //   // else localStorage.removeItem("wrong");
+  // }
+
+  // window.addEventListener("beforeunload", handleBeforeUnload);
+
+  // function handleLoad() {
+  //   isLeavingPage = true;
+  // }
+
+  // window.addEventListener("load", handleLoad);
+
+  const handleDarkModeToggle = async () => {
+    setUserData({ ...userData, isNightMode: !dark });
+    await setNightModeUser(userData.id, { ...userData, isNightMode: !dark }).then((data) => {
       localStorage.setItem("DarkMode", JSON.stringify(!dark));
       setDark(!dark);
-    };
-    return(
-        <>
-        {/*<script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossOrigin="anonymous"/>*/}
-            <ThemeProvider theme={!dark ? themeLight: themeDark}>
-            <CssBaseline />
-            <AppBarSignIn />
-            <MaterialUISwitch checked={dark} onChange={handleDarkModeToggle} />
-            </ThemeProvider>
+    });
+  };
+  return (
+    <>
+      {/*<script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossOrigin="anonymous"/>*/}
+      <ThemeProvider theme={!dark ? themeLight : themeDark}>
+        <CssBaseline />
+        <AppBarSignIn handleDarkModeToggle = {handleDarkModeToggle} dark = {dark} />
+        {/* <MaterialUISwitch checked={dark} onChange={handleDarkModeToggle} /> */}
+      </ThemeProvider>
     </>
-    );
-}
+  );
+};
 
 export default Layout;

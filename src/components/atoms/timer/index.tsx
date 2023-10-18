@@ -1,18 +1,31 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {Switch,Box, Button,Table, styled, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Switch,
+  Box,
+  Button,
+  Table,
+  styled,
+  TableBody,
+  TableCell,
+  tableCellClasses,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 
 interface State {
-    time: number,
-    seconds:number,
-    minutes:number,
-    hours:number,
-};
+  time: number;
+  seconds: number;
+  minutes: number;
+  hours: number;
+}
 
 interface Props {
-    time: number,
-    overTime: any,
-    setOverTime: any
-};
+  time: number;
+  overTime: any;
+  setOverTime: any;
+}
 
 const Timer_Answer: React.FC<Props> = ({ time, overTime, setOverTime }) => {
   const [timeState, setTimeState] = useState<State>({
@@ -34,17 +47,24 @@ const Timer_Answer: React.FC<Props> = ({ time, overTime, setOverTime }) => {
         hours: Math.floor((prevState.time - 1) / 3600),
       }));
     }, 1000);
-    if (timeState.time === 0) setOverTime(true)
+    if (timeState.time === 0) setOverTime(true);
 
     return () => clearTimeout(timer);
   }, [timeState.time]);
 
   return (
-    <h1>
-      {`${timeState.hours}:${timeState.minutes < 10 ? `0${timeState.minutes}` : timeState.minutes}:${timeState.seconds < 10 ? `0${timeState.seconds}` : timeState.seconds}`}
+    <h1 style={{ fontSize: "1.5vw" }}>
+      {`${timeState.hours.toString()}:${
+        timeState.minutes < 10
+          ? `0${timeState.minutes.toString()}`
+          : timeState.minutes.toString()
+      }:${
+        timeState.seconds < 10
+          ? `0${timeState.seconds.toString()}`
+          : timeState.seconds.toString()
+      }`}
     </h1>
   );
 };
-
 
 export default Timer_Answer;

@@ -7,8 +7,11 @@ import {
   FormControlLabel,
   FormLabel,
   Input,
+  InputLabel,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   TextField,
   Typography,
   fabClasses,
@@ -40,24 +43,21 @@ const QuizCard: React.FC<any> = ({
   );
   const setOnAnswerQuizCard = (answers: any) => {
     if (question.type === "Quiz") {
-      setOnAnswerQuiz(answers)
+      setOnAnswerQuiz(answers);
       setQuestion({ ...question, answer: onAnswerQuiz });
-      console.log("Answers Quiz", onAnswerQuiz)
-    }
-    else if (question.type === "Type Answer") {
-      setOnAnswerTyping(answers)
+      console.log("Answers Quiz", onAnswerQuiz);
+    } else if (question.type === "Type Answer") {
+      setOnAnswerTyping(answers);
       setQuestion({ ...question, answer: onAnswerTyping });
-      console.log("Answers Type", onAnswerTyping)
-    }
-    else if (question.type === "Multi Answer Question") {
-      setOnAnswerMulti(answers)
+      console.log("Answers Type", onAnswerTyping);
+    } else if (question.type === "Multi Answer Question") {
+      setOnAnswerMulti(answers);
       setQuestion({ ...question, answer: onAnswerMulti });
-      console.log("Answers Multi", onAnswerMulti)
+      console.log("Answers Multi", onAnswerMulti);
     }
   };
 
-  const setErrorSaveQuizCard = (valid: any) => {
-  };
+  const setErrorSaveQuizCard = (valid: any) => {};
   const handleChildError = (index: number, isError: boolean) => {
     setErrorStatesQuiz((prevStates) => {
       const newStates = [...prevStates];
@@ -67,8 +67,9 @@ const QuizCard: React.FC<any> = ({
   };
 
   const errorMemo = React.useMemo(() => {
-    if (!isQuestionEmpty && question.type === "Type Answer") return false
-    else if (question.type === "Quiz") return isQuestionEmpty || errorStatesQuiz.some((state) => state);
+    if (!isQuestionEmpty && question.type === "Type Answer") return false;
+    else if (question.type === "Quiz")
+      return isQuestionEmpty || errorStatesQuiz.some((state) => state);
   }, [isQuestionEmpty, errorStatesQuiz, question.type]);
 
   React.useEffect(() => {
@@ -78,13 +79,15 @@ const QuizCard: React.FC<any> = ({
   useEffect(() => {
     const hasEmptyAnswer =
       question.answer.length === 1 && question.answer[0] === "";
-    if (question.type === "Quiz")
-    {setErrorSave(
-      isQuestionEmpty ||
-        errorStatesQuiz.some((state) => state) ||
-        hasEmptyAnswer
-    );}
-    if (!isQuestionEmpty && question.type === "Type Answer") setErrorSave(false)
+    if (question.type === "Quiz") {
+      setErrorSave(
+        isQuestionEmpty ||
+          errorStatesQuiz.some((state) => state) ||
+          hasEmptyAnswer
+      );
+    }
+    if (!isQuestionEmpty && question.type === "Type Answer")
+      setErrorSave(false);
   }, [isQuestionEmpty, errorStatesQuiz, question.answer, question.type]);
 
   return (
@@ -114,6 +117,59 @@ const QuizCard: React.FC<any> = ({
               Please fill in the question.
             </Typography>
           )}
+          {/* <FormControl fullWidth sx={{ backgroundColor: "#FFFFFF" }}>
+            <InputLabel
+              id="demo-simple-select-label"
+              color="primary"
+              sx={{ fontWeight: "bold", color: "#000000" }}
+            >
+              {"Quiz Type"}
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={type}
+              label="question type"
+              // onChange={(event) => handleChange(slideIndex, event)}
+              sx={{
+                backgroundColor: "#FFFFFF",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                paddingRight: "20px",
+              }}
+            >
+              <MenuItem
+                value={"Quiz"}
+                sx={{
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Quiz
+              </MenuItem>
+              <MenuItem
+                value={"Type Answer"}
+                sx={{
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Type Answer
+              </MenuItem>
+              <MenuItem
+                value={"Multi Answer Question"}
+                sx={{
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Multi Answer Question
+              </MenuItem>
+            </Select>
+          </FormControl> */}
           <TextField
             label="Question"
             variant="outlined"
@@ -125,7 +181,7 @@ const QuizCard: React.FC<any> = ({
               textShadow: "1px 1px #ffffff",
               backgroundColor: "#ffffff",
               border: "2px solid #8d6e63",
-              borderRadius: "5px",
+              borderRadius: "2vh",
               padding: "10px",
               marginBottom: "20px",
             }}
@@ -149,7 +205,7 @@ const QuizCard: React.FC<any> = ({
                     setChoices={(ansChoices: any) => {
                       setQuestion({ ...question, choices: ansChoices });
                     }}
-                    setOnAnswerQuizCard = {setOnAnswerQuizCard}
+                    setOnAnswerQuizCard={setOnAnswerQuizCard}
                     setErrorStatesQuiz={setErrorStatesQuiz}
                     errorStatesQuiz={errorStatesQuiz}
                     handleChildError={handleChildError}
@@ -157,7 +213,7 @@ const QuizCard: React.FC<any> = ({
                 );
 
               case "Type Answer":
-                return <Type_Question_Template/>;
+                return <Type_Question_Template />;
 
               case "Multi Answer Question":
                 return (
@@ -169,7 +225,7 @@ const QuizCard: React.FC<any> = ({
                     setChoices={(ansChoices: any) => {
                       setQuestion({ ...question, choices: ansChoices });
                     }}
-                    setOnAnswerQuizCard = {setOnAnswerQuizCard}
+                    setOnAnswerQuizCard={setOnAnswerQuizCard}
                   />
                 );
 

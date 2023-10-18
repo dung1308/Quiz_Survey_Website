@@ -23,11 +23,10 @@ const Quiz_Choice: React.FC<any> = ({
   const [isChoiceEmpty, setIsChoiceEmpty] = React.useState(
     choices[index] === ""
   );
-  const [isContainAnswer, setIsContainAnswer] = React.useState(
-    false
-  );
+  const [isChoiceNotDeletable, setIsChoiceNotDeletable] = React.useState(false);
+  const [isContainAnswer, setIsContainAnswer] = React.useState(false);
   const [isDuplicateChoice, setIsDuplicateChoice] = React.useState(false);
-  
+
   useEffect(() => {
     setErrorSave(isChoiceEmpty || isDuplicateChoice);
   }, [isChoiceEmpty, isDuplicateChoice, setErrorSave]);
@@ -41,7 +40,7 @@ const Quiz_Choice: React.FC<any> = ({
   //     ).length > 0
   //   );
   // }, [choices, index]);
-  
+
   //   const [isAnswersEmpty, setIsAnswerEmpty] = React.useState(
   //     answers.length === 1 && answers[0] === ""
   //   );
@@ -54,20 +53,20 @@ const Quiz_Choice: React.FC<any> = ({
   ) => {
     const currentAnswer = answers.find((a: string) => a === choices[index]);
     const newChoice = event.target.value;
-    console.log(choices)
-    console.log("Choice:",choices[index])
+    console.log(choices);
+    console.log("Choice:", choices[index]);
     choices[index] = event.target.value;
     setChoices(choices);
-    console.log("Current Answer: ",currentAnswer)
+    console.log("Current Answer: ", currentAnswer);
     if (currentAnswer) {
-      console.log(event.target.value)
+      console.log(event.target.value);
       // update answer array with new choice
       // const answerIndex = answers.indexOf(currentAnswer);
       // answers[answerIndex] = event.target.value;
-      setAnswers([event.target.value])
-      console.log("Quiz Answers:", answers)
+      setAnswers([event.target.value]);
+      console.log("Quiz Answers:", answers);
     }
-    
+
     setIsChoiceEmpty(event.target.value === "");
     setIsDuplicateChoice(
       choices.filter(
@@ -91,6 +90,11 @@ const Quiz_Choice: React.FC<any> = ({
           This choice is a duplicate.
         </Typography>
       )}
+      {isChoiceNotDeletable && (
+        <Typography variant="caption" color="secondary">
+          Please deselect the current choice to remove it
+        </Typography>
+      )}
       {/* {isAnswersEmpty && (
         <Typography variant="caption" color="error">
           Please choose your answer.
@@ -100,7 +104,11 @@ const Quiz_Choice: React.FC<any> = ({
         <FormControlLabel
           control={
             <Radio
-              checked={!isDuplicateChoice && !isChoiceEmpty && choices[index] === answers[0]}
+              checked={
+                !isDuplicateChoice &&
+                !isChoiceEmpty &&
+                choices[index] === answers[0]
+              }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleChangeChoiceByID(e, index)
               }
@@ -125,7 +133,15 @@ const Quiz_Choice: React.FC<any> = ({
           }
         />
         <Button
-          onClick={() => handleRemoveChoice(index)}
+          onClick={() => {
+            const currentAnswer = answers.find(
+              (a: string) => a === choices[index]
+            );
+            if (!currentAnswer) {
+              setIsChoiceNotDeletable(false);
+              handleRemoveChoice(index);
+            } else setIsChoiceNotDeletable(true);
+          }}
           sx={{
             backgroundColor: "secondary.main",
             color: "white",

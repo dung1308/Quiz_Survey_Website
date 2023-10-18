@@ -15,6 +15,7 @@ import {
   TextField,
   List,
   ListItem,
+  Typography,
 } from "@mui/material";
 
 import { createTheme } from "@mui/material/styles";
@@ -104,6 +105,7 @@ const Multi_Ans_Quiz_Template: React.FC<any> = ({
   //   question.answers.map((choice: string) => String(choice))
   // );
   const [loading, setLoading] = useState(false);
+  const [isChoiceNotDeletable, setIsChoiceNotDeletable] = React.useState(false);
 
   const setAnswers = (editAnswer: any) => {
     setQuestion({ ...question, answer: editAnswer });
@@ -149,6 +151,11 @@ const Multi_Ans_Quiz_Template: React.FC<any> = ({
 
   return (
     <List>
+      {isChoiceNotDeletable && (
+        <Typography variant="caption" color="secondary">
+          Please deselect the current choice to remove it
+        </Typography>
+      )}
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -165,7 +172,16 @@ const Multi_Ans_Quiz_Template: React.FC<any> = ({
             />
 
             <Button
-              onClick={() => handleRemoveChoice(index)}
+              // onClick={() => handleRemoveChoice(index)}
+              onClick={() => {
+                const currentAnswer = question.answer.find(
+                  (a: string) => a === choices[index]
+                );
+                if (!currentAnswer) {
+                  setIsChoiceNotDeletable(false);
+                  handleRemoveChoice(index);
+                } else setIsChoiceNotDeletable(true);
+              }}
               sx={{
                 backgroundColor: "secondary.main",
                 color: "white",

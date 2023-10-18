@@ -27,10 +27,15 @@ import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import dayjs, { Dayjs } from "dayjs";
 
-const RowComponent_Report_Interactions: React.FC<any> = ({ row, index, userData, totalScore, handleResultShow }) => {
+const RowComponent_Report_Interactions: React.FC<any> = ({
+  row,
+  index,
+  userData,
+  totalScore,
+  handleResultShow,
+}) => {
   const navigate = useNavigate();
 
-  
   return (
     <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
@@ -40,7 +45,8 @@ const RowComponent_Report_Interactions: React.FC<any> = ({ row, index, userData,
         {row.questionBankId}
       </StyledTableCell>
       <StyledTableCell component="th" scope="row" align="left">
-        {row.resultScores}/{totalScore ?? 0}
+        {/* {row.resultScores}/{totalScore ?? 0} */}
+        {row.resultScores}/{totalScore === null || totalScore === 0 ? 0 : 10}
       </StyledTableCell>
       <StyledTableCell component="th" scope="row" align="left">
         <Box sx={{ justifyContent: "space-between" }}>
@@ -54,8 +60,9 @@ const RowComponent_Report_Interactions: React.FC<any> = ({ row, index, userData,
               color: "#333",
               ":hover": { backgroundColor: "skyblue" },
             }}
-            onClick={(e) => {handleResultShow(row.id)}}
-            
+            onClick={(e) => {
+              handleResultShow(row.id);
+            }}
           >
             Show Question Results
           </Button>

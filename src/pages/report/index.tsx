@@ -10,7 +10,11 @@ import {
   GetInteractionsByUserAndQuestionBank,
   GetLimitedInteractionsByUserAndQuestionBank,
   GetMultipleReports,
+  GetMultipleReportsAscOrDes,
+  GetMultipleReportsFilteredAscOrDes,
   GetMultipleReportsForAdmin,
+  GetMultipleReportsWithQuestionBankName,
+  GetMultipleReportsWithUserName,
   Interaction,
   MultipleReportWithPagination,
   QuestionBank,
@@ -26,6 +30,7 @@ import {
   DialogTitle,
   IconButton,
   InputAdornment,
+  Menu,
   MenuItem,
   Paper,
   Select,
@@ -35,6 +40,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  TextField,
 } from "@mui/material";
 import StyledTableCell from "../../components/molecules/TableCellStyle";
 import RowComponent_Report from "../../components/organisms/rowComponentReport";
@@ -44,22 +50,23 @@ import {
   tablePaginationClasses as classes,
 } from "@mui/base/TablePagination";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { styled } from "@mui/material/styles";
 import { blue, grey } from "@mui/material/colors";
 import RowComponent_Report_Answer from "../../components/organisms/rowComponentReport_Answers";
 import StyledTableSortLabel from "../../components/molecules/TableSortStyle";
 
-function createReport(
-  id: string,
-  questionBankId: string,
-  questionBankName: string
-) {
-  return {
-    id,
-    questionBankId,
-    questionBankName,
-  };
-}
+// function createReport(
+//   id: string,
+//   questionBankId: string,
+//   questionBankName: string
+// ) {
+//   return {
+//     id,
+//     questionBankId,
+//     questionBankName,
+//   };
+// }
 interface ResultShowDTO {
   id: number;
   onAnswers: string[];
@@ -67,12 +74,12 @@ interface ResultShowDTO {
   questionId: number;
   questionBankInteractId: number;
 }
-interface ReportDTO {
-  questionBankId: number;
-  surveyName: string;
-  userName: string;
-  resultScores: number;
-}
+// interface ReportDTO {
+//   questionBankId: number;
+//   surveyName: string;
+//   userName: string;
+//   resultScores: number;
+// }
 
 interface ItemsDTO {
   questionBankId: number;
@@ -86,7 +93,7 @@ interface ItemsDTO {
 const Report: React.FC = () => {
   const newData =
     localStorage.getItem("currentUser") ??
-    JSON.stringify(new UserDTO(0, "", "", "", 0));
+    JSON.stringify(new UserDTO(0, "", "", "", true, 0));
   const newRole =
     localStorage.getItem("Role") ??
     JSON.stringify(new Role(0, "Anonymous", "Anonymous"));
@@ -101,6 +108,7 @@ const Report: React.FC = () => {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      color: green;
       gap: 10px;
   
       @media (min-width: 768px) {
@@ -111,6 +119,7 @@ const Report: React.FC = () => {
   
     & .${classes.selectLabel} {
       margin: 0;
+      color: green;
     }
   
     & .${classes.select}{
@@ -118,6 +127,7 @@ const Report: React.FC = () => {
       border: 1px solid ${
         theme.palette.mode === "dark" ? grey[800] : grey[200]
       };
+      color: red;
       border-radius: 50px;
       background-color: transparent;
   
@@ -171,28 +181,223 @@ const Report: React.FC = () => {
     }
     `
   );
-  const [value, setValue] = useState("");
-  const [open, setOpen] = useState(false);
+  // const [value, setValue] = useState("");
+  // const [open, setOpen] = useState(false);
 
-  const handleChange = (event: any) => {
-    setValue(event.target.value);
+  const handleChangeForAscOrDes = async (filter: string) => {
+    setFilterAscOrDes(filter);
+    // setPage(0);
+    setLoading(true);
+    handleMenuClose();
+    setFilterAscOrNot(filter === "Asc" ? true : false);
+    // if (filterQuestionBankNameValue !== "")
+    //   await GetMultipleReportsWithQuestionBankName(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filter,
+    //     filterQuestionBankNameValue
+    //   ).then((data) => {
+    //     console.log("QuestionBankName: ", data);
+    //     // setFilterUserNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else if (filterUserNameValue !== "")
+    //   await GetMultipleReportsWithUserName(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filter,
+    //     filterUserNameValue
+    //   ).then((data) => {
+    //     // setFilterQuestionBankNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else
+    //   await GetMultipleReportsAscOrDes(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     filter
+    //   ).then((data) => {
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    await GetMultipleReportsFilteredAscOrDes(
+      userData.id,
+      rowsPerPage,
+      page + 1,
+      // filter
+      filter === "Asc" ? true : false,
+      "",
+      filterQuestionBankNameValue,
+      filterUserNameValue
+    ).then((data) => {
+      console.log("QuestionBankName: ", data);
+      // setFilterUserNameValue("");
+      setQuestionBankInteract(data);
+      setTotalPages(data.numOfItems);
+      setLoading(false);
+    });
   };
 
-  const handleFilterButtonClick = () => {
-    setOpen(true);
+  const handleChangeForQuestionBankName = async (filter: string) => {
+    // setFilterAscOrDes(filter);
+    setPage(0);
+    setLoading(true);
+    handleMenuQuestionBankNameClose();
+    // await GetMultipleReportsWithQuestionBankName(
+    //   roleData.permission,
+    //   userData.id,
+    //   rowsPerPage,
+    //   1,
+    //   // filter
+    //   "Asc",
+    //   filter
+    // ).then((data) => {
+    //   setPage(0);
+    //   console.log("QuestionBankName: ", data);
+    //   // setFilterUserNameValue("");
+    //   setQuestionBankInteract(data);
+    //   setTotalPages(data.numOfItems);
+    //   setLoading(false);
+    // });
+    await GetMultipleReportsFilteredAscOrDes(
+      userData.id,
+      rowsPerPage,
+      page + 1,
+      // filter
+      filterAscOrNot,
+      "",
+      filter,
+      filterUserNameValue
+    ).then((data) => {
+      setPage(0);
+      setQuestionBankInteract(data);
+      setTotalPages(data.numOfItems);
+      setLoading(false);
+    });
   };
 
-  const handleSelectClose = () => {
-    setOpen(false);
+  const handleChangeForUserName = async (filter: string) => {
+    // setFilterAscOrDes(filter);
+    setPage(0);
+    setLoading(true);
+    handleMenuUserNameClose();
+    console.log("User");
+    // await GetMultipleReportsWithUserName(
+    //   roleData.permission,
+    //   userData.id,
+    //   rowsPerPage,
+    //   1,
+    //   // filter
+    //   "Asc",
+    //   filter
+    // ).then((data) => {
+    //   setPage(0);
+    //   // setFilterQuestionBankNameValue("");
+    //   setQuestionBankInteract(data);
+    //   setTotalPages(data.numOfItems);
+    //   setLoading(false);
+    // });
+    await GetMultipleReportsFilteredAscOrDes(
+      userData.id,
+      rowsPerPage,
+      page + 1,
+      // filter
+      filterAscOrNot,
+      "",
+      filterQuestionBankNameValue,
+      filter
+    ).then((data) => {
+      setPage(0);
+      setQuestionBankInteract(data);
+      setTotalPages(data.numOfItems);
+      setLoading(false);
+    });
   };
+
+  const handleFilterButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElForAscOrDes(event.currentTarget);
+  };
+
+  const handleFilterQuestionBankNameButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElForQuestionBankName(event.currentTarget);
+  };
+
+  const handleFilterUserNameButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElUserName(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorElForAscOrDes(null);
+  };
+
+  const handleMenuQuestionBankNameClose = () => {
+    setAnchorElForQuestionBankName(null);
+  };
+
+  const handleMenuUserNameClose = () => {
+    setAnchorElUserName(null);
+  };
+
+  // const handleFilterButtonClick = () => {
+  //   setOpen(true);
+  // };
+
+  // const handleSelectClose = () => {
+  //   setOpen(false);
+  // };
 
   const [loading, setLoading] = useState(true);
-  const [rows, setRows] = useState<any>([]);
+  // const [rows, setRows] = useState<any>([]);
   const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
   const [roleData, setRoleData] = useState<Role>(JSON.parse(newRole));
   // const [questionBankInteract, setQuestionBankInteract] = useState<ReportDTO[]>(
   //   []
   // );
+
+  const [anchorElForAscOrDes, setAnchorElForAscOrDes] =
+    React.useState<null | HTMLElement>(null);
+  const [anchorElForQuestionBankName, setAnchorElForQuestionBankName] =
+    React.useState<null | HTMLElement>(null);
+  const [anchorElUserName, setAnchorElUserName] =
+    React.useState<null | HTMLElement>(null);
+  const openForAscOrDes = Boolean(anchorElForAscOrDes);
+  const handleClickForAscOrDes = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElForAscOrDes(event.currentTarget);
+  };
+  const handleCloseForAscOrDes = () => {
+    setAnchorElForAscOrDes(null);
+  };
+
+  // Filter
+  const [filterAscOrDes, setFilterAscOrDes] = useState("Asc");
+  const [filterAscOrNot, setFilterAscOrNot] = useState(true);
+  const [filterQuestionBankNameValue, setFilterQuestionBankNameValue] =
+    useState("");
+  const [filterUserNameValue, setFilterUserNameValue] = useState("");
+  const [filterQuestionBankName, setFilterQuestionBankName] = useState("");
+  const [filterUserName, setFilterUserName] = useState("");
+
   const [questionBankInteract, setQuestionBankInteract] =
     useState<MultipleReportWithPagination>(
       new MultipleReportWithPagination({ pages: 0, numOfItems: 0, data: [] })
@@ -263,15 +468,24 @@ const Report: React.FC = () => {
   };
 
   const listTitles = [
-    ["QuestionBankName", "UserName", "Show Interaction Results"],
+    ["QuestionBankName", "UserName"],
     ["Id", "Question Bank Id", "Results", "Show Answers Results"],
     ["Id", "Question Name", "Result", "Your Answers"],
+  ];
+  const listSetStateForReport = [
+    setFilterQuestionBankNameValue,
+    setFilterUserName,
+  ];
+  // const listStateValueForReport = [filterQuestionBankName, filterUserName];
+  const listButtonFunctionsForReport = [
+    handleChangeForQuestionBankName,
+    handleChangeForUserName,
   ];
 
   const listContents = [
     {
       id: questionBankInteract.data
-        .reverse()
+        // .reverse()
         .map((data) => data.questionBankId),
     },
   ];
@@ -374,21 +588,70 @@ const Report: React.FC = () => {
     //   // const newReportDTO = data;
     //   setQuestionBankInteract(data);
     //   setLoading(false);
-    //   console.log("Error: ", data);
+    //   console.log("Change Page: ", data);
     // } else {
-    const data = await GetMultipleReports(
-      roleData.permission,
+    // if (filterQuestionBankNameValue !== "")
+    //   await GetMultipleReportsWithQuestionBankName(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterQuestionBankNameValue
+    //   ).then((data) => {
+    //     console.log("QuestionBankName: ", data);
+    //     // setFilterUserNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else if (filterUserNameValue !== "")
+    //   await GetMultipleReportsWithUserName(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterUserNameValue
+    //   ).then((data) => {
+    //     // setFilterQuestionBankNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else
+    //   await GetMultipleReportsAscOrDes(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     newPage + 1,
+    //     filterAscOrDes
+    //   ).then((data) => {
+    //     console.log("Error: ", data);
+    //     setQuestionBankInteract(data);
+    //     setLoading(false);
+    //   });
+
+    await GetMultipleReportsFilteredAscOrDes(
       userData.id,
       rowsPerPage,
-      newPage + 1
+      newPage + 1,
+      // filter
+      filterAscOrNot,
+      "",
+      filterQuestionBankName,
+      filterUserNameValue
     ).then((data) => {
       setQuestionBankInteract(data);
+      setTotalPages(data.numOfItems);
       setLoading(false);
     });
     // const newReportDTO = data;
     // setQuestionBankInteract(data);
     // setLoading(false);
-    console.log("Error: ", data);
+    // console.log("Error: ", data);
     // }
   };
 
@@ -411,13 +674,60 @@ const Report: React.FC = () => {
     // setLoading(false);
     // console.log("Error: ", rowsPerPage + 1);
     // } else {
-    const data = await GetMultipleReports(
-      roleData.permission,
+    // if (filterQuestionBankNameValue !== "")
+    //   await GetMultipleReportsWithQuestionBankName(
+    //     roleData.permission,
+    //     userData.id,
+    //     newRowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterQuestionBankNameValue
+    //   ).then((data) => {
+    //     console.log("QuestionBankName: ", data);
+    //     // setFilterUserNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else if (filterUserNameValue !== "")
+    //   await GetMultipleReportsWithUserName(
+    //     roleData.permission,
+    //     userData.id,
+    //     newRowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterUserNameValue
+    //   ).then((data) => {
+    //     // setFilterQuestionBankNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else
+    //   await GetMultipleReportsAscOrDes(
+    //     roleData.permission,
+    //     userData.id,
+    //     newRowsPerPage,
+    //     page + 1,
+    //     filterAscOrDes
+    //   ).then((data) => {
+    //     setQuestionBankInteract(data);
+    //     setLoading(false);
+    //   });
+    await GetMultipleReportsFilteredAscOrDes(
       userData.id,
       newRowsPerPage,
-      page + 1
+      page + 1,
+      // filter
+      filterAscOrNot,
+      "",
+      filterQuestionBankName,
+      filterUserNameValue
     ).then((data) => {
       setQuestionBankInteract(data);
+      setTotalPages(data.numOfItems);
       setLoading(false);
     });
     // setQuestionBankInteract(data);
@@ -441,11 +751,14 @@ const Report: React.FC = () => {
     //     }
     //   );
     // } else {
-    GetMultipleReports(
-      roleData.permission,
+    GetMultipleReportsFilteredAscOrDes(
       userData.id,
       rowsPerPage,
-      page + 1
+      page + 1,
+      filterAscOrNot,
+      "",
+      "",
+      ""
     ).then((data) => {
       const newReportDTO = data;
       setQuestionBankInteract(data);
@@ -487,15 +800,15 @@ const Report: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <StyledTableCell>
-                    QuestionBankId{" "}
                     <Button
                       onClick={handleFilterButtonClick}
-                      startIcon={<FilterListIcon sx={{ color: "white" }} />}
-                    >
-                    </Button>
-                    <Select
+                      startIcon={
+                        <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                      }
+                    />
+                    {/* <Select
                       value={value}
-                      onChange={handleChange}
+                      onChange={handleChangeForAscOrDes}
                       open={open}
                       onClose={handleSelectClose}
                       // startAdornment={
@@ -505,30 +818,165 @@ const Report: React.FC = () => {
                       //     </IconButton>
                       //   </InputAdornment>
                       // }
-                      style={{ display: "none" }}
+                      style={{ display: open ? 'block' : 'none' }}
+                    > */}
+                    <Menu
+                      anchorEl={anchorElForAscOrDes}
+                      open={Boolean(anchorElForAscOrDes)}
+                      onClose={handleMenuClose}
                     >
-                      <MenuItem value="">Ascending</MenuItem>
-                      <MenuItem value="option1">Descending</MenuItem>
+                      <MenuItem
+                        value="Asc"
+                        onClick={(e) => handleChangeForAscOrDes("Asc")}
+                      >
+                        Ascending
+                      </MenuItem>
+                      <MenuItem
+                        value="Des"
+                        onClick={(e) => handleChangeForAscOrDes("Des")}
+                      >
+                        Descending
+                      </MenuItem>
                       {/* <MenuItem value="">All</MenuItem>
                       <MenuItem value="option1">Option 1</MenuItem>
                       <MenuItem value="option2">Option 2</MenuItem>
                       <MenuItem value="option3">Option 3</MenuItem> */}
-                    </Select>
+                      {/* </Select> */}
+                    </Menu>
+                    QuestionBankId
                   </StyledTableCell>
-                  {/* <StyledTableSortLabel >Filter</StyledTableSortLabel> */}
-                  {listTitles[0].map((title: any, index: number) => (
+
+                  <StyledTableCell align="right">Owner</StyledTableCell>
+
+                  <StyledTableCell align="right">
+                    <Button
+                      onClick={handleFilterQuestionBankNameButtonClick}
+                      startIcon={
+                        <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                      }
+                    />
+                    <Menu
+                      anchorEl={anchorElForQuestionBankName}
+                      open={Boolean(anchorElForQuestionBankName)}
+                      onClose={handleMenuQuestionBankNameClose}
+                    >
+                      <MenuItem>
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="surveyName"
+                          label="Survey Name"
+                          value={filterQuestionBankNameValue}
+                          fullWidth
+                          variant="standard"
+                          onChange={(e) => {
+                            setFilterQuestionBankNameValue(e.target.value);
+                          }}
+                        />
+                        <Button
+                          fullWidth
+                          onClick={() =>
+                            handleChangeForQuestionBankName(
+                              filterQuestionBankNameValue
+                            )
+                          }
+                        >
+                          Filter
+                        </Button>
+                      </MenuItem>
+                    </Menu>
+                    Survey Name
+                  </StyledTableCell>
+
+                  <StyledTableCell align="right">
+                    <Button
+                      onClick={handleFilterUserNameButtonClick}
+                      startIcon={
+                        <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                      }
+                    />
+                    <Menu
+                      anchorEl={anchorElUserName}
+                      open={Boolean(anchorElUserName)}
+                      onClose={handleMenuUserNameClose}
+                    >
+                      <MenuItem>
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="surveyName"
+                          label="Username"
+                          value={filterUserNameValue}
+                          fullWidth
+                          variant="standard"
+                          onChange={(e) => {
+                            setFilterUserNameValue(e.target.value);
+                          }}
+                        />
+                        <Button
+                          fullWidth
+                          onClick={() =>
+                            handleChangeForUserName(filterUserNameValue)
+                          }
+                        >
+                          Filter
+                        </Button>
+                      </MenuItem>
+                    </Menu>
+                    Username
+                  </StyledTableCell>
+                  {/* {listTitles[0].map((title: any, index: number) => (
                     <StyledTableCell align="right">
-                      {title}{" "}
-                      <IconButton>
-                        <FilterListIcon sx={{ color: "white" }} />
-                      </IconButton>
+                      {""}
+                      {title}
+                      <Button
+                        onClick={handleFilterQuestionBankNameButtonClick}
+                        startIcon={
+                          <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                        }
+                      />
+                      <Menu
+                        anchorEl={anchorElForQuestionBankName}
+                        open={Boolean(anchorElForQuestionBankName)}
+                        onClose={handleMenuQuestionBankNameClose}
+                      >
+                        <MenuItem>
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="surveyName"
+                            label="Survey Name"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => {
+                              listSetStateForReport[index](e.target.value);
+                            }}
+                          />
+                          <Button
+                            fullWidth
+                            onClick={() =>
+                              listButtonFunctionsForReport[index](
+                                listStateValueForReport[index]
+                              )
+                            }
+                          >
+                            Filter
+                          </Button>
+                        </MenuItem>
+                      </Menu>
                     </StyledTableCell>
-                  ))}
+                  ))} */}
+
+                  {/* Show Interaction Results */}
+                  <StyledTableCell align="right">
+                    Show Interaction Results
+                  </StyledTableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {questionBankInteract.data
-                  .reverse()
+                  // .reverse()
                   .map((row: any, index: number) => (
                     <RowComponent_Report
                       row={row}
@@ -575,9 +1023,9 @@ const Report: React.FC = () => {
                   {listTitles[1].map((title: any, index: number) => (
                     <StyledTableCell>
                       {title}
-                      <IconButton>
-                        <FilterListIcon sx={{ color: "white" }} />
-                      </IconButton>
+                      {/* <IconButton>
+                        <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                      </IconButton> */}
                     </StyledTableCell>
                   ))}
                 </TableRow>
@@ -612,9 +1060,9 @@ const Report: React.FC = () => {
                   {listTitles[2].map((title: any, index: number) => (
                     <StyledTableCell>
                       {title}
-                      <IconButton>
-                        <FilterListIcon sx={{ color: "white" }} />
-                      </IconButton>
+                      {/* <IconButton>
+                        <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                      </IconButton> */}
                     </StyledTableCell>
                   ))}
                   <StyledTableCell align="right">Right Answers</StyledTableCell>

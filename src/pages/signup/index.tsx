@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Button,
-  TextField,
+  // TextField,
   FormControl,
   InputLabel,
   Input,
@@ -10,16 +10,16 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import Layout from "../../components/templates/layout";
-import { CreateUser, GetRoles } from "../../services/dataService/dataService";
+import { CreateUser, GetRoles, UserDTO } from "../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 
-interface UserDTO {
-  id: number;
-  userName: string;
-  password: string;
-  email: string;
-  roleId: number;
-}
+// interface UserDTO {
+//   id: number;
+//   userName: string;
+//   password: string;
+//   email: string;
+//   roleId: number;
+// }
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -74,6 +74,7 @@ const SignUp: React.FC = () => {
       userName: name,
       password: password,
       email: email,
+      isNightMode: true,
       roleId: role.id,
     };
     CreateUser(user).then((data) => {

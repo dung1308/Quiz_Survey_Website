@@ -30,6 +30,7 @@ import {
   Interaction,
   Question,
   QuestionBank,
+  RemoveParticipantForSurvey,
   Role,
   Survey,
   UserDTO,
@@ -100,7 +101,7 @@ const AnswerPage: React.FC<any> = () => {
 
   const newData =
     localStorage.getItem("currentUser") ??
-    JSON.stringify(new UserDTO(0, "", "", "", 0));
+    JSON.stringify(new UserDTO(0, "", "", "", true, 0));
   const newRole =
     localStorage.getItem("Role") ?? JSON.stringify(new Role(0, "", ""));
   const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
@@ -126,7 +127,10 @@ const AnswerPage: React.FC<any> = () => {
   function handleBeforeUnload() {
     if (!isLeavingPage) {
       // localStorage.setItem("wrong", JSON.stringify("no"));
-      localStorage.removeItem("busyUser");
+      // localStorage.removeItem("busyUser");
+      if (questionBank !== undefined) {
+        RemoveParticipantForSurvey(questionBank.id, userData.id);
+      }
     }
     // else localStorage.removeItem("wrong");
   }
@@ -339,11 +343,11 @@ const AnswerPage: React.FC<any> = () => {
           console.log(anonyData);
           return;
         }
-        console.log("For anonymous: ", anonyData)
+        console.log("For anonymous: ", anonyData);
         setFinalResult(+(anonyData.resultScores ?? "0"));
         // console.log(anonyData.resultScores);
         GetDefaultScores(+(params.surveyId ?? 0)).then((data) => {
-          console.log(data)
+          console.log(data);
           setTotalScore(data.totalScore);
           GetLatestInteractByUserAndQuestionBank(
             +(anonyData.userId ?? 0),
@@ -456,12 +460,12 @@ const AnswerPage: React.FC<any> = () => {
                 key={seed}
                 sx={{
                   width: 2 / 4,
-                  height: "100vh",
+                  // height: "100vh",
                   textAlign: "-webkit-center",
                 }}
               >
                 <div ref={(el) => (scrollRefs.current[index] = el)}>
-                  <h1 className="text-center">Question {index + 1}</h1>
+                  <h2 className="text-center">Question {index + 1}</h2>
                   <QuizCard_Answer
                     question={question}
                     rightAnswers={rightAnswers}
@@ -509,7 +513,7 @@ const AnswerPage: React.FC<any> = () => {
           <Box
             sx={{
               width: "25%",
-              height: "100vh",
+              height: "99vh",
               backgroundColor: "#F5F5F5",
               display: "flex",
               flexDirection: "column",
@@ -525,6 +529,7 @@ const AnswerPage: React.FC<any> = () => {
               sx={{
                 backgroundColor: "#F5F5F5",
                 width: "100%",
+                height: "58vh",
                 textAlign: "center",
                 padding: "10px",
                 marginBottom: "10px",
@@ -536,23 +541,31 @@ const AnswerPage: React.FC<any> = () => {
                 },
               }}
             >
-              <Grid item xs={6}>
-                <Typography variant="h5" sx={{ color: "#2AA789" }}>
+              <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                <Typography
+                  variant="h5"
+                  sx={{ color: "#2AA789", fontSize: "1.5vw" }}
+                >
                   Survey Name:
                 </Typography>
               </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h6">{questionBank?.surveyName}</Typography>
+              <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                <Typography variant="h6" sx={{ fontSize: "1.5vw" }}>
+                  {questionBank?.surveyName}
+                </Typography>
               </Grid>
 
               {/*Username*/}
-              <Grid item xs={6}>
-                <Typography variant="h5" sx={{ color: "#2AA789" }}>
+              <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                <Typography
+                  variant="h5"
+                  sx={{ color: "#2AA789", fontSize: "1.5vw" }}
+                >
                   Username:
                 </Typography>
               </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h6">
+              <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                <Typography variant="h6" sx={{ fontSize: "1.5vw" }}>
                   {userData.userName !== "" ? userData.userName : "Anonymous"}
                 </Typography>
               </Grid>
@@ -560,12 +573,15 @@ const AnswerPage: React.FC<any> = () => {
               {/*Timer*/}
               {!hasAnswered && (
                 <>
-                  <Grid item xs={6}>
-                    <Typography variant="h5" sx={{ color: "#2AA789" }}>
+                  <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ color: "#2AA789", fontSize: "1.5vw" }}
+                    >
                       Timer:
                     </Typography>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={6} sx={{ height: "1.5vw" }}>
                     <Timer_Answer
                       time={calculateTime(tempSur.timer)}
                       overTime={overTime}
@@ -580,6 +596,7 @@ const AnswerPage: React.FC<any> = () => {
             <Grid
               sx={{
                 display: "flex",
+                height: "2vw",
                 justifyContent: "center",
                 marginTop: "20px",
               }}

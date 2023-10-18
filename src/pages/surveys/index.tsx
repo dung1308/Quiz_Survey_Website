@@ -1,13 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  // useRef,
+  useEffect,
+} from "react";
 import {
-  Switch,
+  // Switch,
   Box,
   Button,
   Table,
   styled,
   TableBody,
-  TableCell,
-  tableCellClasses,
+  // TableCell,
+  // tableCellClasses,
   TableContainer,
   TableHead,
   TableRow,
@@ -19,26 +23,38 @@ import {
   TextField,
   DialogActions,
   Typography,
+  MenuItem,
+  Menu,
 } from "@mui/material";
 import Layout from "../../components/templates/layout";
 import StyledTableCell from "../../components/molecules/TableCellStyle";
 import RowComponent from "../../components/organisms/rowComponent";
-import JSONdata from "../../data/data.json";
+import {
+  TablePagination,
+  tablePaginationClasses as classes,
+} from "@mui/base/TablePagination";
+// import JSONdata from "../../data/data.json";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
   GetAllQuestionBanks,
-  GetCategories,
-  GetQuestionBankByUserId,
+  GetAndSetParticipantForSurvey,
+  // GetCategories,
+  // GetQuestionBankByUserId,
+  GetQuestionBankByUserIdAscOrDes,
   QuestionBank,
   Role,
   UserDTO,
-  dataSevice,
-  setStatusAfterJoin,
+  // dataSevice,
+  // setStatusAfterJoin,
 } from "../../services/dataService/dataService";
+import // getSurveyByID,
+// getSurveys,
+"../../services/dataService/dataService";
 import {
-  getSurveyByID,
-  getSurveys,
-} from "../../services/dataService/dataService";
-import { useNavigate, useNavigation } from "react-router-dom";
+  useNavigate,
+  // useNavigation
+} from "react-router-dom";
+import { blue, grey } from "@mui/material/colors";
 
 function createData(
   id: string,
@@ -114,29 +130,343 @@ function Surveys() {
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<any>([]);
   const [questionBank, setQuestionBank] = useState<QuestionBank[]>([]);
-  const [allQuestionBank, setAllQuestionBank] = useState<QuestionBank[]>([]);
+  // const [allQuestionBank, setAllQuestionBank] = useState<QuestionBank[]>([]);
+  const [, setAllQuestionBank] = useState<QuestionBank[]>([]);
   const [surveyCodeJoin, setSurveyCodeJoin] = useState("");
-  const [userId, setUserId] = useState(1);
-  const [categories, setCategories] = useState<Category[]>([]);
+  // const [userId, setUserId] = useState(1);
+  const [userId] = useState(1);
+  // const [categories, setCategories] = useState<Category[]>([]);
+  const [categories] = useState<Category[]>([]);
   const newData =
     localStorage.getItem("currentUser") ??
     JSON.stringify(
-      new UserDTO(0, "Anonymous", "Anonymous", "Anonymous@Anonymous.com", 0)
+      new UserDTO(
+        0,
+        "Anonymous",
+        "Anonymous",
+        "Anonymous@Anonymous.com",
+        true,
+        0
+      )
     );
   const newRole =
     localStorage.getItem("Role") ??
     JSON.stringify(new Role(0, "Anonymous", "Anonymous"));
   const [userData, setUserData] = useState<UserDTO>(JSON.parse(newData));
-  const [roleData, setRoleData] = useState<Role>(JSON.parse(newRole));
+  // const [roleData, setRoleData] = useState<Role>(JSON.parse(newRole));
+  const [roleData] = useState<Role>(JSON.parse(newRole));
 
   const [wrongSurveyCode, setWrongSurveyCode] = useState(false);
+  const [alreadyParticipated, setAlreadyParticipated] = useState(false);
+
+  // Pagination
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(10);
+  const [filterAscOrDes, setFilterAscOrDes] = useState("Asc");
+  const [anchorElForAscOrDes, setAnchorElForAscOrDes] =
+    React.useState<null | HTMLElement>(null);
+
+  const handleFilterButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElForAscOrDes(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorElForAscOrDes(null);
+  };
+
+  const handleChangeForAscOrDes = async (filter: string) => {
+    setFilterAscOrDes(filter);
+    // setPage(0);
+    setLoading(true);
+    handleMenuClose();
+    await GetQuestionBankByUserIdAscOrDes(
+      userData.id,
+      rowsPerPage,
+      page + 1,
+      filter
+    ).then((data) => {
+      setQuestionBank(data.data);
+      setTotalPages(data.numOfItems);
+      setLoading(false);
+      console.log(data);
+    });
+    // await GetMultipleReportsAscOrDes(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     filter
+    //   ).then((data) => {
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+  };
 
   // Open State
   const [openJoinParticipant, setOpenJoinParticipant] = useState(false);
 
-  const getCategoryNameById = (id: number) => {
-    const category = categories.find((entity) => entity.id === id);
-    return category ? category.categoryName : ".......";
+  const CustomTablePagination = styled(TablePagination)(
+    ({ theme }) => `
+    & .${classes.spacer} {
+      display: none;
+    }
+  
+    & .${classes.toolbar}  {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: green;
+      gap: 10px;
+  
+      @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+  
+    & .${classes.selectLabel} {
+      margin: 0;
+      color: green;
+    }
+  
+    & .${classes.select}{
+      padding: 2px;
+      border: 1px solid ${
+        theme.palette.mode === "dark" ? grey[800] : grey[200]
+      };
+      color: red;
+      border-radius: 50px;
+      background-color: transparent;
+  
+      &:hover {
+        background-color: ${
+          theme.palette.mode === "dark" ? grey[800] : grey[50]
+        };
+      }
+  
+      &:focus {
+        outline: 1px solid ${
+          theme.palette.mode === "dark" ? blue[400] : blue[200]
+        };
+      }
+    }
+  
+    & .${classes.displayedRows} {
+      margin: 0;
+  
+      @media (min-width: 768px) {
+        margin-left: auto;
+      }
+    }
+  
+    & .${classes.actions} {
+      padding: 2px;
+      border: 1px solid ${
+        theme.palette.mode === "dark" ? grey[800] : grey[200]
+      };
+      border-radius: 50px;
+      text-align: center;
+    }
+  
+    & .${classes.actions} > button {
+      margin: 0 8px;
+      border: transparent;
+      border-radius: 2px;
+      background-color: transparent;
+  
+      &:hover {
+        background-color: ${
+          theme.palette.mode === "dark" ? grey[800] : grey[50]
+        };
+      }
+  
+      &:focus {
+        outline: 1px solid ${
+          theme.palette.mode === "dark" ? blue[400] : blue[200]
+        };
+      }
+    }
+    `
+  );
+
+  // const getCategoryNameById = (id: number) => {
+  //   const category = categories.find((entity) => entity.id === id);
+  //   return category ? category.categoryName : ".......";
+  // };
+
+  const handleChangePage = async (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+    setLoading(true);
+    // setUserData(JSON.parse(newData));
+    // console.log(userData);
+    // if (roleData.permission === "All") {
+    //   const data = await GetMultipleReportsForAdmin(
+    //     userData.id,
+    //     rowsPerPage,
+    //     newPage + 1
+    //   );
+    //   // const newReportDTO = data;
+    //   setQuestionBankInteract(data);
+    //   setLoading(false);
+    //   console.log("Change Page: ", data);
+    // } else {
+    // if (filterQuestionBankNameValue !== "")
+    //   await GetMultipleReportsWithQuestionBankName(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterQuestionBankNameValue
+    //   ).then((data) => {
+    //     console.log("QuestionBankName: ", data);
+    //     // setFilterUserNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else if (filterUserNameValue !== "")
+    //   await GetMultipleReportsWithUserName(
+    //     roleData.permission,
+    //     userData.id,
+    //     rowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterUserNameValue
+    //   ).then((data) => {
+    //     // setFilterQuestionBankNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else
+    await GetQuestionBankByUserIdAscOrDes(
+      userData.id,
+      rowsPerPage,
+      newPage + 1,
+      filterAscOrDes
+    ).then((data) => {
+      console.log("Error: ", data);
+      setQuestionBank(data.data);
+      setTotalPages(data.numOfItems);
+      if (categories !== undefined) {
+        const newRows = data.data.map((data) =>
+          createData(
+            data.id.toString(),
+            data.surveyName,
+            data.owner,
+            data.categoryName,
+            data.status,
+            data.startDate,
+            data.endDate,
+            data.enableStatus,
+            data.categoryListId,
+            data.surveyCode
+          )
+        );
+        setRows(newRows);
+        setLoading(false);
+      }
+      // setLoading(false);
+    });
+    // const newReportDTO = data;
+    // setQuestionBankInteract(data);
+    // setLoading(false);
+    // console.log("Error: ", data);
+    // }
+  };
+
+  const handleChangeRowsPerPage = async (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log("event.target.value", parseInt(event.target.value, 10));
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);
+    console.log("rowsPerPage: ", rowsPerPage);
+    setPage(0);
+    setLoading(true);
+    // if (roleData.permission === "All") {
+    // const data = await GetMultipleReportsForAdmin(
+    //   userData.id,
+    //   rowsPerPage,
+    //   page + 1
+    // );
+    // setQuestionBankInteract(data);
+    // setLoading(false);
+    // console.log("Error: ", rowsPerPage + 1);
+    // } else {
+    // if (filterQuestionBankNameValue !== "")
+    //   await GetMultipleReportsWithQuestionBankName(
+    //     roleData.permission,
+    //     userData.id,
+    //     newRowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterQuestionBankNameValue
+    //   ).then((data) => {
+    //     console.log("QuestionBankName: ", data);
+    //     // setFilterUserNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else if (filterUserNameValue !== "")
+    //   await GetMultipleReportsWithUserName(
+    //     roleData.permission,
+    //     userData.id,
+    //     newRowsPerPage,
+    //     page + 1,
+    //     // filter
+    //     filterAscOrDes,
+    //     filterUserNameValue
+    //   ).then((data) => {
+    //     // setFilterQuestionBankNameValue("");
+    //     setQuestionBankInteract(data);
+    //     setTotalPages(data.numOfItems);
+    //     setLoading(false);
+    //   });
+    // else
+    await GetQuestionBankByUserIdAscOrDes(
+      userData.id,
+      newRowsPerPage,
+      page + 1,
+      filterAscOrDes
+    ).then((data) => {
+      setQuestionBank(data.data);
+      setTotalPages(data.numOfItems);
+      if (categories !== undefined) {
+        const newRows = data.data.map((data) =>
+          createData(
+            data.id.toString(),
+            data.surveyName,
+            data.owner,
+            data.categoryName,
+            data.status,
+            data.startDate,
+            data.endDate,
+            data.enableStatus,
+            data.categoryListId,
+            data.surveyCode
+          )
+        );
+        setRows(newRows);
+        setLoading(false);
+      }
+    });
+    // setQuestionBankInteract(data);
+    // setLoading(false);
+    console.log("Error: ", rowsPerPage + 1);
+    // }
   };
 
   const buttonCloseJoinParticipant = () => {
@@ -150,13 +480,15 @@ function Surveys() {
   };
 
   const handleJoin = async (surveyId: number) => {
-    await setStatusAfterJoin(userData.id, surveyId).then((data) => {
+    await GetAndSetParticipantForSurvey(userData.id, surveyId).then((data) => {
       if (typeof data === "string" && data !== "") {
         return;
       }
       console.log("This is: ", userData);
       console.log(userData);
-      navigate(`/answer_page/${surveyId}`);
+      if (!data.participantIdList.includes(userData.id))
+        navigate(`/answer_page/${surveyId}`);
+      else setAlreadyParticipated(true);
     });
   };
 
@@ -181,22 +513,15 @@ function Surveys() {
     setLoading(true);
     setUserData(JSON.parse(newData));
     console.log(userData);
-    GetQuestionBankByUserId(userData.id).then((data) => {
-      setQuestionBank(data.reverse());
-      setLoading(false);
-      console.log(data);
-    });
+    GetQuestionBankByUserIdAscOrDes(userData.id, 5, 1, filterAscOrDes).then(
+      (data) => {
+        setQuestionBank(data.data);
+        setTotalPages(data.numOfItems);
+        setLoading(false);
+        console.log(data);
+      }
+    );
   }, [setUserData]);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   setTimeout(() => {})
-  //   GetCategories().then((data) => {
-  //     setCategories(data);
-  //     setLoading(false);
-  //     console.log(data);
-  //   });
-  // }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -283,7 +608,33 @@ function Surveys() {
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell>ID</StyledTableCell>
+                      <StyledTableCell>
+                        <Button
+                          onClick={handleFilterButtonClick}
+                          startIcon={
+                            <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                          }
+                        />
+                        <Menu
+                          anchorEl={anchorElForAscOrDes}
+                          open={Boolean(anchorElForAscOrDes)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem
+                            value="Asc"
+                            onClick={(e) => handleChangeForAscOrDes("Asc")}
+                          >
+                            Ascending
+                          </MenuItem>
+                          <MenuItem
+                            value="Des"
+                            onClick={(e) => handleChangeForAscOrDes("Des")}
+                          >
+                            Descending
+                          </MenuItem>
+                        </Menu>
+                        ID
+                      </StyledTableCell>
                       <StyledTableCell align="right">Name</StyledTableCell>
                       <StyledTableCell align="right">Owner</StyledTableCell>
                       <StyledTableCell align="right">
@@ -307,9 +658,37 @@ function Surveys() {
                         questionBank={questionBank}
                         status={row.enableStatus}
                         userData={userData}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        setLoading={setLoading}
                       />
                     ))}
                   </TableBody>
+                  <CustomTablePagination
+                    rowsPerPageOptions={[
+                      5,
+                      10,
+                      25,
+                      { label: "All", value: -1 },
+                    ]}
+                    colSpan={3}
+                    // component="div"
+                    count={totalPages}
+                    slotProps={{
+                      select: {
+                        "aria-label": "rows per page",
+                      },
+                      actions: {
+                        showFirstButton: true,
+                        showLastButton: true,
+                      },
+                    }}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    filterAscOrDes={filterAscOrDes}
+                  />
                 </Table>
               </TableContainer>
             )}
@@ -325,6 +704,11 @@ function Surveys() {
           {wrongSurveyCode && (
             <Typography variant="caption" color="error">
               Wrong Survey Code. Try Again
+            </Typography>
+          )}
+          {alreadyParticipated && (
+            <Typography variant="caption" color="error">
+              You already particpated this survey
             </Typography>
           )}
           <TextField

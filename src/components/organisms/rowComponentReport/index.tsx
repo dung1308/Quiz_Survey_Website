@@ -44,6 +44,9 @@ const RowComponent_Report: React.FC<any> = ({ row, index, userData, handleShowSu
         {row.questionBankId}
       </StyledTableCell>
       <StyledTableCell component="th" scope="row" align="right">
+        {row.ownerName}
+      </StyledTableCell>
+      <StyledTableCell component="th" scope="row" align="right">
         {row.surveyName}
       </StyledTableCell>
       <StyledTableCell component="th" scope="row" align="right">

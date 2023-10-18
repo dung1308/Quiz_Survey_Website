@@ -10,7 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 import Leather from "../../assets/images/leather.png";
-import { GetRoleById, LoginData, UserDTO } from "../../services/dataService/dataService";
+import {
+  GetRoleById,
+  LoginData,
+  UserDTO,
+} from "../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 
 interface LoginUserDTO {
@@ -24,6 +28,7 @@ const Login: React.FC = () => {
     userName: "",
     password: "",
     email: "",
+    isNightMode: true,
     roleId: 0,
   };
   const navigate = useNavigate();
@@ -50,6 +55,8 @@ const Login: React.FC = () => {
       }
       localStorage.clear();
       localStorage.setItem("currentUser", JSON.stringify(data));
+      localStorage.setItem("DarkMode", JSON.stringify(data.isNightMode));
+      console.log("This is user", data);
       const newUserData =
         localStorage.getItem("currentUser") ?? JSON.stringify(example);
       if (data !== null) {
@@ -60,7 +67,7 @@ const Login: React.FC = () => {
         await GetRoleById(newUserDataNew.roleId).then((newRoleData) => {
           localStorage.setItem("Role", JSON.stringify(newRoleData));
           navigate("/");
-        })
+        });
       }
     });
   };

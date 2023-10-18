@@ -117,10 +117,18 @@ const QuizCard_Answer: React.FC<any> = ({
               border: "2px solid #8d6e63",
               borderRadius: "5px",
               padding: "10px",
+              // height: "1vw",
               marginBottom: "20px",
               // "@media (max-width: 1700px)": {
               //   fontSize: "1vw",
+              //   height: "5vw",
+              //   overflow: "auto",
               // },
+              "@media (max-width: 601px)": {
+                fontSize: "1vw",
+                height: "5vw",
+                overflow: "auto",
+              },
               // "@media (min-width: 601px)": {
               //   fontSize: "10px",
               // },

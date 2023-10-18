@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Box,
@@ -25,6 +25,8 @@ import {
   GetQuestionBankByUserId,
   InviteUser,
   InviteUserDTO,
+  GetQuestionBankByUserIdAscOrDes,
+  GetAndSetParticipantForSurvey,
 } from "../../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
@@ -38,12 +40,17 @@ const RowComponent: React.FC<any> = ({
   questionBank,
   userData,
   setQuestionBank,
+  rowsPerPage,
+  page,
+  filterAscOrDes,
+  setLoading,
 }) => {
   const navigate = useNavigate();
 
   const [enabled, setEnabled] = useState<Boolean>(status);
   const [open, setOpen] = useState(false);
   const [openJoin, setOpenJoin] = useState(false);
+  const [tableStatus, setTableStatus] = useState(row.status);
   const [inviteUserName, setInviteUserName] = useState("");
   const [joinSurveyCode, setJoinSurveyCode] = useState("");
   const [isBusyAnswer, setIsBusyAnswer] = useState(false);
@@ -53,7 +60,7 @@ const RowComponent: React.FC<any> = ({
     row.status === "Early" || row.status === "Expired"
   );
   const [enable_Edit_Disable, setEnable_Edit_Disable] = useState(
-    row.status === "Busy"
+    row.status === "Busy" || userData.userName !== row.owner
   );
   const [isOwner, setIsOwner] = useState(
     (row.owner ?? "1") === (userData.userName ?? "1")
@@ -63,16 +70,52 @@ const RowComponent: React.FC<any> = ({
     // setEnabled((status) => !status);
     // setLoading(true);
     setEnabled((status) => !status);
-    await setEnableStatusQuestionBank(row.id, !enabled).then((data) => {
-      GetQuestionBankByUserId(userData.id).then((data) => {
-        setQuestionBank(data.reverse());
-        console.log(data);
-      });
-      console.log(
-        `https://localhost:7232/UpdateEnabledStatus?id=${
-          row.id
-        }&enableStatus=${!enabled}`
-      );
+    await setEnableStatusQuestionBank(row.id, !enabled).then(async (data) => {
+      if (filterAscOrDes !== undefined) {
+        await GetQuestionBankByUserIdAscOrDes(
+          userData.id,
+          rowsPerPage,
+          page + 1,
+          filterAscOrDes
+        ).then((data) => {
+          setTableStatus(row.status);
+          console.log("Error: ", data);
+          setQuestionBank(data.data);
+          // setQuestionBank((data.data) => [...data.data]); // trigger re-render
+
+          // setTotalPages(data.numOfItems);
+          // if (categories !== undefined) {
+          //   const newRows = data.data.map((data) =>
+          //     createData(
+          //       data.id.toString(),
+          //       data.surveyName,
+          //       data.owner,
+          //       data.categoryName,
+          //       data.status,
+          //       data.startDate,
+          //       data.endDate,
+          //       data.enableStatus,
+          //       data.categoryListId,
+          //       data.surveyCode
+          //     )
+          //   );
+          //   setRows(newRows);
+          // }
+          // setLoading(false);
+        });
+      }
+      // GetQuestionBankByUserIdAscOrDes(userData.id,
+      //   rowsPerPage,
+      //   page + 1,
+      //   filterAscOrDes).then((questionBankdata) => {
+      //   setQuestionBank(questionBankdata.data);
+      //   console.log(questionBankdata);
+      // });
+      // console.log(
+      //   `https://localhost:7232/UpdateEnabledStatus?id=${
+      //     row.id
+      //   }&enableStatus=${!enabled}`
+      // );
     });
   };
 
@@ -98,7 +141,6 @@ const RowComponent: React.FC<any> = ({
   const handleInvite = async () => {
     const newUser = new InviteUserDTO(0, 0, userData.id, row.id);
     await InviteUser(inviteUserName, newUser).then((data) => {
-
       buttonInviteWindowClose();
     });
   };
@@ -107,21 +149,35 @@ const RowComponent: React.FC<any> = ({
 
   const handleJoin = async () => {
     // if (joinSurveyCode === row.surveyCode) {
-    const busyUserId = localStorage.getItem("busyUser") ?? JSON.stringify(0);
-    console.log(busyUserId)
-    if ((+busyUserId) === userData.id){
-      setIsBusyAnswer(true)
-      return
-    }
-    localStorage.setItem("busyUser", JSON.stringify(userData.id));
-    await setStatusAfterJoin(userData.id, row.id).then((data) => {
+    // const busyUserId = localStorage.getItem("busyUser") ?? JSON.stringify(0);
+    // console.log(busyUserId);
+    // if (+busyUserId === userData.id) {
+    //   setIsBusyAnswer(true);
+    //   return;
+    // }
+    // localStorage.setItem("busyUser", JSON.stringify(userData.id));
+    await GetAndSetParticipantForSurvey(row.id, userData.id).then((data) => {
       if (typeof data === "string" && data !== "") {
         return;
       }
-      navigate(`/answer_page/${row.id}`);
+      if (!data.participantIdList.includes(userData.id))
+        navigate(`/answer_page/${row.id}`);
+      else setIsBusyAnswer(true);
+      // navigate(`/answer_page/${row.id}`);
     });
     // } else setWrongSurveyCode(true);
   };
+
+  useEffect(() => {
+    setTableStatus(row.status);
+    setIsOwner((row.owner ?? "1") === (userData.userName ?? "1"));
+    setEnabled(row.enableStatus);
+    setJoinDisable(row.status === "Early" || row.status === "Expired");
+    setEnable_Edit_Disable(
+      row.status === "Busy" || userData.userName !== row.owner
+    );
+    setIsOwner((row.owner ?? "1") === (userData.userName ?? "1"));
+  }, [row]);
 
   return (
     <StyledTableRow key={row.id}>
@@ -155,7 +211,9 @@ const RowComponent: React.FC<any> = ({
 
           {/* <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small"  */}
           <Button
-            disabled={((joinDisable && row.owner !== userData.userName) || !enabled)}
+            disabled={
+              (joinDisable && row.owner !== userData.userName) || !enabled
+            }
             variant="contained"
             color="primary"
             onClick={buttonJoinWindowOpen}
@@ -170,20 +228,22 @@ const RowComponent: React.FC<any> = ({
             Join
           </Button>
 
-          {userData.userName === row.owner && <Button
-            variant="contained"
-            color="success"
-            size="small"
-            onClick={buttonInviteWindowOpen}
-            sx={{
-              marginLeft: 2,
-              backgroundColor: "lightpink",
-              color: "#333",
-              ":hover": { backgroundColor: "pink" },
-            }}
-          >
-            invite
-          </Button>}
+          {userData.userName === row.owner && (
+            <Button
+              variant="contained"
+              color="success"
+              size="small"
+              onClick={buttonInviteWindowOpen}
+              sx={{
+                marginLeft: 2,
+                backgroundColor: "lightpink",
+                color: "#333",
+                ":hover": { backgroundColor: "pink" },
+              }}
+            >
+              invite
+            </Button>
+          )}
 
           {/* <Button
             variant="contained"
@@ -265,7 +325,8 @@ const RowComponent: React.FC<any> = ({
           </DialogContentText>
           {isBusyAnswer && (
             <Typography variant="caption" color="error">
-              You are busy answering a survey. Complete your survey first before joining
+              You are busy answering a survey. Complete your survey first before
+              joining
             </Typography>
           )}
           {/* <TextField

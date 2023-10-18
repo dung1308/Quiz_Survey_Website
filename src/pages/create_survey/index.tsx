@@ -25,9 +25,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import QuizCard from "../../components/organisms/QuizCard";
 import {
   CreateQuestionBank,
-  
   CreateQuestionBankByUserId,
-  
   GetCategories,
   GetCurrentDate,
   GetQuestionBankById,
@@ -87,7 +85,14 @@ const CreateSurvey: React.FC<any> = () => {
   const newData =
     localStorage.getItem("currentUser") ??
     JSON.stringify(
-      new UserDTO(0, "Anonymous", "Anonymous", "Anonymous@Anonymous.com", 0)
+      new UserDTO(
+        0,
+        "Anonymous",
+        "Anonymous",
+        "Anonymous@Anonymous.com",
+        true,
+        0
+      )
     );
   const newRole =
     localStorage.getItem("Role") ??
@@ -520,21 +525,23 @@ const CreateSurvey: React.FC<any> = () => {
       categoryName: "string",
       userId: userData.id,
       dateTimeNow: "string",
+      participantIdList: [],
+      userDoneIdList: [],
       questionDTOs: mappedQuestionBanks,
     };
 
     // console.log("This is questionBankrs", questionBankrs);
     // if (params.userId !== undefined) {
-      await CreateQuestionBankByUserId(
-        // Number(params.userId),
-        questionBankrs
-      ).then((data) => {
-        setSaveState(false);
-        setQuestionBank(questionBankrs);
-        setSaveState(true);
-        navigate("/surveys")
-        // handleOpenSurveyCode();
-      });
+    await CreateQuestionBankByUserId(
+      // Number(params.userId),
+      questionBankrs
+    ).then((data) => {
+      setSaveState(false);
+      setQuestionBank(questionBankrs);
+      setSaveState(true);
+      navigate("/surveys");
+      // handleOpenSurveyCode();
+    });
     // }
   };
 
@@ -567,6 +574,8 @@ const CreateSurvey: React.FC<any> = () => {
       categoryName: "string",
       dateTimeNow: "string",
       userId: userData.id,
+      participantIdList: [],
+      userDoneIdList: [],
       questionDTOs: mappedQuestionBanksExisted,
     };
     // console.log(questionBankrs);
@@ -578,7 +587,7 @@ const CreateSurvey: React.FC<any> = () => {
         setSaveState(false);
         setQuestionBank(questionBankrs);
         setSaveState(true);
-        navigate("/surveys")
+        navigate("/surveys");
         // handleOpenSurveyCode();
       }
     );
