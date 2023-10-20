@@ -239,12 +239,50 @@ const Report: React.FC = () => {
       page + 1,
       // filter
       filter === "Asc" ? true : false,
-      "",
+      filterOwnerValue,
       filterQuestionBankNameValue,
       filterUserNameValue
     ).then((data) => {
       console.log("QuestionBankName: ", data);
       // setFilterUserNameValue("");
+      setQuestionBankInteract(data);
+      setTotalPages(data.numOfItems);
+      setLoading(false);
+    });
+  };
+
+  const handleChangeForOwner = async (filter: string) => {
+    // setFilterAscOrDes(filter);
+    setPage(0);
+    setLoading(true);
+    handleMenuOwnerClose();
+    // await GetMultipleReportsWithQuestionBankName(
+    //   roleData.permission,
+    //   userData.id,
+    //   rowsPerPage,
+    //   1,
+    //   // filter
+    //   "Asc",
+    //   filter
+    // ).then((data) => {
+    //   setPage(0);
+    //   console.log("QuestionBankName: ", data);
+    //   // setFilterUserNameValue("");
+    //   setQuestionBankInteract(data);
+    //   setTotalPages(data.numOfItems);
+    //   setLoading(false);
+    // });
+    await GetMultipleReportsFilteredAscOrDes(
+      userData.id,
+      rowsPerPage,
+      page + 1,
+      // filter
+      filterAscOrNot,
+      filter,
+      filterQuestionBankNameValue,
+      filterUserNameValue
+    ).then((data) => {
+      setPage(0);
       setQuestionBankInteract(data);
       setTotalPages(data.numOfItems);
       setLoading(false);
@@ -278,7 +316,7 @@ const Report: React.FC = () => {
       page + 1,
       // filter
       filterAscOrNot,
-      "",
+      filterOwnerValue,
       filter,
       filterUserNameValue
     ).then((data) => {
@@ -316,7 +354,7 @@ const Report: React.FC = () => {
       page + 1,
       // filter
       filterAscOrNot,
-      "",
+      filterOwnerValue,
       filterQuestionBankNameValue,
       filter
     ).then((data) => {
@@ -333,6 +371,12 @@ const Report: React.FC = () => {
     setAnchorElForAscOrDes(event.currentTarget);
   };
 
+  const handleFilterOwnerButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElForOwner(event.currentTarget);
+  };
+
   const handleFilterQuestionBankNameButtonClick = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
@@ -347,6 +391,10 @@ const Report: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorElForAscOrDes(null);
+  };
+
+  const handleMenuOwnerClose = () => {
+    setAnchorElForOwner(null);
   };
 
   const handleMenuQuestionBankNameClose = () => {
@@ -375,6 +423,8 @@ const Report: React.FC = () => {
 
   const [anchorElForAscOrDes, setAnchorElForAscOrDes] =
     React.useState<null | HTMLElement>(null);
+  const [anchorElForOwner, setAnchorElForOwner] =
+    React.useState<null | HTMLElement>(null);
   const [anchorElForQuestionBankName, setAnchorElForQuestionBankName] =
     React.useState<null | HTMLElement>(null);
   const [anchorElUserName, setAnchorElUserName] =
@@ -392,9 +442,11 @@ const Report: React.FC = () => {
   // Filter
   const [filterAscOrDes, setFilterAscOrDes] = useState("Asc");
   const [filterAscOrNot, setFilterAscOrNot] = useState(true);
+  const [filterOwnerValue, setFilterOwnerValue] = useState("");
   const [filterQuestionBankNameValue, setFilterQuestionBankNameValue] =
     useState("");
   const [filterUserNameValue, setFilterUserNameValue] = useState("");
+  const [filterOwner, setFilterOwner] = useState("");
   const [filterQuestionBankName, setFilterQuestionBankName] = useState("");
   const [filterUserName, setFilterUserName] = useState("");
 
@@ -640,7 +692,7 @@ const Report: React.FC = () => {
       newPage + 1,
       // filter
       filterAscOrNot,
-      "",
+      filterOwnerValue,
       filterQuestionBankName,
       filterUserNameValue
     ).then((data) => {
@@ -722,7 +774,7 @@ const Report: React.FC = () => {
       page + 1,
       // filter
       filterAscOrNot,
-      "",
+      filterOwnerValue,
       filterQuestionBankName,
       filterUserNameValue
     ).then((data) => {
@@ -795,61 +847,216 @@ const Report: React.FC = () => {
         <p>Loading...</p>
       ) : (
         <Box m={2}>
-          <TableContainer component={Paper} sx={{ overflow: "auto" }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              overflow: "auto",
+            }}
+          >
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
               <TableHead>
                 <TableRow>
                   <StyledTableCell>
-                    <Button
-                      onClick={handleFilterButtonClick}
-                      startIcon={
-                        <KeyboardArrowDownIcon sx={{ color: "white" }} />
-                      }
-                    />
-                    {/* <Select
-                      value={value}
-                      onChange={handleChangeForAscOrDes}
-                      open={open}
-                      onClose={handleSelectClose}
-                      // startAdornment={
-                      //   <InputAdornment position="start">
-                      //     <IconButton>
-                      //       <FilterListIcon />
-                      //     </IconButton>
-                      //   </InputAdornment>
-                      // }
-                      style={{ display: open ? 'block' : 'none' }}
-                    > */}
-                    <Menu
-                      anchorEl={anchorElForAscOrDes}
-                      open={Boolean(anchorElForAscOrDes)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem
-                        value="Asc"
-                        onClick={(e) => handleChangeForAscOrDes("Asc")}
+                    <div style={{ flexDirection: "column" }}>
+                      <div>QuestionBankId</div>
+                      <Button
+                        onClick={handleFilterButtonClick}
+                        startIcon={
+                          <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                        }
+                        sx={{
+                          textAlign: "left",
+                          width: "100%",
+                          "@media (min-width: 768px)": {
+                            width: "50%",
+                          },
+                          "@media (min-width: 1024px)": {
+                            width: "30%",
+                          },
+                        }}
                       >
-                        Ascending
-                      </MenuItem>
-                      <MenuItem
-                        value="Des"
-                        onClick={(e) => handleChangeForAscOrDes("Des")}
+                        Asc/Des
+                        {filterAscOrNot === null
+                          ? ""
+                          : filterAscOrNot === true
+                          ? " (Asc)"
+                          : " (Des)"}
+                      </Button>
+                      <Menu
+                        anchorEl={anchorElForAscOrDes}
+                        open={Boolean(anchorElForAscOrDes)}
+                        onClose={handleMenuClose}
                       >
-                        Descending
-                      </MenuItem>
-                      {/* <MenuItem value="">All</MenuItem>
-                      <MenuItem value="option1">Option 1</MenuItem>
-                      <MenuItem value="option2">Option 2</MenuItem>
-                      <MenuItem value="option3">Option 3</MenuItem> */}
-                      {/* </Select> */}
-                    </Menu>
-                    QuestionBankId
+                        <MenuItem
+                          value="Asc"
+                          onClick={(e) => handleChangeForAscOrDes("Asc")}
+                        >
+                          Ascending
+                        </MenuItem>
+                        <MenuItem
+                          value="Des"
+                          onClick={(e) => handleChangeForAscOrDes("Des")}
+                        >
+                          Descending
+                        </MenuItem>
+                      </Menu>
+                    </div>
                   </StyledTableCell>
 
-                  <StyledTableCell align="right">Owner</StyledTableCell>
+                  <StyledTableCell align="right">
+                    <div style={{ flexDirection: "column" }}>
+                      <div>Owner</div>
+                      <Button
+                        onClick={handleFilterOwnerButtonClick}
+                        startIcon={
+                          <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                        }
+                        sx={{
+                          textAlign: "left",
+                          width: "100%",
+                          "@media (min-width: 768px)": {
+                            width: "50%",
+                          },
+                          "@media (min-width: 1024px)": {
+                            width: "30%",
+                          },
+                        }}
+                      >
+                        Filter Owner
+                        {filterOwnerValue === ""
+                          ? ""
+                          : filterOwnerValue.length > 5
+                          ? " (" + filterOwnerValue.substring(0, 5) + "...)"
+                          : " (" + filterOwnerValue + ")"}
+                      </Button>
+                      <Menu
+                        anchorEl={anchorElForOwner}
+                        open={Boolean(anchorElForOwner)}
+                        onClose={handleMenuOwnerClose}
+                      >
+                        <MenuItem>
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="ownerName"
+                            label="Owner Name"
+                            value={filterOwnerValue.toUpperCase()}
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => {
+                              setFilterOwnerValue(e.target.value);
+                            }}
+                            sx={{
+                              width: "100%",
+                              "@media (min-width: 768px)": {
+                                width: "50%",
+                              },
+                              "@media (min-width: 1024px)": {
+                                width: "30%",
+                              },
+                            }}
+                          />
+                          <Button
+                            fullWidth
+                            onClick={() =>
+                              handleChangeForOwner(filterOwnerValue)
+                            }
+                            sx={{
+                              width: "100%",
+                              "@media (min-width: 768px)": {
+                                width: "50%",
+                              },
+                              "@media (min-width: 1024px)": {
+                                width: "30%",
+                              },
+                            }}
+                          >
+                            Filter
+                          </Button>
+                        </MenuItem>
+                      </Menu>
+                    </div>
+                  </StyledTableCell>
 
                   <StyledTableCell align="right">
-                    <Button
+                    <div style={{ flexDirection: "column" }}>
+                      <div>Survey Name</div>
+                      <Button
+                        onClick={handleFilterQuestionBankNameButtonClick}
+                        startIcon={
+                          <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                        }
+                        sx={{
+                          textAlign: "left",
+                          width: "100%",
+                          "@media (min-width: 768px)": {
+                            width: "50%",
+                          },
+                          "@media (min-width: 1024px)": {
+                            width: "30%",
+                          },
+                        }}
+                      >
+                        Filter Survey Name
+                        {filterQuestionBankNameValue === ""
+                          ? ""
+                          : filterQuestionBankNameValue.length > 5
+                          ? " (" +
+                            filterQuestionBankNameValue.substring(0, 5) +
+                            "...)"
+                          : " (" + filterQuestionBankNameValue + ")"}
+                      </Button>
+                      <Menu
+                        anchorEl={anchorElForQuestionBankName}
+                        open={Boolean(anchorElForQuestionBankName)}
+                        onClose={handleMenuQuestionBankNameClose}
+                      >
+                        <MenuItem>
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="surveyName"
+                            label="Survey Name"
+                            value={filterQuestionBankNameValue.toUpperCase()}
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => {
+                              setFilterQuestionBankNameValue(e.target.value);
+                            }}
+                            sx={{
+                              width: "100%",
+                              "@media (min-width: 768px)": {
+                                width: "50%",
+                              },
+                              "@media (min-width: 1024px)": {
+                                width: "30%",
+                              },
+                            }}
+                          />
+                          <Button
+                            fullWidth
+                            onClick={() =>
+                              handleChangeForQuestionBankName(
+                                filterQuestionBankNameValue
+                              )
+                            }
+                            sx={{
+                              width: "100%",
+                              "@media (min-width: 768px)": {
+                                width: "50%",
+                              },
+                              "@media (min-width: 1024px)": {
+                                width: "30%",
+                              },
+                            }}
+                          >
+                            Filter
+                          </Button>
+                        </MenuItem>
+                      </Menu>
+                    </div>
+
+                    {/* <Button
                       onClick={handleFilterQuestionBankNameButtonClick}
                       startIcon={
                         <KeyboardArrowDownIcon sx={{ color: "white" }} />
@@ -885,11 +1092,84 @@ const Report: React.FC = () => {
                         </Button>
                       </MenuItem>
                     </Menu>
-                    Survey Name
+                    Survey Name */}
                   </StyledTableCell>
 
                   <StyledTableCell align="right">
-                    <Button
+                    <div style={{ flexDirection: "column" }}>
+                      <div>Username</div>
+                      <Button
+                        onClick={handleFilterUserNameButtonClick}
+                        startIcon={
+                          <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                        }
+                        sx={{
+                          textAlign: "left",
+                          width: "100%",
+                          "@media (min-width: 768px)": {
+                            width: "50%",
+                          },
+                          "@media (min-width: 1024px)": {
+                            width: "30%",
+                          },
+                        }}
+                      >
+                        Filter Username
+                        {filterUserNameValue === ""
+                          ? ""
+                          : filterUserNameValue.length > 5
+                          ? " (" + filterUserNameValue.substring(0, 5) + "...)"
+                          : " (" + filterUserNameValue + ")"}
+                      </Button>
+                      <Menu
+                        anchorEl={anchorElUserName}
+                        open={Boolean(anchorElUserName)}
+                        onClose={handleMenuUserNameClose}
+                      >
+                        <MenuItem>
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="surveyName"
+                            label="Username"
+                            value={filterUserNameValue.toUpperCase()}
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => {
+                              setFilterUserNameValue(e.target.value);
+                            }}
+                            sx={{
+                              width: "100%",
+                              "@media (min-width: 768px)": {
+                                width: "50%",
+                              },
+                              "@media (min-width: 1024px)": {
+                                width: "30%",
+                              },
+                            }}
+                          />
+                          <Button
+                            fullWidth
+                            onClick={() =>
+                              handleChangeForUserName(filterUserNameValue)
+                            }
+                            sx={{
+                              width: "100%",
+                              "@media (min-width: 768px)": {
+                                width: "50%",
+                              },
+                              "@media (min-width: 1024px)": {
+                                width: "30%",
+                              },
+                            }}
+                          >
+                            Filter
+                          </Button>
+                        </MenuItem>
+                      </Menu>
+                    </div>
+
+                    {/* <Button
                       onClick={handleFilterUserNameButtonClick}
                       startIcon={
                         <KeyboardArrowDownIcon sx={{ color: "white" }} />
@@ -923,7 +1203,7 @@ const Report: React.FC = () => {
                         </Button>
                       </MenuItem>
                     </Menu>
-                    Username
+                    Username */}
                   </StyledTableCell>
                   {/* {listTitles[0].map((title: any, index: number) => (
                     <StyledTableCell align="right">

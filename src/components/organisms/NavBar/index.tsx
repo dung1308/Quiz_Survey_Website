@@ -29,7 +29,7 @@ import AppBarImage from "../../../assets/images/App_Bar.png";
 import { Role, UserDTO } from "../../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 
-const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
+const AppBarSignIn: React.FC<any> = ({ handleDarkModeToggle, dark }) => {
   const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     width: 62,
     height: 34,
@@ -48,7 +48,8 @@ const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
         },
         "& + .MuiSwitch-track": {
           opacity: 1,
-          backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+          backgroundColor:
+            theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
         },
       },
     },
@@ -76,7 +77,7 @@ const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
       borderRadius: 20 / 2,
     },
   }));
-  
+
   const pages = [
     { name: "Survey", link: "/surveys" },
     { name: "Report", link: "/report" },
@@ -126,7 +127,14 @@ const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
   };
 
   return (
-    <AppBar position="static" style={{ background: "#B6C4CE", backgroundImage: `url(${AppBarImage})`, backgroundSize: "cover", }}>
+    <AppBar
+      position="static"
+      style={{
+        background: "#B6C4CE",
+        backgroundImage: `url(${AppBarImage})`,
+        backgroundSize: "cover",
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex", mr: 1 } }}>
@@ -153,17 +161,18 @@ const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
                 />
               }
             ></Button>
-            {localStorage.getItem("currentUser") !== null && pages.map((page) => (
-              <Button
-                variant="text"
-                key={page.name}
-                size="large"
-                sx={{ color: "#ffg", borderRadius: 28 }}
-                href={page.link}
-              >
-                {page.name}
-              </Button>
-            ))}
+            {localStorage.getItem("currentUser") !== null &&
+              pages.map((page) => (
+                <Button
+                  variant="text"
+                  key={page.name}
+                  size="large"
+                  sx={{ color: "#ffg", borderRadius: 28 }}
+                  href={page.link}
+                >
+                  {page.name}
+                </Button>
+              ))}
             {/* {pages.map((page) => (
               <Button
                 variant="text"
@@ -175,17 +184,18 @@ const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
                 {page.name}
               </Button>
             ))} */}
-            {localStorage.getItem("currentUser") !== null && roleData.permission === "All" && (
-              <Button
-                variant="text"
-                key={"category"}
-                size="large"
-                sx={{ color: "#ffg", borderRadius: 28 }}
-                href={"/category"}
-              >
-                Category
-              </Button>
-            )}
+            {localStorage.getItem("currentUser") !== null &&
+              roleData.permission === "All" && (
+                <Button
+                  variant="text"
+                  key={"category"}
+                  size="large"
+                  sx={{ color: "#ffg", borderRadius: 28 }}
+                  href={"/category"}
+                >
+                  Category
+                </Button>
+              )}
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <Button
@@ -228,23 +238,43 @@ const AppBarSignIn: React.FC<any> = ({handleDarkModeToggle, dark}) => {
                   Home
                 </Button>
               </MenuItem>
-              {pages.map((page) => (
-                <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                  <Button
-                    variant="text"
-                    key={page.name}
-                    size="large"
-                    sx={{ color: "#ffg", borderRadius: 28 }}
-                    href={page.link}
-                  >
-                    {page.name}
-                  </Button>
-                </MenuItem>
-              ))}
+              {pages.map((page) =>
+                localStorage.getItem("currentUser") !== null ? (
+                  <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+                    <Button
+                      variant="text"
+                      key={page.name}
+                      size="large"
+                      sx={{ color: "#ffg", borderRadius: 28 }}
+                      href={page.link}
+                    >
+                      {page.name}
+                    </Button>
+                  </MenuItem>
+                ) : (
+                  <></>
+                )
+              )}
+              {localStorage.getItem("currentUser") !== null &&
+                roleData.permission === "All" && (
+                  <MenuItem key={"category"} onClick={handleCloseNavMenu}>
+                    <Button
+                      variant="text"
+                      key={"category"}
+                      size="large"
+                      sx={{ color: "#ffg", borderRadius: 28 }}
+                      href={"/category"}
+                    >
+                      Category
+                    </Button>
+                  </MenuItem>
+                )}
             </Menu>
           </Box>
           <MaterialUISwitch checked={dark} onChange={handleDarkModeToggle} />
-          {localStorage.getItem("currentUser") !== null && <Typography>歓迎 (いらっしゃいませ) {userData.userName}</Typography>}
+          {localStorage.getItem("currentUser") !== null && (
+            <Typography>歓迎 (いらっしゃいませ) {userData.userName}</Typography>
+          )}
           <IconButton
             size="large"
             aria-label="account of current user"

@@ -313,6 +313,15 @@ const AnswerPage: React.FC<any> = () => {
     setOpenResult(false);
   };
 
+  const [openSurveyDetails, setOpenSurveyDetails] = React.useState(false);
+
+  const handleOpenSurveyDetails = () => {
+    setOpenSurveyDetails(true);
+  };
+  const handleCloseSurveyDetails = () => {
+    setOpenSurveyDetails(false);
+  };
+
   const mappedResultShowExisted: ResultShowDTO[] = data.map(
     (question, index) => ({
       id: 0,
@@ -430,7 +439,7 @@ const AnswerPage: React.FC<any> = () => {
               width: 1 / 4,
               height: "100vh",
               backgroundColor: "#A0B3A0",
-              display: "flex",
+              display: { xs: "none", md: "flex", mr: 1 },
               flexDirection: "column",
               alignItems: "center",
               overflow: "auto",
@@ -448,7 +457,7 @@ const AnswerPage: React.FC<any> = () => {
           <Box
             key={seed}
             sx={{
-              width: 2 / 4,
+              width: { mr: 3 / 4 },
               height: "100vh",
               textAlign: "-webkit-center",
               overflow: "auto",
@@ -459,7 +468,7 @@ const AnswerPage: React.FC<any> = () => {
               <Box
                 key={seed}
                 sx={{
-                  width: 2 / 4,
+                  width: { md: 2 / 4, mr: 2 / 4 },
                   // height: "100vh",
                   textAlign: "-webkit-center",
                 }}
@@ -509,13 +518,41 @@ const AnswerPage: React.FC<any> = () => {
           </Box>
 
           {/*Setup Type, Timer*/}
+          {/* <Box
+            sx={{
+              // width: "25%",
+              // height: "99vh",
+              width: "5%",
+              backgroundColor: "#F5F5F5",
+              display: { xs: 1, md: "none", mr: "none" },
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              padding: "20px",
+            }}
+          > */}
+          <Button
+            variant="contained"
+            color="success"
+            sx={{
+              width: "5%",
+              height: "5%",
+              // backgroundColor: "#F5F5F5",
+              fontSize: { xs: "10px", md: "13px", mr: "18px" },
+              display: { xs: 1, md: "none", mr: "none" },
+            }}
+            onClick={handleOpenSurveyDetails}
+          >
+            Survey Detail
+          </Button>
+          {/* </Box> */}
 
           <Box
             sx={{
               width: "25%",
               height: "99vh",
               backgroundColor: "#F5F5F5",
-              display: "flex",
+              display: { xs: "none", md: "flex", mr: 1 },
               flexDirection: "column",
               justifyContent: "flex-start",
               alignItems: "center",
@@ -535,10 +572,10 @@ const AnswerPage: React.FC<any> = () => {
                 marginBottom: "10px",
                 paddingTop: "20px",
                 paddingBottom: "20px",
-                "@media (max-width: 600px)": {
-                  paddingTop: "10px",
-                  paddingBottom: "10px",
-                },
+                // "@media (max-width: 600px)": {
+                //   paddingTop: "10px",
+                //   paddingBottom: "10px",
+                // },
               }}
             >
               <Grid item xs={6} sx={{ height: "1.5vw" }}>
@@ -634,6 +671,140 @@ const AnswerPage: React.FC<any> = () => {
               )}
             </Grid>
           </Box>
+
+          <Dialog open={openSurveyDetails} onClose={handleCloseSurveyDetails}>
+            <DialogTitle>Survey Details?</DialogTitle>
+            <DialogContent>
+              <Box
+                sx={{
+                  // width: "25%",
+                  // height: "99vh",
+                  backgroundColor: "#F5F5F5",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  padding: "20px",
+                }}
+              >
+                {/*Survey Name*/}
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{
+                    backgroundColor: "#F5F5F5",
+                    width: "100%",
+                    height: "58vh",
+                    textAlign: "center",
+                    padding: "10px",
+                    marginBottom: "10px",
+                    paddingTop: "20px",
+                    paddingBottom: "20px",
+                    // "@media (max-width: 600px)": {
+                    //   paddingTop: "10px",
+                    //   paddingBottom: "10px",
+                    // },
+                  }}
+                >
+                  <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ color: "#2AA789", fontSize: "11px" }}
+                    >
+                      Survey Name:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                    <Typography variant="h6" sx={{ fontSize: "11px" }}>
+                      {questionBank?.surveyName}
+                    </Typography>
+                  </Grid>
+
+                  {/*Username*/}
+                  <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ color: "#2AA789", fontSize: "11px" }}
+                    >
+                      Username:
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                    <Typography variant="h6" sx={{ fontSize: "11px" }}>
+                      {userData.userName !== ""
+                        ? userData.userName
+                        : "Anonymous"}
+                    </Typography>
+                  </Grid>
+
+                  {/*Timer*/}
+                  {!hasAnswered && (
+                    <>
+                      <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                        <Typography
+                          variant="h5"
+                          sx={{ color: "#2AA789", fontSize: "13px" }}
+                        >
+                          Timer:
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6} sx={{ height: "1.5vw" }}>
+                        <Timer_Answer
+                          time={calculateTime(tempSur.timer)}
+                          overTime={overTime}
+                          setOverTime={setOverTime}
+                        />
+                      </Grid>
+                    </>
+                  )}
+                </Grid>
+
+                {/*Submit Button*/}
+                <Grid
+                  sx={{
+                    display: "flex",
+                    height: "2vw",
+                    justifyContent: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  {!hasAnswered ? (
+                    <Button
+                      className="submit-button"
+                      sx={{
+                        backgroundColor: "#8d6e63",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "5px",
+                        padding: "10px 20px",
+                        cursor: "pointer",
+                      }}
+                      onClick={handleOpenSubmit}
+                    >
+                      Submit
+                    </Button>
+                  ) : (
+                    <Button
+                      className="submit-button"
+                      sx={{
+                        backgroundColor: "#8d6e63",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "5px",
+                        padding: "10px 20px",
+                        cursor: "pointer",
+                      }}
+                      href="/"
+                    >
+                      Return to Home
+                    </Button>
+                  )}
+                </Grid>
+              </Box>
+            </DialogContent>
+          </Dialog>
+
+          {/* Survey Details For Responsive Size */}
+
           <Dialog open={openSubmit} onClose={handleCloseSubmit}>
             <DialogTitle>Save?</DialogTitle>
             <DialogContent>

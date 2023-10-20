@@ -96,7 +96,7 @@ const QuizCard_Answer: React.FC<any> = ({
           padding: "20px",
           width: "100vh",
           "@media (max-width: 1700px)": {
-            width: "100vw",
+            // width: "100vw",
             // height: "60vw"
           },
         }}
@@ -109,7 +109,7 @@ const QuizCard_Answer: React.FC<any> = ({
           )}
           <Typography
             sx={{
-              fontSize: "1vw",
+              fontSize: "0.8rem",
               fontWeight: "bold",
               color: "#8d6e63",
               textShadow: "1px 1px #ffffff",
@@ -117,20 +117,13 @@ const QuizCard_Answer: React.FC<any> = ({
               border: "2px solid #8d6e63",
               borderRadius: "5px",
               padding: "10px",
-              // height: "1vw",
+              height: "auto",
+              maxHeight: "50vh",
+              overflow: "auto",
               marginBottom: "20px",
-              // "@media (max-width: 1700px)": {
-              //   fontSize: "1vw",
-              //   height: "5vw",
-              //   overflow: "auto",
-              // },
-              "@media (max-width: 601px)": {
-                fontSize: "1vw",
-                height: "5vw",
-                overflow: "auto",
-              },
               // "@media (min-width: 601px)": {
-              //   fontSize: "10px",
+              //   fontSize: "1rem",
+              //   height: "5vw",
               // },
             }}
           >

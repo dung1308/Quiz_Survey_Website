@@ -84,7 +84,7 @@ const AnswerChoice: React.FC<any> = ({
           inputProps={{ "aria-label": "controlled" }}
           onChange={() => handleChangeAnswer(index)}
           sx={{
-            fontSize: "18px",
+            fontSize: { xs: "13px", md: "13px", mr: "18px", },
             fontWeight: "bold",
             color: "#8d6e63",
             textShadow: "1px 1px #ffffff",
@@ -106,7 +106,7 @@ const AnswerChoice: React.FC<any> = ({
             variant="body1"
             component="div"
             sx={{
-              fontSize: "1vw",
+              fontSize: { xs: "13px", md: "13px", mr: "18px", },
               overflow: "auto",
               "& .Mui-disabled": {
                 color: "gray",
@@ -117,8 +117,8 @@ const AnswerChoice: React.FC<any> = ({
                 marginBottom: "20px",
               },
               "@media (max-width: 601px)": {
-                fontSize: "1vw",
-                height: "2vw",
+                fontSize: { xs: "13px", md: "13px", mr: "18px", },
+                // height: "2vw",
                 overflow: "auto",
               },
             }}

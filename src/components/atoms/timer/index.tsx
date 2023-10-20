@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Typography,
 } from "@mui/material";
 
 interface State {
@@ -53,17 +54,29 @@ const Timer_Answer: React.FC<Props> = ({ time, overTime, setOverTime }) => {
   }, [timeState.time]);
 
   return (
-    <h1 style={{ fontSize: "1.5vw" }}>
-      {`${timeState.hours.toString()}:${
-        timeState.minutes < 10
-          ? `0${timeState.minutes.toString()}`
-          : timeState.minutes.toString()
-      }:${
-        timeState.seconds < 10
-          ? `0${timeState.seconds.toString()}`
-          : timeState.seconds.toString()
-      }`}
-    </h1>
+    <Typography
+    sx={{
+      fontSize: { xs: "11px", md: "1.5vw", mr: "1.5vw" },
+      // fontWeight: "bold",
+      // color: "#8d6e63",
+      // textShadow: "1px 1px #ffffff",
+      // backgroundColor: "#ffffff",
+      // border: "2px solid #8d6e63",
+      // borderRadius: "5px",
+      // padding: "10px",
+      // marginBottom: "20px",
+    }}
+  >
+    {`${timeState.hours.toString()}:${
+      timeState.minutes < 10
+        ? `0${timeState.minutes.toString()}`
+        : timeState.minutes.toString()
+    }:${
+      timeState.seconds < 10
+        ? `0${timeState.seconds.toString()}`
+        : timeState.seconds.toString()
+    }`}
+  </Typography>
   );
 };
 

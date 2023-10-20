@@ -22,7 +22,7 @@ const Typing_Answer_Template: React.FC<any> = ({
       maxRows={10}
       inputProps={{ minLength: 50 }}
       sx={{
-        fontSize: "18px",
+        fontSize: { xs: "13px", md: "13px", mr: "18px", },
         fontWeight: "bold",
         color: "#8d6e63",
         textShadow: "1px 1px #ffffff",

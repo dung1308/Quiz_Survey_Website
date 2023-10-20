@@ -100,7 +100,8 @@ const Quiz_Answer_Choice: React.FC<any> = ({
           label=""
           value={choices[index]}
           sx={{
-            fontSize: "1vw",
+            fontSize: { xs: "13px", md: "13px", mr: "18px", },
+            // fontSize: "1vw",
             fontWeight: "bold",
             color: "#8d6e63",
             textShadow: "1px 1px #ffffff",
@@ -122,7 +123,8 @@ const Quiz_Answer_Choice: React.FC<any> = ({
             variant="body1"
             component="div"
             sx={{
-              fontSize: "1vw",
+              fontSize: { xs: "13px", md: "13px", mr: "18px", },
+              // fontSize: "1vw",
               overflow: "auto",
               "& .Mui-disabled": {
                 color: "gray",
@@ -133,8 +135,9 @@ const Quiz_Answer_Choice: React.FC<any> = ({
                 marginBottom: "20px",
               },
               "@media (max-width: 601px)": {
-                fontSize: "1vw",
-                height: "2vw",
+                fontSize: { xs: "13px", md: "13px", mr: "18px", },
+                // fontSize: "1vw",
+                // height: "15px",
                 overflow: "auto",
               },
             }}
