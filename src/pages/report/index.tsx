@@ -628,7 +628,7 @@ const Report: React.FC = () => {
     newPage: number
   ) => {
     setPage(newPage);
-    setLoading(true);
+    // setLoading(true);
     setUserData(JSON.parse(newData));
     console.log(userData);
     // if (roleData.permission === "All") {
@@ -698,7 +698,7 @@ const Report: React.FC = () => {
     ).then((data) => {
       setQuestionBankInteract(data);
       setTotalPages(data.numOfItems);
-      setLoading(false);
+      // setLoading(false);
     });
     // const newReportDTO = data;
     // setQuestionBankInteract(data);
@@ -857,8 +857,14 @@ const Report: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <StyledTableCell>
-                    <div style={{ flexDirection: "column" }}>
-                      <div>QuestionBankId</div>
+                    <Box sx={{ flexDirection: "column" }}>
+                      <Box
+                        sx={{
+                          fontSize: { xs: "10px", md: "13px", mr: "18px" },
+                        }}
+                      >
+                        Survey Id
+                      </Box>
                       <Button
                         onClick={handleFilterButtonClick}
                         startIcon={
@@ -867,6 +873,7 @@ const Report: React.FC = () => {
                         sx={{
                           textAlign: "left",
                           width: "100%",
+                          fontSize: { xs: "10px", md: "13px", mr: "18px" },
                           "@media (min-width: 768px)": {
                             width: "50%",
                           },
@@ -900,12 +907,18 @@ const Report: React.FC = () => {
                           Descending
                         </MenuItem>
                       </Menu>
-                    </div>
+                    </Box>
                   </StyledTableCell>
 
-                  <StyledTableCell align="right">
+                  <StyledTableCell align="right" >
                     <div style={{ flexDirection: "column" }}>
-                      <div>Owner</div>
+                      <Box
+                        sx={{
+                          fontSize: { xs: "10px", md: "13px", mr: "18px" },
+                        }}
+                      >
+                        Owner
+                      </Box>
                       <Button
                         onClick={handleFilterOwnerButtonClick}
                         startIcon={
@@ -914,6 +927,7 @@ const Report: React.FC = () => {
                         sx={{
                           textAlign: "left",
                           width: "100%",
+                          fontSize: { xs: "10px", md: "13px", mr: "18px" },
                           "@media (min-width: 768px)": {
                             width: "50%",
                           },
@@ -978,9 +992,18 @@ const Report: React.FC = () => {
                     </div>
                   </StyledTableCell>
 
-                  <StyledTableCell align="right">
+                  <StyledTableCell
+                    align="right"
+                    
+                  >
                     <div style={{ flexDirection: "column" }}>
-                      <div>Survey Name</div>
+                      <Box
+                        sx={{
+                          fontSize: { xs: "10px", md: "13px", mr: "18px" },
+                        }}
+                      >
+                        Survey Name
+                      </Box>
                       <Button
                         onClick={handleFilterQuestionBankNameButtonClick}
                         startIcon={
@@ -988,6 +1011,7 @@ const Report: React.FC = () => {
                         }
                         sx={{
                           textAlign: "left",
+                          fontSize: { xs: "10px", md: "13px", mr: "18px" },
                           width: "100%",
                           "@media (min-width: 768px)": {
                             width: "50%",
