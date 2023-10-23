@@ -27,18 +27,24 @@ import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import dayjs, { Dayjs } from "dayjs";
 
-const RowComponent_Report: React.FC<any> = ({ row, index, userData, handleShowSurveyResults }) => {
+const RowComponent_Report: React.FC<any> = ({
+  row,
+  index,
+  userData,
+  handleShowSurveyResults,
+  questionBankInteract,
+}) => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [openJoin, setOpenJoin] = useState(false);
-  
+
   const buttonShowSurveys = () => {
     // handleShowSurveyResults(userData.id, row.questionBankId, 5)
-    handleShowSurveyResults(index, row.questionBankId)
-  }
+    handleShowSurveyResults(index, row.questionBankId);
+  };
 
-  return (
+  return questionBankInteract.data[index] !== null ? (
     <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
         {row.questionBankId}
@@ -72,6 +78,8 @@ const RowComponent_Report: React.FC<any> = ({ row, index, userData, handleShowSu
       </StyledTableCell>
       {/* <StyledTableCell align="center">{row.status}</StyledTableCell> */}
     </StyledTableRow>
+  ) : (
+    <></>
   );
 };
 export default RowComponent_Report;

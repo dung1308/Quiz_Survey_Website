@@ -748,7 +748,12 @@ const CreateSurvey: React.FC<any> = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              left: 0,
+              right: "auto",
+              top: "auto",
+              bottom: 0,
               overflow: "auto",
+              resize: "horizontal",
             }}
           >
             <SliderComponent
@@ -822,8 +827,9 @@ const CreateSurvey: React.FC<any> = () => {
               backgroundColor: "#F5F5F5",
               padding: "20px",
               boxSizing: "border-box",
-              resize: "horizontal",
               overflow: "auto",
+              resize: "horizontal",
+              direction: "rtl",
             }}
           >
             {/* Question Type */}

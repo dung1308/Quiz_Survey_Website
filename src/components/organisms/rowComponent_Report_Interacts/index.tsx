@@ -44,7 +44,7 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
   const [loading, setLoading] = useState(true);
 
   const handleRemoveReport = async (reportId: number) => {
-    const newUserData = new UserDTO(userData.id, "", "", "", false, 0);
+    const newUserData = new UserDTO(row.userId, "", "", "", false, 0);
     setLoading(true);
     await DeleteReportAndAllowRedo(newUserData, reportId).then((data) => {
       setSimilarQuestionBankInteract(
@@ -52,16 +52,14 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
           (item: { id: any }) => item.id !== row.id
         )
       );
-      // questionBankInteract.data[index] = similarQuestionBankInteract;
+      // questionBankInteract.data[index].items = similarQuestionBankInteract;
+      // console.log(questionBankInteract.data[index])
       // setQuestionBankInteract(questionBankInteract);
-      // setLoading(false);
+      setLoading(false);
     });
   };
 
   return (
-    // {!loading  && (
-
-    // )}
     <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
         {row.id}

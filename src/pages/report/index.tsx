@@ -1212,16 +1212,18 @@ const Report: React.FC = () => {
               </TableHead>
 
               <TableBody>
-                {questionBankInteract.data
-                  // .reverse()
-                  .map((row: any, index: number) => (
-                    <RowComponent_Report
-                      row={row}
-                      index={index}
-                      userData={userData}
-                      handleShowSurveyResults={handleShowSurveyResults}
-                    />
-                  ))}
+                {questionBankInteract.data.map(
+                  (row: any, index: number) =>
+                    questionBankInteract.data[index] !== null && (
+                      <RowComponent_Report
+                        row={row}
+                        index={index}
+                        userData={userData}
+                        handleShowSurveyResults={handleShowSurveyResults}
+                        questionBankInteract = {questionBankInteract}
+                      />
+                    )
+                )}
               </TableBody>
               <CustomTablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
@@ -1282,8 +1284,8 @@ const Report: React.FC = () => {
                     setSimilarQuestionBankInteract={
                       setSimilarQuestionBankInteract
                     }
-                    questionBankInteract = {questionBankInteract}
-                    setQuestionBankInteract = {setQuestionBankInteract}
+                    questionBankInteract={questionBankInteract}
+                    setQuestionBankInteract={setQuestionBankInteract}
                   />
                 ))}
               </TableBody>
