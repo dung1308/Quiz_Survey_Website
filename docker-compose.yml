@@ -4,7 +4,8 @@ services:
   frontend:
     build:
         context: ./
-        dockerfile: ./dockerfile
     container_name: frontend
     ports:
       - "3000:80" # map 80 in container => 3000 in local
+    
+    command: "npm run dev"

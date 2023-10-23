@@ -37,6 +37,8 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
   handleResultShow,
   similarQuestionBankInteract,
   setSimilarQuestionBankInteract,
+  questionBankInteract,
+  setQuestionBankInteract,
 }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -45,14 +47,20 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
     const newUserData = new UserDTO(userData.id, "", "", "", false, 0);
     setLoading(true);
     await DeleteReportAndAllowRedo(newUserData, reportId).then((data) => {
-      setSimilarQuestionBankInteract(similarQuestionBankInteract.filter((item: { id: any; }) => item.id !== row.id))
-      setLoading(false)
+      setSimilarQuestionBankInteract(
+        similarQuestionBankInteract.filter(
+          (item: { id: any }) => item.id !== row.id
+        )
+      );
+      // questionBankInteract.data[index] = similarQuestionBankInteract;
+      // setQuestionBankInteract(questionBankInteract);
+      // setLoading(false);
     });
   };
 
   return (
     // {!loading  && (
-      
+
     // )}
     <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
@@ -85,27 +93,30 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
           </Button>
         </Box>
       </StyledTableCell>
-
-      <StyledTableCell component="th" scope="row" align="left">
-        <Box sx={{ justifyContent: "space-between" }}>
-          <Button
-            variant="contained"
-            color="error"
-            size="small"
-            sx={{
-              marginLeft: 2,
-              // backgroundColor: "lightblue",
-              // color: "#333",
-              ":hover": { backgroundColor: "lightblue" },
-            }}
-            onClick={(e) => {
-              handleRemoveReport(row.id);
-            }}
-          >
-            Delete Report And Allow Redo
-          </Button>
-        </Box>
-      </StyledTableCell>
+      {userData.id === row.ownerId ? (
+        <StyledTableCell component="th" scope="row" align="left">
+          <Box sx={{ justifyContent: "space-between" }}>
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              sx={{
+                marginLeft: 2,
+                // backgroundColor: "lightblue",
+                // color: "#333",
+                ":hover": { backgroundColor: "lightblue" },
+              }}
+              onClick={(e) => {
+                handleRemoveReport(row.id);
+              }}
+            >
+              Delete Report And Allow Redo
+            </Button>
+          </Box>
+        </StyledTableCell>
+      ) : (
+        <StyledTableCell>Not Authorized</StyledTableCell>
+      )}
     </StyledTableRow>
   );
 };

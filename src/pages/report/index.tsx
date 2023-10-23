@@ -88,6 +88,7 @@ interface ItemsDTO {
   surveyName: string;
   userName: string;
   ownerName: string;
+  ownerId: number;
   resultScores: number;
 }
 
@@ -522,7 +523,7 @@ const Report: React.FC = () => {
 
   const listTitles = [
     ["QuestionBankName", "UserName"],
-    ["Id", "Question Bank Id", "Results", "Show Answers Results", "Delete Report And Redo"],
+    ["Id", "Question Bank Id", "Results", "Show Answers Results"],
     ["Id", "Question Name", "Result", "Your Answers"],
   ];
   const listSetStateForReport = [
@@ -1264,6 +1265,9 @@ const Report: React.FC = () => {
                       </IconButton> */}
                     </StyledTableCell>
                   ))}
+                  {/* {userData.userName === similarQuestionBankInteract.ownerId && ( */}
+                  <StyledTableCell>Delete Report And Redo</StyledTableCell>
+                  {/* )} */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1274,8 +1278,12 @@ const Report: React.FC = () => {
                     userData={userData}
                     totalScore={totalScore}
                     handleResultShow={handleResultShow}
-                    similarQuestionBankInteract = {similarQuestionBankInteract}
-                    setSimilarQuestionBankInteract = {setSimilarQuestionBankInteract}
+                    similarQuestionBankInteract={similarQuestionBankInteract}
+                    setSimilarQuestionBankInteract={
+                      setSimilarQuestionBankInteract
+                    }
+                    questionBankInteract = {questionBankInteract}
+                    setQuestionBankInteract = {setQuestionBankInteract}
                   />
                 ))}
               </TableBody>
