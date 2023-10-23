@@ -158,6 +158,7 @@ function Surveys() {
 
   const [wrongSurveyCode, setWrongSurveyCode] = useState(false);
   const [alreadyParticipated, setAlreadyParticipated] = useState(false);
+  const [isDoneAnswer, setIsDoneAnswer] = useState(false);
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -486,9 +487,10 @@ function Surveys() {
       }
       console.log("This is: ", userData);
       console.log(userData);
-      if (!data.participantIdList.includes(userData.id))
-        navigate(`/answer_page/${surveyId}`);
-      else setAlreadyParticipated(true);
+      if (data.participantIdList.includes(userData.id))
+        setAlreadyParticipated(true);
+      else if (data.userDoneIdList.includes(userData.id)) setIsDoneAnswer(true);
+      else navigate(`/answer_page/${surveyId}`);
     });
   };
 
@@ -709,6 +711,13 @@ function Surveys() {
           {alreadyParticipated && (
             <Typography variant="caption" color="error">
               You already particpated this survey
+            </Typography>
+          )}
+
+          {isDoneAnswer && (
+            <Typography variant="caption" color="error">
+              You have answered this survey. Contact the mananger of this survey
+              to redo it.
             </Typography>
           )}
           <TextField

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/templates/layout";
 import {
   AnswerReport,
+  DeleteReportAndAllowRedo,
   GetAnswerReports,
   GetDefaultScores,
   GetDistinctQuestionBankInteractByUser,
@@ -521,7 +522,7 @@ const Report: React.FC = () => {
 
   const listTitles = [
     ["QuestionBankName", "UserName"],
-    ["Id", "Question Bank Id", "Results", "Show Answers Results"],
+    ["Id", "Question Bank Id", "Results", "Show Answers Results", "Delete Report And Redo"],
     ["Id", "Question Name", "Result", "Your Answers"],
   ];
   const listSetStateForReport = [
@@ -616,13 +617,6 @@ const Report: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(10);
 
-  // useEffect(() => {
-  //   // Fetch data and calculate total pages
-  //   const data = fetchData();
-  //   const totalPages = Math.ceil(data.length / rowsPerPage);
-  //   setTotalPages(totalPages);
-  // }, [rowsPerPage]);
-
   const handleChangePage = async (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -631,60 +625,6 @@ const Report: React.FC = () => {
     // setLoading(true);
     setUserData(JSON.parse(newData));
     console.log(userData);
-    // if (roleData.permission === "All") {
-    //   const data = await GetMultipleReportsForAdmin(
-    //     userData.id,
-    //     rowsPerPage,
-    //     newPage + 1
-    //   );
-    //   // const newReportDTO = data;
-    //   setQuestionBankInteract(data);
-    //   setLoading(false);
-    //   console.log("Change Page: ", data);
-    // } else {
-    // if (filterQuestionBankNameValue !== "")
-    //   await GetMultipleReportsWithQuestionBankName(
-    //     roleData.permission,
-    //     userData.id,
-    //     rowsPerPage,
-    //     page + 1,
-    //     // filter
-    //     filterAscOrDes,
-    //     filterQuestionBankNameValue
-    //   ).then((data) => {
-    //     console.log("QuestionBankName: ", data);
-    //     // setFilterUserNameValue("");
-    //     setQuestionBankInteract(data);
-    //     setTotalPages(data.numOfItems);
-    //     setLoading(false);
-    //   });
-    // else if (filterUserNameValue !== "")
-    //   await GetMultipleReportsWithUserName(
-    //     roleData.permission,
-    //     userData.id,
-    //     rowsPerPage,
-    //     page + 1,
-    //     // filter
-    //     filterAscOrDes,
-    //     filterUserNameValue
-    //   ).then((data) => {
-    //     // setFilterQuestionBankNameValue("");
-    //     setQuestionBankInteract(data);
-    //     setTotalPages(data.numOfItems);
-    //     setLoading(false);
-    //   });
-    // else
-    //   await GetMultipleReportsAscOrDes(
-    //     roleData.permission,
-    //     userData.id,
-    //     rowsPerPage,
-    //     newPage + 1,
-    //     filterAscOrDes
-    //   ).then((data) => {
-    //     console.log("Error: ", data);
-    //     setQuestionBankInteract(data);
-    //     setLoading(false);
-    //   });
 
     await GetMultipleReportsFilteredAscOrDes(
       userData.id,
@@ -700,11 +640,6 @@ const Report: React.FC = () => {
       setTotalPages(data.numOfItems);
       // setLoading(false);
     });
-    // const newReportDTO = data;
-    // setQuestionBankInteract(data);
-    // setLoading(false);
-    // console.log("Error: ", data);
-    // }
   };
 
   const handleChangeRowsPerPage = async (
@@ -910,7 +845,7 @@ const Report: React.FC = () => {
                     </Box>
                   </StyledTableCell>
 
-                  <StyledTableCell align="right" >
+                  <StyledTableCell align="right">
                     <div style={{ flexDirection: "column" }}>
                       <Box
                         sx={{
@@ -992,10 +927,7 @@ const Report: React.FC = () => {
                     </div>
                   </StyledTableCell>
 
-                  <StyledTableCell
-                    align="right"
-                    
-                  >
+                  <StyledTableCell align="right">
                     <div style={{ flexDirection: "column" }}>
                       <Box
                         sx={{
@@ -1342,6 +1274,8 @@ const Report: React.FC = () => {
                     userData={userData}
                     totalScore={totalScore}
                     handleResultShow={handleResultShow}
+                    similarQuestionBankInteract = {similarQuestionBankInteract}
+                    setSimilarQuestionBankInteract = {setSimilarQuestionBankInteract}
                   />
                 ))}
               </TableBody>

@@ -22,6 +22,8 @@ import {
   updatedJSON,
   setStatusAfterJoin,
   setEnableStatusQuestionBank,
+  DeleteReportAndAllowRedo,
+  UserDTO,
 } from "../../../services/dataService/dataService";
 import { useNavigate } from "react-router-dom";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
@@ -33,10 +35,25 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
   userData,
   totalScore,
   handleResultShow,
+  similarQuestionBankInteract,
+  setSimilarQuestionBankInteract,
 }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  const handleRemoveReport = async (reportId: number) => {
+    const newUserData = new UserDTO(userData.id, "", "", "", false, 0);
+    setLoading(true);
+    await DeleteReportAndAllowRedo(newUserData, reportId).then((data) => {
+      setSimilarQuestionBankInteract(similarQuestionBankInteract.filter((item: { id: any; }) => item.id !== row.id))
+      setLoading(false)
+    });
+  };
 
   return (
+    // {!loading  && (
+      
+    // )}
     <StyledTableRow key={row.id}>
       <StyledTableCell component="th" scope="row">
         {row.id}
@@ -65,6 +82,27 @@ const RowComponent_Report_Interactions: React.FC<any> = ({
             }}
           >
             Show Question Results
+          </Button>
+        </Box>
+      </StyledTableCell>
+
+      <StyledTableCell component="th" scope="row" align="left">
+        <Box sx={{ justifyContent: "space-between" }}>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            sx={{
+              marginLeft: 2,
+              // backgroundColor: "lightblue",
+              // color: "#333",
+              ":hover": { backgroundColor: "lightblue" },
+            }}
+            onClick={(e) => {
+              handleRemoveReport(row.id);
+            }}
+          >
+            Delete Report And Allow Redo
           </Button>
         </Box>
       </StyledTableCell>

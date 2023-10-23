@@ -382,7 +382,6 @@ interface ItemsDTO {
   endDate: string;
   dateTimeNow: string;
   resultScores: number;
-
 }
 
 interface MultipleReportDTO {
@@ -861,7 +860,7 @@ export async function GetMultipleReportsFilteredAscOrDes(
   ascendingOrNot: boolean,
   ownerName: string,
   surveyName: string,
-  userName: string,
+  userName: string
 ): Promise<MultipleReportWithPagination> {
   return axios
     .get(
@@ -1308,6 +1307,23 @@ export async function GetQuestionsByQuestionBankId(questionBankId: number) {
 export async function deleteQuestionById(id: string): Promise<Boolean> {
   return axios
     .delete(`https://localhost:7232/DeleteQuestion?id=${id}`)
+    .then((response) => {
+      return true;
+    })
+    .catch((error) => {
+      console.log(error);
+      return false;
+    });
+}
+
+export async function DeleteReportAndAllowRedo(
+  user: UserDTO,
+  id: number
+): Promise<Boolean> {
+  return axios
+    .delete(`https://localhost:7232/DeleteReportAndAllowRedo?id=${id}`, {
+      data: user,
+    })
     .then((response) => {
       return true;
     })

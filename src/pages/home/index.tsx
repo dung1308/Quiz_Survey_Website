@@ -67,6 +67,7 @@ function Home() {
   const [allQuestionBank, setAllQuestionBank] = useState<QuestionBank[]>([]);
   const [wrongSurveyCode, setWrongSurveyCode] = useState(false);
   const [alreadyParticipated, setAlreadyParticipated] = useState(false);
+  const [isDoneAnswer, setIsDoneAnswer] = useState(false);
   const newData =
     localStorage.getItem("currentUser") ??
     JSON.stringify(
@@ -93,9 +94,10 @@ function Home() {
       }
       console.log("This is: ", userData);
       console.log(data.participantIdList);
-      if (!data.participantIdList.includes(userData.id) || data.participantIdList === null)
-        navigate(`/answer_page/${surveyId}`);
-      else setAlreadyParticipated(true);
+      if (data.participantIdList.includes(userData.id))
+        setAlreadyParticipated(true);
+      else if (data.userDoneIdList.includes(userData.id)) setIsDoneAnswer(true);
+      else navigate(`/answer_page/${surveyId}`);
     });
   };
   const handleParticipantJoin = async () => {
@@ -146,6 +148,13 @@ function Home() {
           {alreadyParticipated && (
             <Typography variant="caption" color="error">
               You already particpated this survey
+            </Typography>
+          )}
+
+          {isDoneAnswer && (
+            <Typography variant="caption" color="error">
+              You have answered this survey. Contact the mananger of this survey
+              to redo it.
             </Typography>
           )}
           <TextField

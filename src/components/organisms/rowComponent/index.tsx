@@ -54,6 +54,7 @@ const RowComponent: React.FC<any> = ({
   const [inviteUserName, setInviteUserName] = useState("");
   const [joinSurveyCode, setJoinSurveyCode] = useState("");
   const [isBusyAnswer, setIsBusyAnswer] = useState(false);
+  const [isDoneAnswer, setIsDoneAnswer] = useState(false);
   const [errorInvite, setErrorInvite] = useState("");
 
   const [joinDisable, setJoinDisable] = useState(
@@ -126,16 +127,19 @@ const RowComponent: React.FC<any> = ({
   const buttonJoinWindowClose = () => {
     setOpenJoin(false);
     setIsBusyAnswer(false);
+    setIsDoneAnswer(false);
   };
 
   const buttonInviteWindowOpen = () => {
     setOpen(true);
     setIsBusyAnswer(false);
+    setIsDoneAnswer(false);
   };
 
   const buttonInviteWindowClose = () => {
     setOpen(false);
     setIsBusyAnswer(false);
+    setIsDoneAnswer(false);
   };
 
   const handleInvite = async () => {
@@ -160,9 +164,10 @@ const RowComponent: React.FC<any> = ({
       if (typeof data === "string" && data !== "") {
         return;
       }
-      if (!data.participantIdList.includes(userData.id))
-        navigate(`/answer_page/${row.id}`);
-      else setIsBusyAnswer(true);
+      if (data.participantIdList.includes(userData.id)) setIsBusyAnswer(true);
+      else if (data.userDoneIdList.includes(userData.id)) setIsDoneAnswer(true);
+      else navigate(`/answer_page/${row.id}`);
+
       // navigate(`/answer_page/${row.id}`);
     });
     // } else setWrongSurveyCode(true);
@@ -193,21 +198,23 @@ const RowComponent: React.FC<any> = ({
       </StyledTableCell>
       <StyledTableCell align="center">
         <Box sx={{ justifyContent: "space-between" }}>
-          <Button
-            disabled={enable_Edit_Disable || !isOwner}
-            variant="contained"
-            color="secondary"
-            href={`/edit/${row.id}`}
-            size="small"
-            sx={{
-              marginLeft: 2,
-              backgroundColor: "lightblue",
-              color: "#333",
-              ":hover": { backgroundColor: "skyblue" },
-            }}
-          >
-            edit
-          </Button>
+          {userData.userName === row.owner && (
+            <Button
+              disabled={enable_Edit_Disable || !isOwner}
+              variant="contained"
+              color="secondary"
+              href={`/edit/${row.id}`}
+              size="small"
+              sx={{
+                marginLeft: 2,
+                backgroundColor: "lightblue",
+                color: "#333",
+                ":hover": { backgroundColor: "skyblue" },
+              }}
+            >
+              edit
+            </Button>
+          )}
 
           {/* <Button variant="contained" color="primary" href={`/answer_page/${userId}/${row.id}`} size="small"  */}
           <Button
@@ -259,23 +266,24 @@ const RowComponent: React.FC<any> = ({
           >
             invite
           </Button> */}
-
-          <Button
-            disabled={enable_Edit_Disable}
-            variant="contained"
-            color={enabled ? "warning" : "error"}
-            onClick={buttonHandler}
-            size="small"
-            sx={{
-              marginLeft: 2,
-              backgroundColor: enabled ? "#e0e0e0" : "#ccc",
-              color: enabled ? "#333" : "#666",
-              opacity: enabled ? 1 : 0.5,
-              ":hover": { backgroundColor: "#ccc" },
-            }}
-          >
-            {enabled && !enable_Edit_Disable ? "Disabled" : "Enabled"}
-          </Button>
+          {userData.userName === row.owner && (
+            <Button
+              disabled={enable_Edit_Disable}
+              variant="contained"
+              color={enabled ? "warning" : "error"}
+              onClick={buttonHandler}
+              size="small"
+              sx={{
+                marginLeft: 2,
+                backgroundColor: enabled ? "#e0e0e0" : "#ccc",
+                color: enabled ? "#333" : "#666",
+                opacity: enabled ? 1 : 0.5,
+                ":hover": { backgroundColor: "#ccc" },
+              }}
+            >
+              {enabled && !enable_Edit_Disable ? "Disabled" : "Enabled"}
+            </Button>
+          )}
         </Box>
       </StyledTableCell>
       <StyledTableCell align="center">{row.status}</StyledTableCell>
@@ -327,6 +335,12 @@ const RowComponent: React.FC<any> = ({
             <Typography variant="caption" color="error">
               You are busy answering a survey. Complete your survey first before
               joining
+            </Typography>
+          )}
+
+          {isDoneAnswer && (
+            <Typography variant="caption" color="error">
+              You have answered this survey. Contact the mananger of this survey to redo it.
             </Typography>
           )}
           {/* <TextField

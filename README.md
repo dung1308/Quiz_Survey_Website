@@ -48,3 +48,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 # NPM Workaround for warning error
 
 npm install --save-dev @babel/plugin-proposal-private-property-in-object
+
+# Docker deploy (After Create DockerFile)
+
+docker compose up -d
