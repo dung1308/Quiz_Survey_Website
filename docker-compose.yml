@@ -1,11 +1,11 @@
-version: "3.4"
+version: '3.8'
 
 services:
-  frontend:
+  surveyquizapp:
     build:
-        context: ./
-    container_name: frontend
+      context: ./
+      dockerfile: ./Dockerfile
     ports:
-      - "3000:80" # map 80 in container => 3000 in local
-    
-    command: "npm run dev"
+      - 3000:80
+      - 9229:9229
+    command: ["npm", "run", "dev"]
